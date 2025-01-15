@@ -2,31 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
-   
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
-} 
-:root {
-  background: #EBDFD7;
-}  
-body, p {
-  font-family: var(--font-AeoniK-Light);
-  line-height: normal;
 }
-
+:root {
+  background: #ebdfd7;
+}
+/* body,
+p {
+  font-family: var(--font-AeoniK-Regular);
+  line-height: normal;
+} */
 
 .login-button {
   color: #fff;
   line-height: normal;
   border-radius: 49px;
   font-family: var(--font-AeoniK-Bold);
-  background: #E65F2B;
+  background: #e65f2b;
   font-size: 18px;
   height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 10px 30px;
+}
+.sideNav {
+  width: 260px;
+  transition: width 0.3s ease;
+  background-color: #060606;
+  padding: 35px 46px 30px 30px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.sideNav.collapsed {
+  width: 80px;
+  padding: 35px 15px;
+}
+.sideNav.collapsed .navList li a {
+  display: inline-block; 
+  padding: 10px;
+  grid-gap: 0; 
+}
+.navList li a {
+  display: flex;
+  align-items: center;
+  padding: 13px 26px 13px 16px;
+  border-radius: 24px;
+  grid-gap: 16px;
+  color: #fff;
+  font-size: 14px;
+}
+.navList li {
+  margin-bottom: 10px;
+}
+.navList li.active a {
+  background: #fff;
+  color: #e65f2b;
+}
+.navList li.active svg path {
+  fill: #e65f2b;
+}
+@media screen and (max-width: 1023px) {
+  .sideNav {
+    position: fixed;
+    left: -110%;
+    transition: 0.3s ease;
+    top: 66px;
+    height: calc(100vh - 66px);
+  }
+  .sideNav.collapsed ul.navList {
+    width: 100%;
+    margin: 15px auto 0;
+  }
+  .sideNav.collapsed {
+    width: 300px;
+    padding: 20px 20px 20px 20px;
+    left: 0;
+    z-index: 400;
+  }
 }

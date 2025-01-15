@@ -56,7 +56,7 @@ export default function Page() {
                 <form onSubmit={handleSubmit}>
                   <InputField
                     type="text"
-                    label="Phone Number / Email Address"
+                    label="Email Address"
                     value={username}
                     placeholder="loewmipsaume@dummymail.com"
                     onChange={handleChange}

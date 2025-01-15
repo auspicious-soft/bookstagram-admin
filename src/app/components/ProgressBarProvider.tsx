@@ -19,7 +19,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
       {mounted && (
         <ProgressBar
           height="4px"
-          color="#1657FF"
+          color="#E65F2B"
           options={{ showSpinner: false }}
           shallowRouting
         />
