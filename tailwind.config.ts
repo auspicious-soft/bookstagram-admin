@@ -11,7 +11,24 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        orange: "#E65F2B",
+        darkBlack: "#060606"
       },
+      fontFamily: {
+        aeonikBold: ['var(--font-AeoniK-Bold)'],
+        aeonikRegular: ['var(--font-AeoniK-Regular)'],
+        aeonikLight: ['var(--font-AeoniK-Light)'],
+      },
+      container: {
+        center: true,
+        padding: {
+          DEFAULT: '18px',
+          sm: '18px',
+          md: '25px',
+          lg: '30px',
+          xl: '40px',
+        },
+      }
     },
   },
   plugins: [],
