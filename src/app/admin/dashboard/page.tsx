@@ -101,7 +101,7 @@ const Page = () => {
            </div>
            <div className='bg-[#F2EAE5] rounded-[14px] mt-5 p-[18px] pb-7 '>
            <div className='flex justify-between items-center pb-2'>
-            <h2 className='text-[22px] text-darkBlack '>New Users</h2>
+            <h2 className='text-base text-darkBlack '>New Users</h2>
             <div>
                 <select name="" className="py-[9px] px-[14px] rounded-[17px] ">
                 <option value="">Last 30 days</option>

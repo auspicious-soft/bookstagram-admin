@@ -21,10 +21,10 @@ const Header: React.FC = () => {
     
   };
   const getPageName = (path: string): string => {
-    // if (path.startsWith("/admin/customers/profile/")) {
-    //   return t("customers");
-    // }
-    return pageNames[path] || "fkjgjkf";
+    if (path.startsWith("/admin/book-hub/profile/")) {
+      return "Single Book";
+    }
+    return pageNames[path] || "Bookstagram";
   };
   const currentPageName = getPageName(pathname);
   // const currentPageName = pageNames[pathname] || t("projects");

@@ -120,7 +120,7 @@ export const SideBarIcon = () =>(
 export const HamburgerIcon=() => (
   <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
   <g id="hamburg-icon">
-  <path id="Vector" d="M5.15625 8.90625H24.8438M5.15625 21.0938H24.8438" stroke="#E65F2B" strokeWidth="2" strokeMiterlimit="10" strokeLinecap="round"/>
+  <path id="Vector" d="M5.15625 8.90625H24.8438M5.15625 21.0938H24.8438" stroke="var(--tw-bg-orange)" strokeWidth="2" strokeMiterlimit="10" strokeLinecap="round"/>
   <path id="Vector_2" d="M5.15625 15H24.8438" stroke="#fff" strokeWidth="2" strokeMiterlimit="10" strokeLinecap="round"/>
   </g>
   </svg>
@@ -162,8 +162,24 @@ export const DashboardIcon4=() => (
 </svg>
 );
 export const NewBookIcon =() => (
-<svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="34" height="34" rx="17" fill="#E65F2B"/>
-<path fill-rule="evenodd" clip-rule="evenodd" d="M17 8C17.5523 8 18 8.44772 18 9V16H25C25.5523 16 26 16.4477 26 17C26 17.5523 25.5523 18 25 18H18V25C18 25.5523 17.5523 26 17 26C16.4477 26 16 25.5523 16 25V18H9C8.44772 18 8 17.5523 8 17C8 16.4477 8.44772 16 9 16H16V9C16 8.44772 16.4477 8 17 8Z" fill="white"/>
+<svg width={34} height={34} viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width={34} height={34} rx={17} fill="var(--tw-bg-orange)" />
+  <path fillRule="evenodd" clipRule="evenodd" d="M17 8C17.5523 8 18 8.44772 18 9V16H25C25.5523 16 26 16.4477 26 17C26 17.5523 25.5523 18 25 18H18V25C18 25.5523 17.5523 26 17 26C16.4477 26 16 25.5523 16 25V18H9C8.44772 18 8 17.5523 8 17C8 16.4477 8.44772 16 9 16H16V9C16 8.44772 16.4477 8 17 8Z" fill="white" />
+</svg>
+
+);
+export const SearchIcon =()=>(
+<svg xmlns="http://www.w3.org/2000/svg" width={14} height={14} viewBox="0 0 14 14" fill="none">
+  <path d="M13 13L11.8 11.8M6.7 12.4C7.44853 12.4 8.18974 12.2526 8.8813 11.9661C9.57285 11.6797 10.2012 11.2598 10.7305 10.7305C11.2598 10.2012 11.6797 9.57285 11.9661 8.8813C12.2526 8.18974 12.4 7.44853 12.4 6.7C12.4 5.95147 12.2526 5.21026 11.9661 4.5187C11.6797 3.82715 11.2598 3.19879 10.7305 2.66949C10.2012 2.1402 9.57285 1.72034 8.8813 1.43389C8.18974 1.14743 7.44853 1 6.7 1C5.18827 1 3.73845 1.60053 2.66949 2.66949C1.60053 3.73845 1 5.18827 1 6.7C1 8.21173 1.60053 9.66155 2.66949 10.7305C3.73845 11.7995 5.18827 12.4 6.7 12.4V12.4Z" stroke="#6E6E6E" strokeLinecap="round" strokeLinejoin="round" />
+</svg>
+);
+export const PlusIcon =()=>(
+<svg width={16} height={16} viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M8.00004 3.33325V12.6666M3.33337 7.99992H12.6667" stroke="white" strokeLinecap="round" strokeLinejoin="round" />
+</svg>
+);
+export const DropWhite =() => (
+<svg width={18} height={18} viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M4.5 6.75L9 11.25L13.5 6.75" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
 </svg>
 );

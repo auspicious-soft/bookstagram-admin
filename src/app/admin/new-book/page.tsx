@@ -1,10 +1,10 @@
 import React from 'react';
-import BookHub from '../components/(book-hub-tabs)/BookHub';
+import AddNewBook from '../components/AddNewBook';
 
 const Page = () => {
     return (
         <div>
-           <BookHub/>
+            <AddNewBook/>
         </div>
     );
 }

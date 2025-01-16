@@ -30,10 +30,11 @@ const SideNav = () => {
   //   router.push('/login');
   // }
   return (
+    <div className="relative h-full">
+      <button onClick={toggleSidebar} className="hide-content absolute top-[30px] -right-2.5 z-10 ">
+        <SideBarIcon/>
+      </button>
     <div className={`sideNav ${isCollapsed ? 'collapsed' : ''} h-[100%] overflo-custom relative`}>
-          <button onClick={toggleSidebar} className="hide-content absolute top-[30px] -right-4 z-10 ">
-            <SideBarIcon/>
-          </button>
       <div className="">
           {!isCollapsed && (
         <div className="mb-[71px] ">
@@ -42,10 +43,12 @@ const SideNav = () => {
               </Link>
             </div> 
           )}
+           {!isCollapsed && (
           <div className="mb-[60px] ">
-           <button className="flex gap-2.5 p-[7px] items-center bg-white text-darkBlack w-full rounded-[24px] text-sm ">
-            <NewBookIcon/>Add a new book </button> 
+           <Link href="/admin/new-book" className="flex gap-2.5 p-[7px] items-center bg-white text-darkBlack w-full rounded-[24px] text-sm ">
+            <NewBookIcon/>Add a new book </Link> 
           </div>
+           )}
         <ul className="navList">
           <li className={isActive('/admin/dashboard')}>
             <Link href="/admin/dashboard">
@@ -74,6 +77,7 @@ const SideNav = () => {
          
         </ul>
       </div>
+    </div>
     </div>
   );
 };

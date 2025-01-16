@@ -52,7 +52,7 @@ export default async function RootLayout({
           
           <div className="flex-grow md:overflow-y-auto">
             <Header />
-            <div className="p-4 lg:h-[calc(100vh-116px)] overflow-y-auto pb-10 lg:pb-10 lg:px-10">
+            <div className="p-4 lg:h-[calc(100vh-96px)] overflow-y-auto overflo-custom  lg:pb-9 lg:pt-6 lg:px-[30px]">
               {children}
             </div>
           </div>

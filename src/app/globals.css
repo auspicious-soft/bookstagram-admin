@@ -9,6 +9,8 @@
 }
 :root {
   background: #ebdfd7;
+  --tw-bg-orange: #F96915; 
+  --tw-bg-darkBlack: #060606;
 }
 /* @font-face {
   font-family: 'Aeonik Bold';
@@ -47,7 +49,7 @@ p {
   line-height: normal;
   border-radius: 49px;
   font-family: var(--font-AeoniK-Bold);
-  background: #e65f2b;
+  background: var(--tw-bg-orange);
   font-size: 18px;
   height: 50px;
   display: flex;
@@ -82,10 +84,10 @@ p {
 }
 .navList li.active a {
   background: #fff;
-  color: #e65f2b;
+  color: var(--tw-bg-orange);
 }
 .navList li.active svg path {
-  fill: #e65f2b;
+  fill: var(--tw-bg-orange);
 }
 input:focus-visible,
 select:focus-visible,
@@ -111,26 +113,55 @@ font-family: var(--font-AeoniK-Bold);
 .table-normal th, .table-normal td {
 padding: 16px 18px;
 }
+.table-common {
+  border-radius: 20px;
+  background: #FFF;
+  padding: 24px 18px 9px;
+}
 .table-common table {
   width: 100%;
   min-width: 800px;
   background: #ffffff;
 }
-.table-common table tbody tr:nth-child(odd) {
-  background: #f3f6ff;
+.table-common table tbody tr:nth-child(even) {
+  background: #F5FAFF;
 }
 .table-common table thead tr th {
-  color: #3b3f88;
+  color: #7F7F8A;
   font-weight: normal;
   text-align: left;
-  font-size: 16px;
-  font-family: var(--font-AeoniK-Bold);
-  padding: 30px 20px 17px;
+  font-size: 12px;
+  padding: 10px 16px;
+}
+.table-common table thead tr {
+  border-bottom: 1px dashed #D0D0D0;
 }
 th, td {
   padding: 12px 18px;
   color: #060606;
   white-space: nowrap;
+}
+.table-common h3 {
+  color: #151D48;
+  font-family: var(--font-AeoniK-Bold);
+  margin-bottom: 10px;
+  font-size: 20px;
+}
+.table-common th, .table-common td {
+  padding: 12px 14px;
+  font-size: 12px;
+}
+.table-common tr td:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px; 
+}
+.table-common tr td:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px; 
+}
+.table-common tr td:not(:first-child):not(:last-child) {
+    border-left: none;
+    border-right: none;
 }
 .overflo-custom::-webkit-scrollbar-track {
   background-color: #ffffff;
@@ -146,7 +177,22 @@ th, td {
   background-color: #283c6355;
   height: 6px;
 }
-
+.main-form label {
+display: block;
+color: #060606; 
+font-size: 14px; 
+}
+.main-form input,
+.main-form select,
+.main-form textarea {
+  margin-top: 5px;
+  border-radius: 10px;
+  background: #F5F5F5;
+  padding: 12px 15px;
+  width: 100%;
+  color: #6E6E6E;
+  font-size: 14px;
+}
 @media screen and (min-width: 1024px) {
   .sideNav.collapsed .navList li a {
     display: inline-block;
@@ -159,8 +205,8 @@ th, td {
     position: fixed;
     left: -110%;
     transition: 0.3s ease;
-    top: 66px;
-    height: calc(100vh - 66px);
+    top: 54px;
+    height: calc(100vh - 54px);
   }
   .sideNav.collapsed ul.navList {
     width: 100%;
