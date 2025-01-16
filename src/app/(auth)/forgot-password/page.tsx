@@ -1,23 +1,24 @@
 "use client";
 
-import React, { useState, useTransition } from "react";  
+// import React, { useState, useTransition } from "react";  
 import Image from "next/image";
 import Logo from "@/assets/images/logo.png";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+// import { useRouter } from "next/navigation";
+// import { toast } from "sonner";
 import InputField from "../components/InputField";
 import LoginImage from "../components/LoginImage";
+import { useState } from "react";
 
 export default function Page() { 
-    const router = useRouter()
+    // const router = useRouter()
     const [username, setUsername] = useState("")
-    const [isPending, startTransition] = useTransition()
-    const handleChange = (e: any) => {
-      setUsername(e.target.value)
+    // const [isPending, startTransition] = useTransition()
+    const handleChange = () => {
+      setUsername(username)
     }
   
-  const handleSubmit = (e: any) => {
-    e.preventDefault()
+  const handleSubmit = () => {
+    // e.preventDefault()
     // startTransition(async () => {
     //   try {
     //     const response = await forgotPasswordService({ username })
@@ -63,7 +64,7 @@ export default function Page() {
                   />
    
                   <button type="submit" className="login-button  w-full">
-                  {!isPending ? "Confirm" : "Confirm..."}
+                  Confirm
                   </button>
                 </form>
               </div>

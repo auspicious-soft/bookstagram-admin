@@ -35,8 +35,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${AeonikBold.variable} ${AeonikRegular.variable} ${AeonikLight.variable} `}
-      >
+        className={`${AeonikBold.variable} ${AeonikRegular.variable} ${AeonikLight.variable} `}>
         <SessionProvider session={session}>
           <Providers>{children}</Providers>
         </SessionProvider>

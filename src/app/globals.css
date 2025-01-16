@@ -10,11 +10,37 @@
 :root {
   background: #ebdfd7;
 }
-/* body,
+/* @font-face {
+  font-family: 'Aeonik Bold';
+  src: url('/public/assets/fonts/AeonikProBold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Aeonik Regular';
+  src: url('/public/assets/fonts/AeonikProRegular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Aeonik Light';
+  src: url('/public/assets/fonts/AeonikProLight.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+}
+:root {
+  --font-AeoniK-Bold: 'Aeonik Bold', sans-serif;
+  --font-AeoniK-Regular: 'Aeonik Regular', sans-serif;
+  --font-AeoniK-Light: 'Aeonik Light', sans-serif;
+} */
+
+body,
 p {
   font-family: var(--font-AeoniK-Regular);
   line-height: normal;
-} */
+}
 
 .login-button {
   color: #fff;
@@ -42,11 +68,6 @@ p {
   width: 80px;
   padding: 35px 15px;
 }
-.sideNav.collapsed .navList li a {
-  display: inline-block; 
-  padding: 10px;
-  grid-gap: 0; 
-}
 .navList li a {
   display: flex;
   align-items: center;
@@ -65,6 +86,73 @@ p {
 }
 .navList li.active svg path {
   fill: #e65f2b;
+}
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+}
+
+.table-common, .table-normal {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; 
+}
+.table-normal table {
+  background: transparent;
+  width: 100%;
+  min-width: 800px;
+}
+.table-normal table thead tr {
+  border-bottom: 1px solid #D9CEC6;
+}
+.table-normal table thead tr th {
+font-family: var(--font-AeoniK-Bold);
+}
+.table-normal th, .table-normal td {
+padding: 16px 18px;
+}
+.table-common table {
+  width: 100%;
+  min-width: 800px;
+  background: #ffffff;
+}
+.table-common table tbody tr:nth-child(odd) {
+  background: #f3f6ff;
+}
+.table-common table thead tr th {
+  color: #3b3f88;
+  font-weight: normal;
+  text-align: left;
+  font-size: 16px;
+  font-family: var(--font-AeoniK-Bold);
+  padding: 30px 20px 17px;
+}
+th, td {
+  padding: 12px 18px;
+  color: #060606;
+  white-space: nowrap;
+}
+.overflo-custom::-webkit-scrollbar-track {
+  background-color: #ffffff;
+  height: 6px;
+}
+.overflo-custom::-webkit-scrollbar {
+  width: 6px;
+  background-color: #283c63;
+  height: 6px;
+}
+.overflo-custom::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background-color: #283c6355;
+  height: 6px;
+}
+
+@media screen and (min-width: 1024px) {
+  .sideNav.collapsed .navList li a {
+    display: inline-block;
+    padding: 10px;
+    grid-gap: 0;
+  }
 }
 @media screen and (max-width: 1023px) {
   .sideNav {

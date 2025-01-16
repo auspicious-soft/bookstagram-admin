@@ -2,18 +2,20 @@
 import { useState } from "react";
 import { usePathname } from 'next/navigation'; 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { DashboardIcon } from "@/utils/svgicons";
+// import { useRouter } from "next/navigation";
+import { DashboardIcon, HamburgerIcon } from "@/utils/svgicons";
+import Image from "next/image";
+import logo from '@/assets/images/logo.png';
 
 const MobileHeader = () => {
-  const router = useRouter();
+  // const router = useRouter();
   const pathname = usePathname(); 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    router.push('https://blacktherapy.vercel.app/');
-  };
+  // const handleLogout = () => {
+    // localStorage.removeItem('authToken');
+    // router.push('https://blacktherapy.vercel.app/');
+  // };
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -22,19 +24,20 @@ const MobileHeader = () => {
   const isActive = (path: string) => pathname === path ? 'active' : '';
 
   const handleLinkClick = (path: string) => {
+    console.log('path:', path);
     setIsCollapsed(false); // Collapse sidebar after clicking a link
   };
 
   return ( 
     <>
-      <div className="header min-h-[46px] justify-between gap-[10px] py-[10px] px-[15px] bg-white">
+      <div className="header flex justify-between gap-[10px] py-3 p-5 bg-darkBlack">
         <div className="logoContainer">
           <Link href="/admin/dashboard" onClick={() => handleLinkClick("/")}>
-            Logo
+           <Image src={logo} alt="logo" width={150} height={30} />
           </Link>
         </div>
         <button onClick={toggleSidebar} className="hamburgerButton">
-        |||
+       <HamburgerIcon/>
         </button>
       </div>
 

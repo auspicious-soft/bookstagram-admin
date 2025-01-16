@@ -15,6 +15,7 @@
     "next-nprogress-bar": "^2.4.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-loading": "^2.0.3",
     "sonner": "^1.7.1"
   },
   "devDependencies": {
