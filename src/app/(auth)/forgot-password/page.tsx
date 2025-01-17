@@ -1,40 +1,40 @@
 "use client";
 
-// import React, { useState, useTransition } from "react";  
+import React, { useState, useTransition } from "react";  
 import Image from "next/image";
 import Logo from "@/assets/images/logo.png";
-// import { useRouter } from "next/navigation";
-// import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import InputField from "../components/InputField";
 import LoginImage from "../components/LoginImage";
-import { useState } from "react";
+import { forgotPasswordService } from "@/services/admin-services";
 
 export default function Page() { 
-    // const router = useRouter()
+    const router = useRouter()
     const [username, setUsername] = useState("")
-    // const [isPending, startTransition] = useTransition()
-    const handleChange = () => {
-      setUsername(username)
-    }
-  
-  const handleSubmit = () => {
-    // e.preventDefault()
-    // startTransition(async () => {
-    //   try {
-    //     const response = await forgotPasswordService({ username })
-    //     if (response?.status === 200) {
-    //       toast.success(t('otpSentSuccess'))
-    //       router.push('/otp')
-    //     }
-    //     else {
-    //       toast.error(t("somethingWentWrong"))
-    //     }
-    //   }
-    // catch (err: any) {
-    //     if (err.status == 404) toast.error('UserName not found')
-    //     else toast.error(t('somethingWentWrong'))
-    //   }
-    // })
+    const [isPending, startTransition] = useTransition()
+
+  const handleChange = (e: any) => {
+    setUsername(e.target.value)
+  }
+  const handleSubmit = (e: any) => {
+    e.preventDefault()
+    startTransition(async () => {
+      try {
+        const response = await forgotPasswordService({ username })
+        if (response?.status === 200) {
+          toast.success("OTP send successfully")
+          router.push('/otp')
+        }
+        else {
+          toast.error("Something went wrong")
+        }
+      }
+    catch (err: any) {
+        if (err.status == 404) toast.error('Username not found')
+        else toast.error("Something went wrong")
+      }
+    })
   }
   
   return (
@@ -54,7 +54,7 @@ export default function Page() {
             </h2>
             <div className="login rounded-[20px] bg-white">
               <div className="">
-                <form onSubmit={handleSubmit}>
+                <form>
                   <InputField
                     type="text"
                     label="Email Address"
@@ -63,7 +63,7 @@ export default function Page() {
                     onChange={handleChange}
                   />
    
-                  <button type="submit" className="login-button  w-full">
+                  <button disabled={isPending} onClick={handleSubmit} className="login-button  w-full">
                   Confirm
                   </button>
                 </form>

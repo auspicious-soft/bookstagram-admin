@@ -7,6 +7,7 @@ import useSWR from 'swr';
 import { getBookEvents } from "@/services/admin-services";
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 import SearchBar from "./SearchBar";
+import TablePagination from "./TablePagination";
 
 const BooksEvents = () => {
  
@@ -14,7 +15,6 @@ const BooksEvents = () => {
   const [query, setQuery] =useState('')
   const { data , error, isLoading, mutate } = useSWR(`/admin/events?description=${query}`, getBookEvents);
  const  events = data?.data?.data;
- console.log('events: ', events);
   return (
     
 
@@ -77,9 +77,12 @@ const BooksEvents = () => {
             </div>
           ))}
         </div>
-
+        <div className="w-full flex justify-end">
+      <TablePagination/>
+          </div>
+          
         {/* Pagination */}
-        <div className="mt-8 flex justify-end items-center gap-2">
+        {/* <div className="mt-8 flex justify-end items-center gap-2">
           <button className="px-3 py-1 rounded border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50">
             Prev
           </button>
@@ -99,7 +102,7 @@ const BooksEvents = () => {
           <button className="px-3 py-1 rounded border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50">
             Next
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

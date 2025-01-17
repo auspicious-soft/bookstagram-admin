@@ -38,8 +38,10 @@ export default async function RootLayout({
         className={`${AeonikBold.variable} ${AeonikRegular.variable} ${AeonikLight.variable} `}>
 
         <SessionProvider session={session}>
-        <Toaster richColors />
-          <Providers>{children}</Providers>
+          <Providers>
+            {children}
+          <Toaster richColors />
+          </Providers>
         </SessionProvider>
       </body>
     </html>

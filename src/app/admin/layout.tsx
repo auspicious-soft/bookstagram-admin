@@ -5,6 +5,9 @@ import SideNav from "./components/SideNav";
 import MobileHeader from "./components/MobileHeader";
 import Header from "./components/Header";
 import localFont from "next/font/local";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
+import Link from "next/link";
 // import { auth } from "@/auth";
 
 const AeonikBold = localFont({
@@ -29,33 +32,32 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  // const session = await auth();
+  const session = await auth(); 
 
-  // if (!session) {
-  //   redirect("/");
-  // }
+  if (!session) {
+    redirect("/");
+  }
 
-  // const userRole = (session as any)?.user?.role;
-  // const restrictedRoles = ['user']; 
+  const userRole = (session as any)?.user?.role;
+  const restrictedRoles = ['user']; 
   
-  // // Check if user has restricted role
-  // if (restrictedRoles.includes(userRole)) 
-  //   {
-  //   return (
-  //     <html lang="en">
-  //       <body>
-  //         <div className="p-3 bg-black min-h-screen text-white">
-  //           <span>You are not authorized to view this page click{" "}</span>
-  //           <Link href="/" className="p-3 text-black bg-white">
-  //             Login
-  //           </Link>
-  //         </div>
-  //       </body>
-  //     </html>
-  //   );
-  // }
+  // Check if user has restricted role
+  if (restrictedRoles.includes(userRole)) 
+    {
+    return (
+      <html lang="en">
+        <body>
+          <div className="p-3 bg-black min-h-screen text-white">
+            <span>You are not authorized to view this page click{" "}</span>
+            <Link href="/" className="p-3 text-black bg-white">
+              Login
+            </Link>
+          </div>
+        </body>
+      </html>
+    );
+  }
 
-  // Main admin layout for authorized users
   return (
     <html lang="en">
       <body className={`${AeonikBold.variable} ${AeonikRegular.variable} ${AeonikLight.variable} `}>

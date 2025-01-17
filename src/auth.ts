@@ -9,7 +9,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         username: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      authorize: async (credentials:any) => {
+      authorize: async (credentials:any) => { 
         if (credentials.username) {
           return {
             username: credentials.username,
@@ -26,16 +26,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     jwt({ token, user }) {
-      if (user) {
+      if (user) { 
         token.id = user.id;
-        token.email = (user as any).email;
+        token.email = (user as any).username;
         token.fullName = (user as any).fullName;
         token.picture = (user as any).profilePic;
         token.role = (user as any).role;
       }
       return token;
     },
-    session({ session, token }) {
+    session({ session, token }) { 
       if (session.user) {
         session.user.id = token.id as string;
         (session as any).user.fullName = token.fullName;
