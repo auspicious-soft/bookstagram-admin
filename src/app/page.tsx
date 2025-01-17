@@ -4,13 +4,13 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import InputField from "./components/InputField";
-import Logo from "@/assets/images/logo.png";
-import LoginImage from "./components/LoginImage";
+import { useRouter } from "next/navigation"; 
+import Logo from "@/assets/images/logo.png"; 
 import { toast } from "sonner";
 import { useSession } from "next-auth/react";
 import { loginAction } from "@/actions";
+import InputField from "./(auth)/components/InputField";
+import LoginImage from "./(auth)/components/LoginImage";
 
 export default function Page() {
   const { data: session } = useSession();

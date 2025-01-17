@@ -1,22 +1,22 @@
 "use client";
 
-import React, { useEffect, useState, useTransition } from "react";
-import Link from "next/link"; 
+// import React, { useEffect, useState, useTransition } from "react";
+// import Link from "next/link"; 
 import Image from "next/image";
 // import { useSession } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+// import { useRouter, useSearchParams } from "next/navigation";
 
 // import { toast } from "sonner";
 // import { loginAction } from "@/actions";
 import Logo from "@/assets/images/logo.png";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import InputField from "../components/InputField";
 import LoginImage from "../components/LoginImage";
 
 export default function Page() { 
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const [isPending, startTransition] = useTransition();
+    // const router = useRouter();
+    // const searchParams = useSearchParams();
+    // const [isPending, startTransition] = useTransition();
   
     // useEffect(() => {
     //   const otp = searchParams.get('otp');
@@ -90,9 +90,12 @@ export default function Page() {
                     id="confirmPassword"
                     placeholder="Your Password" 
                   />
-                  <button type="submit" disabled={isPending} className="login-button  w-full">
-                  {!isPending ? "Change Password" : "Change Password"}
+                   <button type="submit" className="login-button  w-full">
+                   Change Password
                   </button>
+                  {/* <button type="submit" disabled={isPending} className="login-button  w-full">
+                  {!isPending ? "Change Password" : "Change Password"}
+                  </button> */}
                 </form>
               </div>
             </div>

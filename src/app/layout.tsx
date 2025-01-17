@@ -10,7 +10,6 @@ const AeonikBold = localFont({
   display: "swap",
   variable: "--font-AeoniK-Bold",
 });
-
 const AeonikRegular = localFont({
   src: "../assets/fonts/AeonikProRegular.otf",
   display: "swap",
@@ -35,8 +34,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${AeonikBold.variable} ${AeonikRegular.variable} ${AeonikLight.variable} `}
-      >
+        className={`${AeonikBold.variable} ${AeonikRegular.variable} ${AeonikLight.variable} `}>
         <SessionProvider session={session}>
           <Providers>{children}</Providers>
         </SessionProvider>

@@ -4,6 +4,8 @@ import Image from "next/image";
 import avatar from '@/assets/images/avatar.png';
 import { usePathname } from "next/navigation";
 import { DropIcon } from "@/utils/svgicons";
+import { signOut } from "next-auth/react";
+
 
 
 const Header: React.FC = () => {
@@ -11,18 +13,18 @@ const Header: React.FC = () => {
   const pathname = usePathname(); 
   const pageNames: { [key: string]: string } = {
     "/admin/dashboard": "dashboard",
-    "/admin/projects": "projects",
-    "/admin/customers": "customers",
-    "/admin/new-project": "addNewProject",
+    "/admin/book-hub": "Book Hub",
+    "/admin/categories": "Sub-Categories",
+    "/admin/collection": "Collection",
     "/admin/projects/project-profile/": "projects",
     "/admin/employees":  "Employees"
     
   };
   const getPageName = (path: string): string => {
-    if (path.startsWith("/admin/customers/profile/")) {
-      return t("customers");
+    if (path.startsWith("/admin/book-hub/profile/")) {
+      return "Single Book";
     }
-    return pageNames[path] || "fkjgjkf";
+    return pageNames[path] || "Bookstagram";
   };
   const currentPageName = getPageName(pathname);
   // const currentPageName = pageNames[pathname] || t("projects");
@@ -31,7 +33,7 @@ const Header: React.FC = () => {
     <header className="flex justify-between items-center p-[15px] lg:px-[30px] lg:py-[23px] border-b border-[#D9CEC6] ">
      
       <div className="flex items-center justify-between w-full">
-        <h1 className="text-[32px] text-darkBlack tracking-[0.16px] capitalize">{currentPageName}</h1>  
+        <h1 className="text-[32px] text-darkBlack font-aeonikRegular tracking-[0.16px] capitalize">{currentPageName}</h1>  
         <div className="hidden lg:block relative">
           <div onClick={() => setShowData(!showData)}
           className="flex gap-2.5 items-center bg-white p-[5px] pr-5 rounded-[24px] cursor-pointer ">
@@ -50,7 +52,7 @@ const Header: React.FC = () => {
           </div>
           {showData && (
            <div className=" absolute z-[2] top-[55px] right-0 w-full h-auto bg-white p-5 rounded-lg shadow-[0_4px_4px_0_rgba(0,0,0,0.08)]">
-            <button className="text-darkBlack w-full hover:underline text-left ">Log Out</button>
+            <button onClick={() => signOut({ redirectTo: '/' })} className="text-darkBlack w-full hover:underline text-left ">Log Out</button>
           </div>
           )}
         </div>

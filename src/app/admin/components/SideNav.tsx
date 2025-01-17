@@ -3,13 +3,13 @@ import { useState } from "react";
 import { usePathname } from 'next/navigation';
 import logo from '@/assets/images/logo.png';
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { BookHubIcon, CategoryIcon, CollectionIcon, DashboardIcon, SideBarIcon,BookEventsIcon } from "@/utils/svgicons";
+// import { useRouter } from "next/navigation";
+import { BookEventsIcon, BookHubIcon, CategoryIcon, CollectionIcon, DashboardIcon, NewBookIcon, SideBarIcon } from "@/utils/svgicons";
 import Image from "next/image";
 // import { signOut } from "next-auth/react";
 
 const SideNav = () => {
-  const router = useRouter();
+  // const router = useRouter();
 
   // const handleLogout = () => {
   //   localStorage.removeItem('authToken');
@@ -25,15 +25,16 @@ const SideNav = () => {
     setIsCollapsed(!isCollapsed);
   };
   const isActive = (path: string) => pathname === path ? 'active' : '';
-  const handleLogout = async () => {
-    // await signOut({ redirect: false })
-    router.push('/login');
-  }
+  // const handleLogout = async () => {
+  //    await signOut({ redirect: false })
+  //   router.push('/login');
+  // }
   return (
+    <div className="relative h-full">
+      <button onClick={toggleSidebar} className="hide-content absolute top-[30px] -right-2.5 z-10 ">
+        <SideBarIcon/>
+      </button>
     <div className={`sideNav ${isCollapsed ? 'collapsed' : ''} h-[100%] overflo-custom relative`}>
-          <button onClick={toggleSidebar} className="hide-content absolute top-[30px] -right-4 z-10 ">
-            <SideBarIcon/>
-          </button>
       <div className="">
           {!isCollapsed && (
         <div className="mb-[71px] ">
@@ -42,6 +43,12 @@ const SideNav = () => {
               </Link>
             </div> 
           )}
+           {!isCollapsed && (
+          <div className="mb-[60px] ">
+           <Link href="/admin/new-book" className="flex gap-2.5 p-[7px] items-center bg-white text-darkBlack w-full rounded-[24px] text-sm ">
+            <NewBookIcon/>Add a new book </Link> 
+          </div>
+           )}
         <ul className="navList">
           <li className={isActive('/admin/dashboard')}>
             <Link href="/admin/dashboard">
@@ -76,6 +83,7 @@ const SideNav = () => {
          
         </ul>
       </div>
+    </div>
     </div>
   );
 };

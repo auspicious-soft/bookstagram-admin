@@ -1,17 +1,17 @@
 "use client";
 
-import React, { useState, useTransition } from "react";  
+import React, { useState } from "react";  
 import Image from "next/image";
 import Logo from "@/assets/images/logo.png";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import InputField from "../components/InputField";
+// import { useRouter } from "next/navigation";
+// import { toast } from "sonner";
+// import InputField from "../components/InputField";
 import LoginImage from "../components/LoginImage";
 
 export default function Page() { 
     const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
-    const router = useRouter()
-    const [isPending, startTransition] = useTransition()
+    // const router = useRouter()
+    // const [isPending, startTransition] = useTransition()
     const handleOtpChange = (index: number, value: string) => {
       const sanitizedValue = value.slice(-1);
   
@@ -108,7 +108,7 @@ export default function Page() {
                 ))}
               </div>
               <button type="submit" className="login-button  w-full">
-                  {!isPending ? "Confirm" : "Confirm..."}
+                  Confirm
                   </button>
             </form>
           </div>
