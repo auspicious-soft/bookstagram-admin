@@ -2,26 +2,27 @@
 
 import React, { useState, useCallback } from "react";
 import Image from "next/image";
+import { DeleteIcon } from "@/utils/svgicons";
 
 const DisplayBookEvent = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [eventName] = useState("Name of Event");
 
-const preprocessHTMLContent = (html: string) => {
+  const preprocessHTMLContent = (html: string) => {
     const updatedHTML = html.replace(
       /stroke-([a-z])/g,
       (match, p1) => `stroke${p1.toUpperCase()}`
     );
     return updatedHTML;
   };
-  
+
   const backendContent = `
 
 <p><span style="font-size: 14pt;">Lorem Ipsum Heading</span><br><br>ipsum nonummy diam accumsan magna ex dignissim sed et et exerci facilisi. ut aliquip eum feugait augue dolore Duis tincidunt vel commodo dolor consequat. illum euismod dolore veniam, nostrud minim luptatum qui sit nulla in facilisis elit, iriure hendrerit consequat, quis dolore at autem vero esse Ut feugiat nulla vulputate tation iusto erat vel ullamcorper enim in adipiscing dolor blandit te Lorem praesent eros zzril duis aliquam amet, suscipit wisi volutpat. laoreet ut eu ad nibh ea odio molestie nisl consectetuer lobortis delenit velit</p>
 <br><p><span style="font-size: 14pt;">Lorem Ipsum Heading</span><br><br>ipsum nonummy diam accumsan magna ex dignissim sed et et exerci facilisi. ut aliquip eum feugait augue dolore Duis tincidunt vel commodo dolor consequat. illum euismod dolore veniam, nostrud minim luptatum qui sit nulla in facilisis elit, iriure hendrerit consequat, quis dolore at autem vero esse Ut feugiat nulla vulputate tation iusto erat vel ullamcorper enim in adipiscing dolor blandit te Lorem praesent eros zzril duis aliquam amet, suscipit wisi volutpat. laoreet ut eu ad nibh ea odio molestie nisl consectetuer lobortis delenit velit</p>
 `;
-const safeHTML = preprocessHTMLContent(backendContent);
-console.log('safeHTML: ', safeHTML);
+  const safeHTML = preprocessHTMLContent(backendContent);
+  console.log("safeHTML: ", safeHTML);
   const handleImageUpload = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -37,7 +38,7 @@ console.log('safeHTML: ', safeHTML);
   );
 
   return (
-    <div >
+    <div>
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-6">
         {/* Left Column - Image Upload */}
         <div className="w-full md:w-80">
@@ -49,7 +50,7 @@ console.log('safeHTML: ', safeHTML);
                   alt="Event preview"
                   layout="fill"
                   objectFit="cover"
-                  className="rounded-lg"
+                  className="rounded-[20px]"
                 />
               ) : (
                 <div className="text-gray-400">
@@ -76,7 +77,7 @@ console.log('safeHTML: ', safeHTML);
                 accept="image/*"
                 onChange={handleImageUpload}
               />
-              <div className="bg-[#F96915] text-[14px] text-white text-center py-3 rounded-lg cursor-pointer hover:bg-[#F96915] transition-colors flex items-center justify-center gap-2">
+              <div className="bg-[#F96915] text-[14px] text-white text-center py-3 rounded-[28px] cursor-pointer hover:bg-[#F96915] transition-colors flex items-center justify-center gap-2">
                 Upload Image
               </div>
             </label>
@@ -85,14 +86,15 @@ console.log('safeHTML: ', safeHTML);
 
         {/* Right Column - Content */}
         <div className="flex-1">
-        <div className="w-[30%] mb-[10px]  bg-[#FF0004] rounded-[28px] text-[14px] py-3 text-white text-center  rounded-lg cursor-pointer hover:bg-[#FF0004] transition-colors flex items-center justify-center gap-2">
-       <button className="flex-col gap-[2px]">
-        {/* <Trash2 /> */}
-        Delete Event
-        </button>
-
-              </div>
-          <div className="bg-white rounded-lg p-6 shadow-sm">
+          <div className="w-full text-[14px] text-white text-center flex items-center justify-end gap-2 mb-[10px] ">
+            <div className="bg-[#FF0004] rounded-[28px] w-[211px] flex items-center justify-center cursor-pointer">
+              <button className="flex items-center justify-end gap-2  py-[16px] ">
+                <DeleteIcon />
+                <h6 className="text-[14px] font-medium">Delete Event</h6>
+              </button>
+            </div>
+          </div>
+          <div className="bg-white rounded-[20px] p-6 shadow-sm">
             {/* Event Name */}
             <div className="mb-6">
               <h1 className="text-2xl font-semibold text-gray-900">
@@ -102,7 +104,7 @@ console.log('safeHTML: ', safeHTML);
 
             {/* Lorem Ipsum Sections */}
             {/* {Array.from({ length: 5 }).map((_, index) => ( */}
-              <div  dangerouslySetInnerHTML={{ __html: safeHTML }} />
+            <div dangerouslySetInnerHTML={{ __html: safeHTML }} />
             {/* ))} */}
           </div>
         </div>

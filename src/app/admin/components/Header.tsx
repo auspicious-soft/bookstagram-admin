@@ -61,6 +61,8 @@ const Header: React.FC = () => {
 
 export default Header;
 
-function t(): string {
+function t(key: string): string {
+  // Implement your translation logic here
   throw new Error("Function not implemented.");
+  return key;
 }
