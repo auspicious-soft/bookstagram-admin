@@ -10,7 +10,6 @@ const AeonikBold = localFont({
   display: "swap",
   variable: "--font-AeoniK-Bold",
 });
-
 const AeonikRegular = localFont({
   src: "../assets/fonts/AeonikProRegular.otf",
   display: "swap",

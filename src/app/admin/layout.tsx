@@ -4,7 +4,24 @@
 import SideNav from "./components/SideNav";
 import MobileHeader from "./components/MobileHeader";
 import Header from "./components/Header";
+import localFont from "next/font/local";
 // import { auth } from "@/auth";
+
+const AeonikBold = localFont({
+  src: "../../assets/fonts/AeonikProBold.otf",
+  display: "swap",
+  variable: "--font-AeoniK-Bold",
+});
+const AeonikRegular = localFont({
+  src: "../../assets/fonts/AeonikProRegular.otf",
+  display: "swap",
+  variable: "--font-AeoniK-Regular",
+});
+const AeonikLight = localFont({
+  src: "../../assets/fonts/AeonikProLight.otf",
+  display: "swap",
+  variable: "--font-AeoniK-Light",
+});
 
 export default async function RootLayout({
   children,
@@ -41,7 +58,7 @@ export default async function RootLayout({
   // Main admin layout for authorized users
   return (
     <html lang="en">
-      <body>
+      <body className={`${AeonikBold.variable} ${AeonikRegular.variable} ${AeonikLight.variable} `}>
         <div className="flex h-screen flex-col lg:flex-row lg:overflow-hidden">
           <div className="flex-none hidden h-screen lg:block ">
             <SideNav />
