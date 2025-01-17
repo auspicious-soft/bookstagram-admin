@@ -109,6 +109,7 @@ textarea:focus-visible {
 }
 .table-normal table thead tr th {
 font-family: var(--font-AeoniK-Bold);
+text-align: left;
 }
 .table-normal th, .table-normal td {
 padding: 16px 18px;

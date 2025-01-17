@@ -7,7 +7,7 @@ export const sendOtpService = async (payload: any) => await axiosInstance.post(`
 export const resetUserPassword = async (payload: any) => await axiosInstance.patch(`/new-password-otp-verified`, payload)
 
 export const getDashboardStats = async (route: string) => {
-    const axiosInstance = await getAxiosInstance()
+    const axiosInstance = await getAxiosInstance(true)
     return axiosInstance.get(route)
 }
 
