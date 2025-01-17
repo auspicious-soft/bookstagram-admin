@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import logo from '@/assets/images/logo.png';
 import Link from "next/link";
 // import { useRouter } from "next/navigation";
-import { BookHubIcon, CategoryIcon, CollectionIcon, DashboardIcon, NewBookIcon, SideBarIcon } from "@/utils/svgicons";
+import { BookEventsIcon, BookHubIcon, CategoryIcon, CollectionIcon, DashboardIcon, NewBookIcon, SideBarIcon } from "@/utils/svgicons";
 import Image from "next/image";
 // import { signOut } from "next-auth/react";
 
@@ -72,6 +72,12 @@ const SideNav = () => {
             <Link href="/admin/collection">
               <CollectionIcon />
               {!isCollapsed &&  <span>Collection</span>}
+            </Link>
+          </li>
+          <li className={isActive('/admin/book-events')}>
+            <Link href="/admin/book-events">
+              <BookEventsIcon />
+              {!isCollapsed &&  <span>Book Events</span>}
             </Link>
           </li>
          

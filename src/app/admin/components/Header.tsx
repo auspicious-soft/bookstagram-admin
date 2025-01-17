@@ -62,3 +62,7 @@ const Header: React.FC = () => {
 };
 
 export default Header;
+
+function t(): string {
+  throw new Error("Function not implemented.");
+}
