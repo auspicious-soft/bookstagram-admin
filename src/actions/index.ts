@@ -4,12 +4,11 @@
 import { signIn, signOut } from "@/auth"
 import { loginService } from "@/services/admin-services"
 import { cookies } from "next/headers"
-// import { createS3Client } from "@/config/s3"
-// import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-// import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3"
+import { createS3Client } from "@/config/s3"
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3"
 
 export const loginAction = async (payload: any) => {
-    console.log('payload:', payload);
     try {
         const res: any = await loginService(payload)
         
@@ -43,21 +42,23 @@ export const getTokenCustom = async () => {
     return cookiesOfNextAuth?.get(process.env.JWT_SALT as string)?.value
 }
 
-// export const generateSignedUrlToUploadOn = async (fileName: string, fileType: string, userEmail: string) => {
-//     const uploadParams = {
-//         Bucket: process.env.AWS_BUCKET_NAME,
-//         Key: `projects/${userEmail}/${fileName}`,
-//         ContentType: fileType,
-//     }
-//     try {
-//         const command = new PutObjectCommand(uploadParams)
-//         const signedUrl = await getSignedUrl(await createS3Client(), command)
-//         return { signedUrl, key: uploadParams.Key }
-//     } catch (error) {
-//         console.error("Error generating signed URL:", error);
-//         throw error
-//     }
-// }
+export const generateSignedUrlToUploadOn = async (fileName: string, fileType: string) => {
+    const uploadParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `events/${fileName}`,
+        ContentType: fileType,
+        acl: "public-read"
+    }
+    try {
+        const command = new PutObjectCommand(uploadParams)
+        const signedUrl = await getSignedUrl(await createS3Client(), command)
+        // const signedUrl = await getSignedUrl(s3, command, { expiresIn: 900 });
+        return { signedUrl, key: uploadParams.Key }
+    } catch (error) {
+        console.error("Error generating signed URL:", error);
+        throw error
+    }
+}
 
 // export const generateSignedUrlOfProjectAttachment = async (fileName: string, fileType: string, userEmail: string) => {
 //     const uploadParams = {

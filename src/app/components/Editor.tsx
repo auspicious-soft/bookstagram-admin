@@ -282,20 +282,84 @@
 
 // export default TextEditor;
 
-"use client"
-import { Editor } from '@tinymce/tinymce-react';
-import React, { useRef } from 'react';
+// "use client"
+// import { Editor } from '@tinymce/tinymce-react';
+// import React, { useRef } from 'react';
 
-// Import the correct type for the editor instance
+// // Import the correct type for the editor instance
+// import { Editor as TinyMCEEditor } from 'tinymce';
+
+// const TextEditor = () => {
+//   // Specify the type for useRef to avoid the 'any' type
+//   const editorRef = useRef<TinyMCEEditor | null>(null);
+
+//   const handleEditorChange = (content: string) => {
+//     console.log('Editor content:', content);
+//   };
+
+//   return (
+//     <Editor
+//       apiKey="dlpliwqcoggv1fdi4zy7xbju5vd8dkqmhepsf0jnqcdy7km6"
+//       onInit={(evt, editor) => {
+//         editorRef.current = editor;
+//       }}
+//       init={{
+//         height: 250,
+//         menubar: false,
+//         statusbar: false,
+//         // plugins: ['fontsize'],
+//         toolbar: 'fontfamily fontsize bold italic underline alignleft aligncenter alignright link code undo redo', // Add fontsize option to toolbar
+//         toolbar_location: 'top',
+//         content_css: 'default',
+//         font_family_formats: 'Normal=arial,helvetica,sans-serif;' +
+//           'Sans Serif=sans-serif;' +
+//           'Serif=serif;' +
+//           'Monospace=monospace',
+//         content_style: `
+//           body { 
+//             font-family: arial,helvetica,sans-serif;
+//             font-size: 14px;
+//             margin: 0;
+//             padding: 16px;
+//           }
+//         `,
+//         toolbar_style: 'padding: 8px; color:"red"',
+//         setup: (editor) => {
+//           editor.on('keyup', () => {
+//             console.log('Current content:', editor.getContent());
+//           });
+//         }
+//       }}
+//       onEditorChange={handleEditorChange}
+//     />
+//   );
+// };
+
+// export default TextEditor;
+
+
+"use client";
+import { Editor } from '@tinymce/tinymce-react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Editor as TinyMCEEditor } from 'tinymce';
 
-const TextEditor = () => {
-  // Specify the type for useRef to avoid the 'any' type
+const TextEditor = ({setDescription}: any) => {
+  const [isClient, setIsClient] = useState(false);
   const editorRef = useRef<TinyMCEEditor | null>(null);
 
+  useEffect(() => {
+    // Check if we're running in the client-side (browser)
+    setIsClient(typeof window !== 'undefined');
+  }, []);
+
   const handleEditorChange = (content: string) => {
-    console.log('Editor content:', content);
+    setDescription(content)
   };
+
+  // Render null during SSR to avoid mismatch
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <Editor
@@ -307,8 +371,7 @@ const TextEditor = () => {
         height: 250,
         menubar: false,
         statusbar: false,
-        plugins: ['fontsize'],
-        toolbar: 'fontfamily fontsize bold italic underline alignleft aligncenter alignright link code undo redo', // Add fontsize option to toolbar
+        toolbar: 'fontfamily fontsizeinput blocks forecolor  bold italic underline  alignleft aligncenter alignright   undo redo    ', 
         toolbar_location: 'top',
         content_css: 'default',
         font_family_formats: 'Normal=arial,helvetica,sans-serif;' +
@@ -326,7 +389,6 @@ const TextEditor = () => {
         toolbar_style: 'padding: 8px; color:"red"',
         setup: (editor) => {
           editor.on('keyup', () => {
-            console.log('Current content:', editor.getContent());
           });
         }
       }}
@@ -336,3 +398,5 @@ const TextEditor = () => {
 };
 
 export default TextEditor;
+
+

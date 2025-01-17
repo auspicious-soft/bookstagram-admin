@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Toaster } from "sonner";
 import Providers from "./components/ProgressBarProvider";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
@@ -35,10 +36,13 @@ export default async function RootLayout({
     <html lang="en">
       <body
         className={`${AeonikBold.variable} ${AeonikRegular.variable} ${AeonikLight.variable} `}>
+
         <SessionProvider session={session}>
+        <Toaster richColors />
           <Providers>{children}</Providers>
         </SessionProvider>
       </body>
     </html>
   );
 }
+    

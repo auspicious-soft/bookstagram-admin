@@ -17,7 +17,10 @@ const Header: React.FC = () => {
     "/admin/categories": "Sub-Categories",
     "/admin/collection": "Collection",
     "/admin/projects/project-profile/": "projects",
-    "/admin/employees":  "Employees"
+    "/admin/employees":  "Employees",
+    "/admin/book-events":  "Book Events",
+    "/admin/book-events/add":  "Add New Event",
+    // `/admin/book-events/${id}`:  `${id}`,
     
   };
   const getPageName = (path: string): string => {
