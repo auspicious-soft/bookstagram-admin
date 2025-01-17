@@ -13,8 +13,10 @@ const BooksEvents = () => {
  
   const router = useRouter();
   const [query, setQuery] =useState('')
+  const [page, setPage] =useState('')
   const { data , error, isLoading, mutate } = useSWR(`/admin/events?description=${query}`, getBookEvents);
  const  events = data?.data?.data;
+
   return (
     
 
@@ -78,7 +80,7 @@ const BooksEvents = () => {
           ))}
         </div>
         <div className="w-full flex justify-end">
-      <TablePagination/>
+      <TablePagination setPage={setPage} page={page}/>
           </div>
           
         {/* Pagination */}
