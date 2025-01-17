@@ -32,7 +32,10 @@ const AddBookEvent = () => {
                 <Image 
                   src={imagePreview || '/default-image-path.jpg'} 
                   alt="Preview" 
-                  layout="fill" 
+                  width={300}
+                  height={200}
+                  // layout="fill"
+                  className='max-w-[300px]   ' 
                 />
               ) : (
                 <div className="text-gray-400">

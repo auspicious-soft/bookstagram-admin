@@ -69,10 +69,10 @@ const MobileHeader = () => {
         <div className="">
           <ul className="navList">
             <li className="!m-0">
-            <Link href="/">
-            {/* <LogOut /> */}
+            {/* <button onClick={() => signOut({ redirectTo: '/' })}>
+           
                <span className="text-[#283C63] text-[600]">Log Out</span>
-            </Link>
+            </button> */}
             </li>
           </ul>
         </div>

@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import SearchBar from "../SearchBar";
 import { PlusIcon } from "@/utils/svgicons";
+import TablePagination from "../TablePagination";
+import GenerateCouponModal from "../GenerateCouponModal";
 
 const initialData = [
     {
@@ -39,12 +41,14 @@ const initialData = [
     // Add more data as needed
   ];
 const BookSchool = () => {
+  const [isopen, setIsOpen] = useState(false)
+
   return (
     <div>
       <div className="flex gap-2.5 justify-end mb-5 "> 
         <SearchBar />
         <div>
-          <button
+          <button onClick={()=> setIsOpen(true)}
             className="flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px] ">
             <PlusIcon /> Generate A Coupon
           </button>
@@ -79,8 +83,15 @@ const BookSchool = () => {
             ))}
           </tbody>
         </table>
-            </div>
+      </div>
+        <div className="mt-10 flex justify-end">
+        <TablePagination/>
+        </div>
 
+      <GenerateCouponModal
+      open={isopen}
+      onClose={()=>setIsOpen(false)}
+        />
     </div>
   );
 };

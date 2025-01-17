@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import logo from '@/assets/images/logo.png';
 import Link from "next/link";
 // import { useRouter } from "next/navigation";
-import { BookEventsIcon, BookHubIcon, CategoryIcon, CollectionIcon, DashboardIcon, NewBookIcon, SideBarIcon } from "@/utils/svgicons";
+import { AuthorsIcon, BookEventsIcon, BookHubIcon, BookLifeIcon, CategoryIcon, CollectionIcon, DashboardIcon, DiscountIcon, NewBookIcon, NotificationsIcon, PromotionsIcon, PublishersIcon, SideBarIcon, StoriesIcon, SummaryIcon, UsersIcon } from "@/utils/svgicons";
 import Image from "next/image";
 // import { signOut } from "next-auth/react";
 
@@ -74,13 +74,66 @@ const SideNav = () => {
               {!isCollapsed &&  <span>Collection</span>}
             </Link>
           </li>
+          <li className={isActive('/admin/summary')}>
+            <Link href="/admin/summary">
+              <SummaryIcon />
+              {!isCollapsed &&  <span>Summary</span>}
+            </Link>
+          </li>
+          <li className={isActive('/admin/discounts')}>
+            <Link href="/admin/discounts">
+              <DiscountIcon />
+              {!isCollapsed &&  <span>Discounts</span>}
+            </Link>
+          </li>
+          <li className={isActive('/admin/book-life')}>
+            <Link href="/admin/book-life">
+              <BookLifeIcon />
+              {!isCollapsed &&  <span>Book Life</span>}
+            </Link>
+          </li>
           <li className={isActive('/admin/book-events')}>
             <Link href="/admin/book-events">
               <BookEventsIcon />
               {!isCollapsed &&  <span>Book Events</span>}
             </Link>
           </li>
-         
+          <li className={isActive('/admin/authors')}>
+            <Link href="/admin/authors">
+              <AuthorsIcon />
+              {!isCollapsed &&  <span>Authors</span>}
+            </Link>
+          </li>
+          <li className={isActive('/admin/publishers')}>
+            <Link href="/admin/publishers">
+              <PublishersIcon />
+              {!isCollapsed &&  <span>Publishers</span>}
+            </Link>
+          </li>
+          <li className={isActive('/admin/stories')}>
+            <Link href="/admin/stories">
+              <StoriesIcon />
+              {!isCollapsed &&  <span>Stories</span>}
+            </Link>
+          </li>
+          <li className={isActive('/admin/promotions')}>
+            <Link href="/admin/promotions">
+              <PromotionsIcon />
+              {!isCollapsed &&  <span>Promotions</span>}
+            </Link>
+          </li>
+          <li className={isActive('/admin/users')}>
+            <Link href="/admin/users">
+              <UsersIcon />
+              {!isCollapsed &&  <span>Users</span>}
+            </Link>
+          </li>
+          <li className={isActive('/admin/notifications')}>
+            <Link href="/admin/notifications">
+              <NotificationsIcon />
+              {!isCollapsed &&  <span>Notifications</span>}
+            </Link>
+          </li>
         </ul>
       </div>
     </div>

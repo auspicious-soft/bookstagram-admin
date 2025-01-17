@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use server'
 
 import { signIn, signOut } from "@/auth"
@@ -9,9 +9,9 @@ import { cookies } from "next/headers"
 // import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3"
 
 export const loginAction = async (payload: any) => {
-    console.log('payload:', payload);
     try {
         const res: any = await loginService(payload)
+        console.log('res:', res.data); 
         
         if (res && res?.data?.success) {
             await signIn('credentials', {

@@ -9,6 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/cache": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^6.4.0",
+    "@mui/material-nextjs": "^6.3.1",
     "@syncfusion/ej2-react-richtexteditor": "^28.1.39",
     "@tinymce/tinymce-react": "^5.1.1",
     "@tiptap/react": "^2.11.2",
@@ -20,7 +24,6 @@
     "next-nprogress-bar": "^2.4.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-quill": "^2.0.0-beta.4",
     "react-loading": "^2.0.3",
     "react-select": "^5.9.0",
     "sharp": "^0.33.5",

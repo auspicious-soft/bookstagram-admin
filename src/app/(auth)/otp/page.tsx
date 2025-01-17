@@ -1,17 +1,18 @@
 "use client";
 
-import React, { useState } from "react";  
+import React, { useState, useTransition } from "react";  
 import Image from "next/image";
 import Logo from "@/assets/images/logo.png";
-// import { useRouter } from "next/navigation";
-// import { toast } from "sonner";
-// import InputField from "../components/InputField";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import InputField from "../components/InputField";
 import LoginImage from "../components/LoginImage";
+import { sendOtpService } from "@/services/admin-services";
 
 export default function Page() { 
     const [otpValues, setOtpValues] = useState(['', '', '', '', '', '']);
-    // const router = useRouter()
-    // const [isPending, startTransition] = useTransition()
+    const router = useRouter()
+    const [isPending, startTransition] = useTransition()
     const handleOtpChange = (index: number, value: string) => {
       const sanitizedValue = value.slice(-1);
   
@@ -48,25 +49,25 @@ export default function Page() {
   
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
-    //   const completeOtp = otpValues.join('');
-    //   startTransition(async () => {
-    //     try {
-    //       const response = await sendOtpService({ otp: completeOtp })
-    //       if (response.status === 200) {
-    //         toast.success(t('emailSentSuccess'))
-    //         router.push(`/change-password?otp=${completeOtp}`)
-    //       }
-    //       else {
-    //         toast.error(t('somethingWentWrong'))
-    //       }
-    //     }
-    //     catch (err: any) {
-    //       if (err.status == 404 || err.status == 400) {
-    //        alert(t('invalidOtpOrExpired'))
-    //       }
-    //       else toast.error(t('somethingWentWrong'))
-    //     }
-    //   })
+      const completeOtp = otpValues.join('');
+      startTransition(async () => {
+        try {
+          const response = await sendOtpService({ otp: completeOtp })
+          if (response.status === 200) {
+            toast.success("OTP verified successfully")
+            router.push(`/change-password?otp=${completeOtp}`)
+          }
+          else {
+            toast.error("Something went wrong")
+          }
+        }
+        catch (err: any) {
+          if (err.status == 404 || err.status == 400) {
+           alert("Invalid OTP ")
+          }
+          else toast.error("Something went wrong")
+        }
+      })
     };
   return (
     <div className="bg-[#ebdfd7] rounded-[30px]  pt-5 md:pt-0">

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -35,7 +34,7 @@ export default function Page() {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     // const phoneRegex = /^\+45\s?\d{2}(\s?\d{2}){3}$/;
-    const phoneRegex = /^\d{8}$/;
+    const phoneRegex = /^\d{10}$/;
     let loginFieldType = '';
     if (emailRegex.test(username)) {
       loginFieldType = 'username';

@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "./components/ProgressBarProvider";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
+import { Toaster } from "sonner";
 
 const AeonikBold = localFont({
   src: "../assets/fonts/AeonikProBold.otf",
@@ -36,7 +37,10 @@ export default async function RootLayout({
       <body
         className={`${AeonikBold.variable} ${AeonikRegular.variable} ${AeonikLight.variable} `}>
         <SessionProvider session={session}>
-          <Providers>{children}</Providers>
+          <Providers>
+            {children}
+          <Toaster richColors />
+          </Providers>
         </SessionProvider>
       </body>
     </html>
