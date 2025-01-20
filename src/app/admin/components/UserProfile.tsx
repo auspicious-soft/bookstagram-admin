@@ -137,6 +137,14 @@ const UserProfile = ({id}: Props) => {
     <div className="grid grid-cols-[1fr_2fr] gap-5  ">
       <div>
         <div className="custom relative p-5 bg-white rounded-[20px]">
+        {/* <Image
+                unoptimized
+                src={getImageSource()}
+                alt="Profile preview"
+                width={340}
+                height={340}
+                className="rounded-[10px] w-full h-full object-cover"
+              /> */}
             {imagePreview ? (
             <div className="relative ">
               <Image
