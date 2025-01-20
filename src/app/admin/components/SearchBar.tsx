@@ -1,25 +1,25 @@
 
 import { SearchIcon } from '@/utils/svgicons';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 interface SearchBarProps {
-    setQuery?: React.Dispatch<React.SetStateAction<string>>
+    setQuery: React.Dispatch<React.SetStateAction<string>>
     query?: string
 }
 
 const SearchBar = (props: SearchBarProps) => {
   
-    // const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState('');
     // console.log('inputValue: ', inputValue);
     const { setQuery,query } = props;
-    // useEffect(() => {
-    //     const handler = setTimeout(() => {
-    //         setQuery(`${inputValue ? 'description=' :''}${inputValue.trim()}`);
-    //     }, 500);
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setQuery(`${inputValue ? 'description=' :''}${inputValue.trim()}`);
+        }, 500);
 
-    //     return () => {
-    //         clearTimeout(handler);
-    //     };
-    // }, [inputValue, setQuery]);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [inputValue, setQuery]);
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setQuery(event.target.value);

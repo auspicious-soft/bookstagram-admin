@@ -31,5 +31,6 @@ export const getAxiosInstance = async () => {
 }
 
 export const getImageClientS3URL = (key: string) => {
-    return `${process.env.NEXT_PUBLIC_AWS_BUCKET_PATH}${key}`
+    console.log('key:', key);
+   return`${process.env.NEXT_PUBLIC_AWS_BUCKET_PATH}${key}`
 }

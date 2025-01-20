@@ -5,51 +5,16 @@ import ReactLoading from 'react-loading';
 import { DashboardIcon1, DashboardIcon2, DashboardIcon3, DashboardIcon4 } from '@/utils/svgicons';
 import useSWR from "swr";
 import { getDashboardStats } from '@/services/admin-services';
-
-const initialData = [
-    {
-      id: 'F123',
-      status: 'Completed',
-      clientName: 'Herry',
-      contact: '1234567890',
-      memberSince: '01 Jan 2020',
-      assignments: 5,
-      actionss: "Action",
-      accountStatus: true,
-      action: true,
-    },
-    {
-      id: 'F545',
-      status: 'Completed',
-      clientName: 'Genny',
-      contact: '1234567890',
-      memberSince: '01 Jan 2020',
-      assignments: 5,
-      actionss: "Action",
-      accountStatus: "active",
-      action: "true",
-    },
-    {
-      id: 'F55',
-      status: 'Completed',
-      clientName: 'Genny',
-      contact: '1234567890',
-      memberSince: '01 Jan 2020',
-      assignments: 5,
-      actionss: "Action",
-      accountStatus: true,
-      action: true,
-    },
-    // Add more data as needed
-];
+import { useRouter } from 'next/navigation';
 
 const Dashboard = () => {
 
 const [overview, setOverview] = useState<string>("7");
 const [user, setUser] = useState<string>("7");
-const {data, isLoading} = useSWR(`/admin/dashboard?overviewDuration=${overview}&usersDuration=${user}`, getDashboardStats)
+const {data, error, mutate, isLoading} = useSWR(`/admin/dashboard?overviewDuration=${overview}&usersDuration=${user}`, getDashboardStats)
 const overviewData= data?.data?.data
 console.log('overviewData:', overviewData);
+const router = useRouter();
 
 const OverviewData = [
     {
@@ -84,7 +49,11 @@ const handleOverviewChange = async (e: React.ChangeEvent<HTMLSelectElement>) => 
 const handleUsersChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = e.target.value;
     setUser(selectedValue);
-  };
+};
+const userProfile = (id: string) => {
+  router.push(`/admin/users/profile/${id}`);
+};
+
     return (
         <div>
             <div className='flex justify-between items-center'>
@@ -143,15 +112,33 @@ const handleUsersChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
             </tr>
           </thead>
           <tbody className=''>
-            {overviewData?.newestUsers.map((row: any) => (
+          {isLoading ? (
+              <tr>
+                <td colSpan={6} className="">
+                  Loading...
+                </td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan={6} className="text-center text-red-500 ">
+                  Error loading data.
+                </td>
+              </tr>
+            ) : overviewData?.newestUsers?.length > 0 ? (
+            overviewData?.newestUsers?.map((row: any) => (
               <tr key={row?._id}>
                 <td>{row?._id}</td>
                 <td>{row?.fullName}</td>
                 <td>Level 3</td>
                 <td>{row?.phoneNumber}</td>
-                <td><p className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]  '>View</p></td>
+                <td><button onClick={() => userProfile(row?._id)} className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]  '>View</button></td>
               </tr>
-            ))}
+            ))
+          ) : (
+            <tr>
+              <td  colSpan={6} >{isLoading ? <ReactLoading type={'spin'} color={'#26395e'} height={'20px'} width={'20px'} /> : <p>No data found</p>}</td>
+            </tr>
+          )}
           </tbody>
         </table>
         </div>
@@ -172,14 +159,31 @@ const handleUsersChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
             </tr>
           </thead>
           <tbody className=''>
-            {overviewData?.newestEvents.map((row: any) => (
+          {isLoading ? (
+              <tr> 
+                <td colSpan={6} className=""> Loading... </td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan={6} className="text-center text-red-500 ">
+                  Error loading data.
+                </td>
+              </tr>
+            ) : overviewData?.newestEvents?.length > 0 ? (
+            overviewData?.newestEvents.map((row: any) => (
               <tr key={row?._id}>
                 <td>{row?.image}</td>
                 <td>{row?.name}</td>
                 <td>{row?.createdAt}</td>
-                <td><p className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]  '>View</p></td>
+                <td>
+                  <p className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]  '>View</p></td>
               </tr>
-            ))}
+            ))
+          ) : (
+            <tr>
+              <td  colSpan={6} >{isLoading ? <ReactLoading type={'spin'} color={'#26395e'} height={'20px'} width={'20px'} /> : <p>No data found</p>}</td>
+            </tr>
+          )}
           </tbody>
         </table>
         </div>

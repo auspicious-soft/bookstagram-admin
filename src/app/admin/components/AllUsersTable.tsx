@@ -1,0 +1,81 @@
+'use client'
+import React, { useState } from 'react';
+import SearchBar from './SearchBar';
+import Button from '@/app/components/Button';
+import TablePagination from './TablePagination';
+import { useRouter } from 'next/navigation';
+import useSWR from 'swr';
+import { getAllUsers } from '@/services/admin-services';
+import AddNewUser from './AddNewUser';
+
+const AllUsersTable = () => {
+  const router = useRouter();
+  const [page, setPage] = useState(1); 
+  const itemsPerPage = 10;
+  const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
+  const [searchParams, setsearchParams] = useState('');
+  const {data, error, isLoading, mutate} = useSWR(searchParams!=="" ? `/admin/users?description=${searchParams}`: `/admin/users?${query}`, getAllUsers)
+  const userData = data?.data?.data;  
+  const [addUserModal, setAddUserModal] = useState(false);
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    setQuery(`page=${newPage}&limit=${itemsPerPage}`);
+  };
+
+const userProfile = (id: string) => {
+  router.push(`/admin/users/profile/${id}`);
+}
+
+    return (
+        <div>
+        <div className="flex gap-2.5 justify-end mb-5 "> 
+        <SearchBar setQuery={setsearchParams}  query={searchParams}/>
+        <div>
+        <Button text='Add A New User' onClick={()=>setAddUserModal(true)}  />
+        </div>
+      </div>
+
+      <div className='table-common overflo-custom'>
+        <h3>All Users</h3>
+            <table className="">
+          <thead className="">
+            <tr>
+              <th>User Id</th>
+              <th>Name</th>
+              <th>Level</th>
+              <th>Phone Number</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody className=''>
+            {userData?.map((row: any) => (
+              <tr key={row?._id}>
+                <td>{row?._id}</td>
+                <td>{row?.fullName} </td>
+                <td>Level 3</td>
+                <td>{row?.phoneNumber}</td>
+                <td>
+                <button onClick={()=>userProfile(row?._id)} className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]  '>View</button>
+                </td>
+                
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+        <div className="mt-10 flex justify-end">
+        <TablePagination
+          setPage={handlePageChange}
+          page={page}
+          totalData={data?.data?.total}
+          itemsPerPage={itemsPerPage}
+          />
+        </div>
+
+        <AddNewUser open={addUserModal} onClose={()=>setAddUserModal(false)} mutate={mutate} />
+      </div>
+    );
+}
+
+export default AllUsersTable;

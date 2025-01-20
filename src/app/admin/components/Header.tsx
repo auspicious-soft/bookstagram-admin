@@ -15,17 +15,27 @@ const Header: React.FC = () => {
     "/admin/dashboard": "dashboard",
     "/admin/book-hub": "Book Hub",
     "/admin/categories": "Sub-Categories",
-    "/admin/collection": "Collection",
-    "/admin/projects/project-profile/": "projects",
-    "/admin/employees":  "Employees",
+    "/admin/collection": "Collection",  
+    "/admin/summary": "Summary",
+    "/admin/discounts": "Discounts",
+    "/admin/book-life": "Book Life",
     "/admin/book-events":  "Book Events",
     "/admin/book-events/add":  "Add New Event",
+    "/admin/authors": "Authors",
+    "/admin/publishers": "Publishers",
+    "/admin/stories": "Stories",
+    "/admin/promotions": "Promotions",
+    "/admin/users": "Users",
+    "/admin/notifications": "Notifications"
     // `/admin/book-events/${id}`:  `${id}`,
     
   };
   const getPageName = (path: string): string => {
     if (path.startsWith("/admin/book-hub/profile/")) {
       return "Single Book";
+    }
+    if (path.startsWith("/admin/users/profile/")) {
+      return "Single User";
     }
     return pageNames[path] || "Bookstagram";
   };
@@ -65,9 +75,3 @@ const Header: React.FC = () => {
 };
 
 export default Header;
-
-function t(key: string): string {
-  // Implement your translation logic here
-  throw new Error("Function not implemented.");
-  return key;
-}
