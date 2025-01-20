@@ -3,7 +3,7 @@ import React from 'react';
 
 interface OverviewProps {
     title: string;
-    value: number | string;
+    value: number | string | React.ReactNode;
     icon: React.ReactNode
   };
 const DashboardCard: React.FC<OverviewProps> = ({title, value, icon} ) => {

@@ -11,3 +11,21 @@ export const getDashboardStats = async (route: string) => {
     return axiosInstance.get(route)
 }
 
+export const addBookEventFormData = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+export const getBookEvents = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+
+export const DeleteBookEvent = async (route: any) => {
+    const axiosInstance = await getAxiosInstance();
+    return axiosInstance.delete(route);
+};
+
+export const updateBookEvent = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance();
+    return axiosInstance.put(route, payload);
+  };
