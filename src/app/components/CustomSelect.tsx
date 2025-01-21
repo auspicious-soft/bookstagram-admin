@@ -54,9 +54,9 @@ const customStyles: StylesConfig<any, true> = {
     backgroundColor: isDisabled
       ? undefined
       : isSelected
-        ? "#1657FF"
+        ? "#70A1E5"
         : isFocused
-          ? "#1657FF"
+          ? "#70A1E5"
           : undefined,
     color: isDisabled ? "#ccc" : isSelected ? "white" : "black",
     cursor: isDisabled ? "not-allowed" : "default",
@@ -65,8 +65,8 @@ const customStyles: StylesConfig<any, true> = {
       ...styles[":active"],
       backgroundColor: !isDisabled
         ? isSelected
-          ? "#1657FF"
-          : "#1657FF"
+          ? "#70A1E5"
+          : "#70A1E5"
         : undefined,
     },
     ":hover": {
@@ -75,7 +75,7 @@ const customStyles: StylesConfig<any, true> = {
   }),
   multiValue: (styles: any) => ({
     ...styles,
-    backgroundColor: "#1657FF",
+    backgroundColor: "#70A1E5",
     color: "white",
   }),
   multiValueLabel: (styles: any) => ({

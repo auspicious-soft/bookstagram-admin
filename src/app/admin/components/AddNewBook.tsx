@@ -1,8 +1,8 @@
 "use client";
 import Image from "next/image";
 import React, { useState } from "react";
-import preview from "@/assets/images/preview.png";
-import CustomSelect from "./CustomSelect";
+import preview from "@/assets/images/preview.png"; 
+import CustomSelect from "@/app/components/CustomSelect";
 
 const userData = [
     { label: "Male", value: "male" },
@@ -11,7 +11,7 @@ const userData = [
 ]
 const AddNewBook = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const [ authorName, setAutherName] = useState();
+  const [ authorName, setAutherName] = useState();
   const [formData, setFormData] = useState({
     nameOfBook: "",
     price: "",

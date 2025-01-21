@@ -77,6 +77,22 @@ export const generateUserProfilePicture = async (fileName: string, fileType: str
     }
 }
 
+export const generateAuthorsProfilePicture = async (fileName: string, fileType: string, userName: string) => {
+    const uploadParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `authors/${userName}/${fileName}`,
+        ContentType: fileType,
+    }
+    try {
+        const command = new PutObjectCommand(uploadParams)
+        const signedUrl = await getSignedUrl(await createS3Client(), command)
+        return {signedUrl, key: uploadParams.Key}
+    } catch (error) {
+        console.error("Error generating signed URL:", error);
+        throw error
+    }
+}
+
 
 // export const generateSignedUrlForUserProfile = async (fileName: string, fileType: string, userEmail: string) => {
 //     const uploadParams = {

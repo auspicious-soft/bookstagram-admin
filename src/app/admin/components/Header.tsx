@@ -26,7 +26,8 @@ const Header: React.FC = () => {
     "/admin/stories": "Stories",
     "/admin/promotions": "Promotions",
     "/admin/users": "Users",
-    "/admin/notifications": "Notifications"
+    "/admin/notifications": "Notifications",
+    "/admin/authors/add-author" : "Add New Author",
     // `/admin/book-events/${id}`:  `${id}`,
     
   };

@@ -9,6 +9,7 @@ export const getDashboardStats = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
 }
+//----------User Page--------------------------
 export const getAllUsers = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
@@ -21,10 +22,29 @@ export const addNewUser = async (route: string, payload: any) => {
     const axiosInstance= await getAxiosInstance()
     return axiosInstance.post(route, payload)
 }
-export const updateSingleUser = async (route: string, payload: any) => {
+export const updateSingleUser = async (route: string, payload: any) => { 
     const axiosInstance= await getAxiosInstance()
     return axiosInstance.put(route, payload)
 }
+
+//----------Author Page--------------------------
+export const getAllAuthors = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const getSingleAuthor = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const addNewAuthor = async (route: string, payload: any) => {
+    const axiosInstance= await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+export const updateSingleAuthor = async (route: string, payload: any) => { 
+    const axiosInstance= await getAxiosInstance()
+    return axiosInstance.put(route, payload)
+}
+
 export const addBookEventFormData = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.post(route, payload)

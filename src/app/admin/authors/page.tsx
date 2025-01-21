@@ -1,9 +1,10 @@
 import React from 'react';
+import AllAuthorsTable from '../components/AllAuthorsTable';
 
 const Page = () => {
     return (
         <div>
-            Authors
+           <AllAuthorsTable/>
         </div>
     );
 }

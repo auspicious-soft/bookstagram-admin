@@ -5,7 +5,7 @@ import { Toaster } from "sonner";
 import Providers from "./components/ProgressBarProvider";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
-
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
 const AeonikBold = localFont({
   src: "../assets/fonts/AeonikProBold.otf",
   display: "swap",
@@ -36,10 +36,11 @@ export default async function RootLayout({
     <html lang="en">
       <body
         className={`${AeonikBold.variable} ${AeonikRegular.variable} ${AeonikLight.variable} `}>
-
         <SessionProvider session={session}>
           <Providers>
+          <AppRouterCacheProvider>
             {children}
+          </AppRouterCacheProvider>
           <Toaster richColors />
           </Providers>
         </SessionProvider>

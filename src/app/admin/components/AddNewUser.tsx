@@ -5,7 +5,6 @@ import preview from "@/assets/images/preview.png";
 import { toast } from 'sonner';
 import { generateUserProfilePicture } from '@/actions';
 import { addNewUser } from '@/services/admin-services';
-import { mutate } from 'swr';
 
 interface ModalProp {
     open: any;
