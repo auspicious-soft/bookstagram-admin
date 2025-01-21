@@ -21,7 +21,7 @@ return (
               <th>Order ID</th>
               <th>Name of Book</th>
               <th>Name of Author</th> 
-              <th className='text-right'>Amount Paid</th>
+              <th className='!text-right'>Amount Paid</th>
             </tr>
           </thead>
           <tbody className=''>

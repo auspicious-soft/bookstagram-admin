@@ -237,7 +237,7 @@ const UserProfile = ({id}: Props) => {
       </div>
     </div>
     <div className='flex justify-between items-center mt-[30px]  '>
-    <h2 className='text-[22px] text-darkBlack '>New Users</h2>
+    <h2 className='text-[22px] text-darkBlack '>Overview</h2>
     <div>
         <select name="user" 
         value={user} 
