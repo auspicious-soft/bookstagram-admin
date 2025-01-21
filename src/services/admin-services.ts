@@ -26,6 +26,10 @@ export const updateSingleUser = async (route: string, payload: any) => {
     const axiosInstance= await getAxiosInstance()
     return axiosInstance.put(route, payload)
 }
+export const getSingleUserOrders = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
 
 //----------Author Page--------------------------
 export const getAllAuthors = async (route: string) => {

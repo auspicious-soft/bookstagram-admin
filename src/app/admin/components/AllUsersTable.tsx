@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
 import { getAllUsers } from '@/services/admin-services';
 import AddNewUser from './AddNewUser';
+import ReactLoading from 'react-loading';
 
 const AllUsersTable = () => {
   const router = useRouter();
@@ -49,7 +50,16 @@ const userProfile = (id: string) => {
             </tr>
           </thead>
           <tbody className=''>
-            {userData?.map((row: any) => (
+          {isLoading ? (
+              <tr>
+                <td colSpan={6} className="">Loading...</td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan={6} className="text-center text-red-500 ">Error loading data.</td>
+              </tr>
+            ) : userData?.length > 0 ? (
+            userData?.map((row: any) => (
               <tr key={row?._id}>
                 <td>{row?._id}</td>
                 <td>{row?.fullName} </td>
@@ -60,7 +70,16 @@ const userProfile = (id: string) => {
                 </td>
                 
               </tr>
-            ))}
+            ))
+         ) : (
+             <tr>
+               <td colSpan={6}>{isLoading ? (<ReactLoading type={"spin"} color={"#26395e"} height={"20px"} width={"20px"} />
+                 ) : (
+                   <p>No data found</p>
+                 )}
+               </td>
+             </tr>
+            )}
           </tbody>
         </table>
       </div>

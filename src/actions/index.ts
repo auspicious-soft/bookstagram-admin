@@ -69,6 +69,7 @@ export const generateUserProfilePicture = async (fileName: string, fileType: str
     }
     try {
         const command = new PutObjectCommand(uploadParams)
+        console.log('uploadParams:', uploadParams);
         const signedUrl = await getSignedUrl(await createS3Client(), command)
         return {signedUrl, key: uploadParams.Key}
     } catch (error) {

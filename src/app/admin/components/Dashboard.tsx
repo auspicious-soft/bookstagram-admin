@@ -75,15 +75,6 @@ const userProfile = (id: string) => {
               icon={card.icon}
               title={card.title}
               value={card.value}
-                // card.value ?? (
-                //   <ReactLoading
-                //     type={"spin"}
-                //     color={"#E65F2B"}
-                //     height={"20px"}
-                //     width={"20px"}
-                //   />
-                // )
-            //   }
             />
           ))}
            </div>
