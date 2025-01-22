@@ -9,26 +9,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
+        background: "(--background)",
         foreground: "var(--foreground)",
         orange: "#F96915",
-        darkBlack: "#060606"
+        darkBlack: "#060606",
       },
       fontFamily: {
-        aeonikBold: ['var(--font-AeoniK-Bold)'],
-        aeonikRegular: ['var(--font-AeoniK-Regular)'],
-        aeonikLight: ['var(--font-AeoniK-Light)'],
+        aeonikBold: ["var(--font-AeoniK-Bold)"],
+        aeonikRegular: ["var(--font-AeoniK-Regular)"],
+        aeonikLight: ["var(--font-AeoniK-Light)"],
       },
       container: {
         center: true,
         padding: {
-          DEFAULT: '18px',
-          sm: '18px',
-          md: '25px',
-          lg: '30px',
-          xl: '40px',
+          DEFAULT: "18px",
+          sm: "18px",
+          md: "25px",
+          lg: "30px",
+          xl: "40px",
         },
-      }
+      },
     },
   },
   plugins: [],

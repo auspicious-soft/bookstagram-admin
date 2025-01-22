@@ -16,8 +16,8 @@ const AllCollections = () => {
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchParams, setsearchParams] = useState("");
   const { data, error, isLoading } = useSWR(`/admin/collections?description=${searchParams}&${query}`, getAllCollection);
-  const category = data?.data?.data
-  console.log('category:', category);
+  const collections = data?.data?.data
+  console.log('collections:', collections);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -39,12 +39,13 @@ const AllCollections = () => {
          <div><Button text="Add A New collection" onClick={addNewCategory} /></div>
       </div>
        <div className='grid grid-cols-4 gap-6'>
-            {category?.map((row: any) => (
+            {collections?.map((row: any) => (
             <CategoryCard 
             key={row?._id}
             name={row?.name}
             image={getImageClientS3URL(row?.image)}
             onClick={()=>handleSubCategory(row?._id)}
+            displayMobile={row?.displayOnMobile}
             />
             ))}
         </div>

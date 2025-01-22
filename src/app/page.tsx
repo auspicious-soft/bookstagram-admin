@@ -115,13 +115,6 @@ export default function Page() {
                   <button type="submit" className="login-button  w-full">
                     {!isPending ? "Log In" : "Logging In"}
                   </button>
-
-                  {/* <div className="mt-5 text-center text-[#353E6C] text-[14px]">
-                   {t('noAccount')}
-                    <Link href="/signup" className="text-[#1657FF] ">
-                      {t('createAccount')}
-                    </Link>{" "}
-                  </div> */}
                 </form>
               </div>
             </div>
