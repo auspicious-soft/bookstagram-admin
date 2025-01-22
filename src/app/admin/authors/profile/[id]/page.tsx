@@ -285,7 +285,7 @@ return (
         <BookCard 
         key={data?._id}
         title={data?.name}
-        price={data?.price}
+        price={`$${data?.price}`}
         // imgSrc={preview}
         imgSrc={getImageClientS3URL(data?.image)}
         author={authorData?.name}

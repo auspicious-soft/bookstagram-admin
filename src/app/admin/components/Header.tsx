@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import avatar from '@/assets/images/avatar.png';
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { DropIcon } from "@/utils/svgicons";
 import { signOut } from "next-auth/react";
 
@@ -11,10 +11,14 @@ import { signOut } from "next-auth/react";
 const Header: React.FC = () => {
   const [showData, setShowData] = useState(false);
   const pathname = usePathname(); 
+  const searchParams = useSearchParams();
+  const nameParam = searchParams.get("name");
+
+
   const pageNames: { [key: string]: string } = {
     "/admin/dashboard": "dashboard",
     "/admin/book-hub": "Book Hub",
-    "/admin/categories": "Sub-Categories",
+    "/admin/categories": "Categories",
     "/admin/collection": "Collection",  
     "/admin/summary": "Summary",
     "/admin/discounts": "Discounts",
@@ -40,7 +44,7 @@ const Header: React.FC = () => {
     }
     return pageNames[path] || "Bookstagram";
   };
-  const currentPageName = getPageName(pathname);
+  const currentPageName = nameParam || getPageName(pathname);
   // const currentPageName = pageNames[pathname] || t("projects");
 
   return (

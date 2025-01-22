@@ -1,17 +1,17 @@
 import Image, { StaticImageData } from 'next/image';
 import React from 'react';
 
-
  interface CategoryProps {
     image: string | StaticImageData; 
     name: string;
+    onClick?: React.MouseEventHandler;
  }
  
-const CategoryCard:React.FC<CategoryProps> = ({image, name}) => {
+const CategoryCard:React.FC<CategoryProps> = ({image, name, onClick}) => {
     return (
-        <div className='grid place-items-center bg-white rounded-[20px] px-5 py-10 aspect-square '>
+        <div onClick={onClick}  className='grid place-items-center bg-white rounded-[20px] px-5 py-10 aspect-square '>
             <div className='text-center'>
-                <Image src={image} alt={name} width={122} height={122} className='w-[122px] h-[122px] object-cover rounded-full mx-auto ' />
+                <Image unoptimized src={image} alt={name} width={122} height={122} className='w-[122px] h-[122px] object-cover rounded-full mx-auto ' />
                 <p className='text-darkBlack text-[15px] leading-5 tracking-[-0.24px] mt-[23px] '>{name}</p>
             </div>
         </div>

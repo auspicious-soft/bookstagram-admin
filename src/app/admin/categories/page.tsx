@@ -1,10 +1,10 @@
 import React from 'react';
-import Category from '../components/Category';
+import AllCategories from '../components/AllCategories';
 
 const Page = () => {
     return (
         <div>
-           <Category />
+           <AllCategories/>
         </div>
     );
 }

@@ -16,7 +16,7 @@ interface Props {
 }
 const UserProfile = ({id}: Props) => {
   const [user, setUser] = useState<string>("7");
-  const { data, isLoading, error, mutate } = useSWR(`/admin/users/${id}`, getSingleUsers);
+  const { data, isLoading, error, mutate } = useSWR(`/admin/users/${id}?duration=${user}`, getSingleUsers);
   const overviews= data?.data?.data;
   const profileData = data?.data?.data?.data;
   const [isPending, startTransition] = useTransition();

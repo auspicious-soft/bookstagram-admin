@@ -49,6 +49,52 @@ export const updateSingleAuthor = async (route: string, payload: any) => {
     return axiosInstance.put(route, payload)
 }
 
+//---------Publishers Page--------------------------
+export const getAllPublishers = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const getSinglePublisher = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const addNewPublisher = async (route: string, payload: any) => {
+    const axiosInstance= await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+export const updateSinglePublisher = async (route: string, payload: any) => { 
+    const axiosInstance= await getAxiosInstance()
+    return axiosInstance.put(route, payload)
+}
+//----Category Pages------------------------
+
+export const getAllCategories = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const getSubCategory = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+
+//----Collection Pages------------------------
+export const getAllCollection = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+
+
+
+
+//-----------------Summary Page--------------------------------
+export const getAllSummary = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+
+
+
+//------- Book-------
 export const addBookEventFormData = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.post(route, payload)
