@@ -13,7 +13,7 @@ interface CardProps {
     return (
         <div className="">
             <div className='relative'>
-            <Image unoptimized src={imgSrc} alt="book" width={264} height={264} className="rounded-[10px] w-full object-cover" />
+            <Image unoptimized src={imgSrc} alt="book" width={264} height={264} className="rounded-[10px] w-full object-cover aspect-square" />
             <p className="absolute right-[6px] bottom-[6px] bg-orange text-white text-xs px-4 py-2 text-center rounded-[28px]"
             >{author}</p>
             </div>

@@ -110,7 +110,16 @@ export const getAllDiscountBooks = async (route: string) => {
     return axiosInstance.get(route)
 }
 
+//----------------Store Page--------------------------------
 
+export const getAllStories = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const getSingleStory = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
 
 //------- Book-------
 export const addBookEventFormData = async (route: string, payload: any) => {

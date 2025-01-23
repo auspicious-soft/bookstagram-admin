@@ -198,6 +198,14 @@ font-size: 14px;
   background-color: transparent;
   color: #fff;
 }
+.custom-arrow {
+  appearance: none;
+  background-image: url(../../public/assets/images/icons.svg);
+  background-position: 90%;
+  background-repeat: no-repeat;
+  padding-right: 30px;
+  background-size: 14%;
+}
 @media screen and (min-width: 1024px) {
   .sideNav.collapsed .navList li a {
     display: inline-block;

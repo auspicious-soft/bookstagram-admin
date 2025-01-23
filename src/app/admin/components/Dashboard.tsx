@@ -66,7 +66,7 @@ const eventsProfile = (id: string) => {
                 <select name="overview" 
                 value={overview}
                 onChange={handleOverviewChange}
-                className="py-[9px] px-[14px] rounded-[17px] ">
+                className="custom-arrow py-[9px] px-[14px] rounded-[17px] ">
                 <option value="7">Last 7 days</option>
                 <option value="30">Last 30 days</option>
                 </select>
@@ -84,12 +84,12 @@ const eventsProfile = (id: string) => {
            </div>
            <div className='bg-[#F2EAE5] rounded-[14px] mt-5 p-[18px] pb-7 '>
            <div className='flex justify-between items-center pb-2'>
-            <h2 className='text-base text-darkBlack '>New Users</h2>
+            <h2 className='text-base text-darkBlack font-aeonikBold '>New Users</h2>
             <div>
                 <select name="user" 
                 value={user} 
                 onChange={handleUsersChange} 
-                className="py-[9px] px-[14px] rounded-[17px] ">
+                className="custom-arrow py-[9px] px-[14px] rounded-[17px] ">
                 <option value="7">Last 7 days</option>
                 <option value="30">Last 30 days</option>
                 </select>
@@ -141,7 +141,7 @@ const eventsProfile = (id: string) => {
 
         <div className='bg-[#F2EAE5] rounded-[14px] mt-[32px] p-[18px] pb-7 '>
            <div className='flex justify-between items-center pb-2'>
-            <h2 className='text-base text-darkBlack '>Upcoming Events</h2>
+            <h2 className='text-base text-darkBlack font-aeonikBold '>Upcoming Events</h2>
             </div>
             <div className='table-normal overflo-custom'>
             <table className="">

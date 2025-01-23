@@ -12,7 +12,7 @@ import TablePagination from "../components/TablePagination";
 
 const Page = () => {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("Vouchers");
+  const [activeTab, setActiveTab] = useState("Discounted Books");
   const [bookSearch, setBookSearch] = useState("");
   const [voucherSearch, setVoucherSearch] = useState("");
   const [isVoucher, setisVoucher] = useState(false);
