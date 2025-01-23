@@ -22,7 +22,6 @@ const UserProfile = ({id}: Props) => {
   const [isPending, startTransition] = useTransition();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   // const [imageDisplay, setImageDisplay] = useState<string | null>(null);
-  console.log('imagePreview:', imagePreview);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -84,7 +83,6 @@ const UserProfile = ({id}: Props) => {
 
   const triggerFileInputClick = () => {
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
-    console.log('fileInput:', fileInput);
     if (fileInput) {
       fileInput.click();
     }

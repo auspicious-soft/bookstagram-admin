@@ -17,7 +17,6 @@ const Page = () => {
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchParams, setsearchParams] = useState("");
   const { data, error, isLoading } = useSWR(`/admin/categories/${id}/sub-categories?description=${searchParams}&${query}`, getSubCategory);
-  console.log('data:', data);
   const subCategory = data?.data?.data
 
   const handlePageChange = (newPage: number) => {
@@ -27,11 +26,9 @@ const Page = () => {
 
   const addNewCategory = ()=>{
     //router.push(`/admin/categories/sub-category?name=${name}`); 
-    console.log('add new category clicked');
   }
   
   const handleSubCategory = (id: string,  name: string) => {
-    console.log('id:', id);
     //router.push(`/admin/categories/sub-category/${id}?name=${name}`); 
 
   }

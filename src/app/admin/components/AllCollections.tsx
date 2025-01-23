@@ -17,7 +17,6 @@ const AllCollections = () => {
   const [searchParams, setsearchParams] = useState("");
   const { data, error, isLoading } = useSWR(`/admin/collections?description=${searchParams}&${query}`, getAllCollection);
   const collections = data?.data?.data
-  console.log('collections:', collections);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);

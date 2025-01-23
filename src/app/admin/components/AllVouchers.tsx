@@ -1,33 +1,68 @@
-import { getAllVouchers } from '@/services/admin-services';
+import { deleteVoucher, getAllVouchers } from '@/services/admin-services';
 import React, { useState } from 'react';
 import useSWR from 'swr';
 import TablePagination from './TablePagination';
 import ReactLoading from 'react-loading';
+import { ViewIcon, DeleteIcon } from '@/utils/svgicons'; 
+import CouponCode from './CouponCode';
+import { toast } from 'sonner';
 
-const AllVouchers = () => {
-  const [page, setPage] = useState(1); 
-  const itemsPerPage = 10;
-  const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
-  const {data, error, isLoading} = useSWR(`/admin/vouchers`, getAllVouchers)
-  console.log('data:', data?.data?.data);
-  const vouchers = data?.data?.data
+interface Props {
+  vouchers: any;
+  isLoading: any;
+  error: any;
+  mutate: any;
+  total: any;
+  page: any;
+  itemsPerPage: any;
+  handlePageChange: any;
+}
+const AllVouchers = ({vouchers, isLoading, error, mutate, total, page, itemsPerPage, handlePageChange}: Props) => {
+  // const [page, setPage] = useState(1); 
+  // const itemsPerPage = 10;
+  // const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
+  // const {data, error, isLoading, mutate} = useSWR(`/admin/vouchers`, getAllVouchers)
+  // const vouchers = data?.data?.data;
+  const [couponModal, setCouponModal] = useState(false);
+  const [coupon, setCoupon] = useState();
 
-const handlePageChange = (newPage: number) => {
-  setPage(newPage);
-  setQuery(`page=${newPage}&limit=${itemsPerPage}`);
-};
+
+
+  // const handlePageChange = (newPage: number) => {
+  // setPage(newPage);
+  // setQuery(`page=${newPage}&limit=${itemsPerPage}`);
+  // };
+  const openCouponModal = (code: any) => {
+    setCouponModal(true)
+    setCoupon(code);
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await deleteVoucher(`/admin/vouchers/${id}`);
+      if (response.status === 200) {
+        toast.success("deleted successfully");
+        mutate()
+      } else {
+      toast.error("Failed To Delete voucher");
+      }
+    } catch (error) {
+    toast.error("an Error Occurred While Deleting The voucher");
+    }
+  }
+
 
   return (
     <div>
       <div className='table-common overflo-custom'>
-        <h3>All Users</h3>
-            <table className="">
+        <h3>All Vouchers</h3>
+          <table className="">
           <thead className="">
             <tr>
-              <th>User Id</th>
-              <th>Name</th>
-              <th>Level</th>
-              <th>Phone Number</th>
+              <th>Coupon Code</th>
+              <th>Discount Percentage</th>
+              <th>Created On</th>
+              <th>No of Activations</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -42,14 +77,16 @@ const handlePageChange = (newPage: number) => {
               </tr>
             ) : vouchers?.length > 0 ? (
               vouchers?.map((row: any) => (
-              <tr key={row?._id}>
-                <td>{row?._id}</td>
-                <td> {row?.fullName} 
-                  </td>
-                <td>Level 3</td>
-                <td>{row?.phoneNumber}</td>
+              <tr key={row?.voucher?._id}>
+                <td>{row?.voucher?.couponCode}</td>
+                <td>{row?.voucher?.percentage}%</td>
+                <td>{row?.voucher?.createdAt}</td>
+                <td>{row?.voucher?.activationCount}</td>
                 <td>
-                <button  className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]  '>View</button>
+                <div>
+                <button onClick={()=> openCouponModal(row?.voucher?.couponCode)} className='p-2.5'><ViewIcon/></button>
+                <button onClick={()=>handleDelete(row?.voucher?._id)} className='p-2.5'><DeleteIcon/> </button>
+                </div>
                 </td>
                 
               </tr>
@@ -66,14 +103,20 @@ const handlePageChange = (newPage: number) => {
           </tbody>
         </table>
       </div>
-        <div className="mt-10 flex justify-end">
+        {/* <div className="mt-10 flex justify-end">
         <TablePagination
           setPage={handlePageChange}
           page={page}
-          totalData={data?.data?.total}
+          totalData={total}
           itemsPerPage={itemsPerPage}
           />
-        </div>
+        </div> */}
+        <CouponCode 
+          couponCode={coupon} 
+          open={couponModal} 
+          onClose={() => setCouponModal(false)}
+        /> 
+
     </div>
   );
 }

@@ -46,7 +46,7 @@ const BookSchool = () => {
   return (
     <div>
       <div className="flex gap-2.5 justify-end mb-5 "> 
-        <SearchBar />
+        {/* <SearchBar /> */}
         <div>
           <button onClick={()=> setIsOpen(true)}
             className="flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px] ">
@@ -85,7 +85,7 @@ const BookSchool = () => {
         </table>
       </div>
         <div className="mt-10 flex justify-end">
-        <TablePagination/>
+        {/* <TablePagination/> */}
         </div>
 
       <GenerateCouponModal

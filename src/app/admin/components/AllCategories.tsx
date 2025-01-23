@@ -17,7 +17,6 @@ const AllCategories = () => {
   const [searchParams, setsearchParams] = useState("");
   const { data, error, isLoading } = useSWR(`/admin/categories?description=${searchParams}&${query}`, getAllCategories);
   const category = data?.data?.data
-  console.log('category:', category);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);

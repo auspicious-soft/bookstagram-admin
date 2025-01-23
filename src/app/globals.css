@@ -12,23 +12,23 @@
   --tw-bg-orange: #F96915; 
   --tw-bg-darkBlack: #060606;
 }
-@font-face {
+/* @font-face {
   font-family: 'Aeonik Bold';
-  src: url('/assets/fonts/AeonikProBold.otf') format('opentype');
+  src: url('/public/assets/fonts/AeonikProBold.otf') format('opentype');
   font-weight: 700;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Aeonik Regular';
-  src: url('/assets/fonts/AeonikProRegular.otf') format('opentype');
+  src: url('/public/assets/fonts/AeonikProRegular.otf') format('opentype');
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Aeonik Light';
-  src: url('/assets/fonts/AeonikProLight.otf') format('opentype');
+  src: url('/public/assets/fonts/AeonikProLight.otf') format('opentype');
   font-weight: 300;
   font-style: normal;
 }
@@ -36,12 +36,11 @@
   --font-AeoniK-Bold: 'Aeonik Bold', sans-serif;
   --font-AeoniK-Regular: 'Aeonik Regular', sans-serif;
   --font-AeoniK-Light: 'Aeonik Light', sans-serif;
-}
+} */
 
 body,
 p {
-  /* font-family: var(--font-AeoniK-Regular); */
-  font-family: 'Aeonik Regular';
+  font-family: var(--font-AeoniK-Regular);
   line-height: normal;
 }
 
@@ -49,8 +48,7 @@ p {
   color: #fff;
   line-height: normal;
   border-radius: 49px;
-  /* font-family: var(--font-AeoniK-Bold); */
-  font-family: 'Aeonik Bold';
+  font-family: var(--font-AeoniK-Bold);
   background: var(--tw-bg-orange);
   font-size: 18px;
   height: 50px;

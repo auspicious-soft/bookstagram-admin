@@ -25,7 +25,6 @@ const AllAuthorsTable = () => {
     getAllAuthors
   );
   const authorsData = data?.data?.data;
-  console.log("userData:", authorsData);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);

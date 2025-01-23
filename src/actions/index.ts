@@ -11,7 +11,6 @@ import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from "@aws-sd
 export const loginAction = async (payload: any) => {
     try {
         const res: any = await loginService(payload)
-        console.log('res:', res.data); 
         
         if (res && res?.data?.success) {
             await signIn('credentials', {
@@ -129,12 +128,10 @@ export const deleteFileFromS3 = async (imageKey: string) => {
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: imageKey,
     }
-    console.log('params: ', params);
     try {
         const s3Client = await createS3Client()
         const command = new DeleteObjectCommand(params)
         const response = await s3Client.send(command)
-        console.log('response: ', response);
         return response
     } catch (error) {
         console.error('Error deleting file from S3:', error)

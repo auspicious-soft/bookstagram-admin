@@ -7,8 +7,9 @@ interface CardProps {
     author: string;
     price: string;
     imgSrc?: string | StaticImageData;
+    discount?: string | number
   }
-  const BookCard: React.FC<CardProps> = ({ title, author, price, imgSrc }) => {
+  const BookCard: React.FC<CardProps> = ({ title, author, price, imgSrc, discount }) => {
     return (
         <div className="">
             <div className='relative'>
@@ -17,7 +18,12 @@ interface CardProps {
             >{author}</p>
             </div>
             <h5 className='text-darkBlack mt-3 text-lg font-aeonikBold leading-[normal] mb-[5px] capitalize '>{title}</h5>
+            <div className='flex justify-between items-center'>
             <p className='text-lg text-darkBlack  '>{price}</p>
+          {discount && (
+            <p className='text-lg text-orange '>{discount}% Off</p>
+            )}  
+            </div>
             </div>
     );  
 }

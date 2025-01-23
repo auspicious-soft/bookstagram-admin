@@ -8,6 +8,7 @@ import { getBookEvents } from "@/services/admin-services";
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 import SearchBar from "./SearchBar";
 import TablePagination from "./TablePagination";
+import Image from "next/image";
 
 const BooksEvents = () => {
   const router = useRouter();
@@ -57,8 +58,8 @@ const BooksEvents = () => {
                   objectFit="cover"
                   className="round-[10px]"
                   style={{borderRadius:"10px"}}
-                /> */}
-                <img src={getImageClientS3URL(event.image)} alt={event.name} className="w-full h-full object-cover round-[10px]" style={{ borderRadius: "10px" }} />
+                /> */} 
+                <Image src={getImageClientS3URL(event.image)} alt={event.name} className="w-full h-full object-cover round-[10px]" style={{ borderRadius: "10px" }} />
               </div>
               <div className="p-4">
                 <h3 className="text-[18px] font-medium text-color-[#060606]">{event.name}</h3>

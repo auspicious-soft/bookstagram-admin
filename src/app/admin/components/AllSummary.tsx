@@ -15,7 +15,6 @@ const AllSummary = () => {
   const [searchParams, setsearchParams] = useState("");
   const { data, error, isLoading } = useSWR(`/admin/summaries?description=${searchParams}&${query}`, getAllSummary);
   const summary = data?.data?.data
-  console.log('category:', summary);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);

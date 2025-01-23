@@ -24,7 +24,6 @@ const MobileHeader = () => {
   const isActive = (path: string) => pathname === path ? 'active' : '';
 
   const handleLinkClick = (path: string) => {
-    console.log('path:', path);
     setIsCollapsed(false); // Collapse sidebar after clicking a link
   };
 

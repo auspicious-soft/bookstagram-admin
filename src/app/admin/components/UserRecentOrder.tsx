@@ -8,7 +8,6 @@ interface Props {
 }
 const UserRecentOrder = ({id}:Props) => {
 const {data, isLoading, mutate, error} = useSWR(`/admin/user/${id}`, getSingleUserOrders) 
-// console.log('data:', data);
 const orders = data?.data?.data?.userOrders
 
 return (

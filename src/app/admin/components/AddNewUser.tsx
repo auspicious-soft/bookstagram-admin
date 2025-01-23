@@ -96,9 +96,7 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
                     ...otherFields,
                     profilePic: profilePicKey,
                 };
-                console.log('payload:', payload);
                 const response = await addNewUser("/admin/users", payload);
-                console.log('response:', response);
                 
                 if (response?.status === 201) {
                     toast.success("User added successfully");

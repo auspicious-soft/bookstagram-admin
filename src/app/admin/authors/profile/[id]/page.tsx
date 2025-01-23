@@ -30,7 +30,6 @@ const Page = () => {
     const {data, mutate} = useSWR(`/admin/authors/${id}`,  getSingleAuthor)
     const authorBooks = data?.data?.authorBooks 
     const authorData= data?.data?.data
-    console.log('authorBooks:', authorBooks);
     
 
     const [formData, setFormData] = useState<any>({
@@ -133,7 +132,6 @@ const Page = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     const userName = (formData.name).split(" ").join("-").toLowerCase() +"-" + formData.dob;
-    console.log('userName:', userName);
     e.preventDefault();
     startTransition(async () => {
     try {
@@ -165,9 +163,7 @@ const Page = () => {
             profession: formData.profession.map((p: any) => p.value),
             genres: formData.genres.map((p: any) => p.value),
         };
-        console.log('payload:', payload);
         const response = await updateSingleAuthor(`/admin/authors/${id}`, payload);
-        console.log('response:', response);
         
         if (response?.status === 200) {
             toast.success("Author details updated successfully");

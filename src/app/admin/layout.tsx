@@ -47,7 +47,7 @@ export default async function RootLayout({
       <html lang="en">
         <body>
           <div className="p-3 bg-black min-h-screen text-white">
-            <span>You are not authorized to view this page click{" "}</span>
+            <span>You are not authorized to view this page click</span>
             <Link href="/" className="p-3 text-black bg-white">
               Login
             </Link>

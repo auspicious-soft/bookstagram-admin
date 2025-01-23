@@ -6,14 +6,15 @@ import { DashboardIcon1, DashboardIcon2, DashboardIcon3, DashboardIcon4 } from '
 import useSWR from "swr";
 import { getDashboardStats } from '@/services/admin-services';
 import { useRouter } from 'next/navigation';
-
+import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
+import TableRowImage from '@/app/components/TableRowImage';
+import profile from '@/assets/images/preview.png';
 const Dashboard = () => {
 
 const [overview, setOverview] = useState<string>("7");
 const [user, setUser] = useState<string>("7");
 const {data, error, mutate, isLoading} = useSWR(`/admin/dashboard?overviewDuration=${overview}&usersDuration=${user}`, getDashboardStats)
-const overviewData= data?.data?.data
-console.log('overviewData:', overviewData);
+const overviewData= data?.data?.data 
 const router = useRouter();
 
 const OverviewData = [
@@ -43,16 +44,19 @@ const OverviewData = [
       },
 ];
 const handleOverviewChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = e.target.value;
-    setOverview(selectedValue);
+  const selectedValue = e.target.value;
+  setOverview(selectedValue);
 };
 const handleUsersChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = e.target.value;
-    setUser(selectedValue);
+  const selectedValue = e.target.value;
+  setUser(selectedValue);
 };
 const userProfile = (id: string) => {
   router.push(`/admin/users/profile/${id}`);
 };
+const eventsProfile = (id: string) => {
+ router.push(`/admin/book-events/${id}`);
+}
 
     return (
         <div>
@@ -119,7 +123,7 @@ const userProfile = (id: string) => {
             overviewData?.newestUsers?.map((row: any) => (
               <tr key={row?._id}>
                 <td>{row?._id}</td>
-                <td>{row?.fullName}</td>
+                <td><div className='flex items-center gap-[5px]'><TableRowImage image={row?.profilePic ? getImageClientS3URL(row?.profilePic) : profile}/> {row?.fullName}</div> </td>
                 <td>Level 3</td>
                 <td>{row?.phoneNumber}</td>
                 <td><button onClick={() => userProfile(row?._id)} className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]  '>View</button></td>
@@ -163,11 +167,10 @@ const userProfile = (id: string) => {
             ) : overviewData?.newestEvents?.length > 0 ? (
             overviewData?.newestEvents.map((row: any) => (
               <tr key={row?._id}>
-                <td>{row?.image}</td>
+                <td><TableRowImage image={row?.image ? getImageClientS3URL(row?.image) : profile}/></td>
                 <td>{row?.name}</td>
                 <td>{row?.createdAt}</td>
-                <td>
-                  <p className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]  '>View</p></td>
+                <td><button onClick={() => eventsProfile(row?._id)} className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]  '>View</button></td>
               </tr>
             ))
           ) : (

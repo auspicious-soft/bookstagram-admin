@@ -8,6 +8,7 @@ import { getBookEvents,DeleteBookEvent,updateBookEvent } from "@/services/admin-
 import { useParams } from 'next/navigation'
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const DisplayBookEvent = () => {
   const Params = useParams()
@@ -87,7 +88,7 @@ const handleUpload = async () => {
           <div className="bg-white rounded-[20px] p-4 shadow-sm">
             <div className="aspect-square bg-gray-100 rounded-[20px]  flex items-center justify-center">
               {  imagePreview ==="" && eventImage && (
-                <img
+                <Image unoptimized
                   src={getImageClientS3URL(eventImage)  }
                   alt={eventName}
                   className="w-full h-full object-cover round-[10px]"
@@ -95,7 +96,7 @@ const handleUpload = async () => {
                 />
               ) }
                { imagePreview !=="" && (
-                <img
+                <Image unoptimized
                   src={ imagePreview }
                   alt={"Preview"}
                   className="w-full h-full object-cover round-[10px]"

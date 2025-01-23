@@ -9,7 +9,6 @@ interface SearchBarProps {
 const SearchBar = (props: SearchBarProps) => {
   
     const [inputValue, setInputValue] = useState('');
-    // console.log('inputValue: ', inputValue);
     const { setQuery,query } = props;
     useEffect(() => {
         const handler = setTimeout(() => {

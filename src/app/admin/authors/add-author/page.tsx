@@ -85,7 +85,6 @@ const Page = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     const userName = (formData.name).split(" ").join("-").toLowerCase() +"-" + formData.dob;
-    console.log('userName:', userName);
     e.preventDefault();
     startTransition(async () => {
     try {
@@ -109,9 +108,7 @@ const Page = () => {
             ...formData,
             image: profilePicKey, 
         };
-        console.log('payload:', payload);
         const response = await addNewAuthor("/admin/authors", payload);
-        console.log('response:', response);
         
         if (response?.status === 201) {
             toast.success("User added successfully");

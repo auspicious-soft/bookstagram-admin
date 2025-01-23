@@ -7,22 +7,29 @@ import { CopyIcon } from "@/utils/svgicons";
 interface ModalProp {
   open: any;
   onClose: any;
+  couponCode?: string;
+  close?: any;
 }
 
-const CouponCode: React.FC<ModalProp> = ({ open, onClose }) => {
+const CouponCode: React.FC<ModalProp> = ({ open, onClose, couponCode,close }) => {
     const [copied, setCopied] = useState(false);
-    const couponCode = "SAVE20";
+
 
     const handleCopy = async () => {
         try {
           await navigator.clipboard.writeText(couponCode);
           setCopied(true);
-    
+          
           // Reset the copied state after a short delay
           setTimeout(() => setCopied(false), 2000);
         } catch (error) {
           console.error("Failed to copy text: ", error);
         }
+      };
+      const handleCancel =() => {
+        onClose();
+        close();
+        
       };
   return (
     <Modal
@@ -53,7 +60,7 @@ const CouponCode: React.FC<ModalProp> = ({ open, onClose }) => {
             ><CopyIcon/>  {copied ? "Copied!" : "Copy"}
             </button>
             <button
-              onClick={onClose}
+              onClick={()=>handleCancel()}
               className="rounded-[28px] border border-darkBlack py-2 px-5 text-sm "
             >Cancel
             </button>
