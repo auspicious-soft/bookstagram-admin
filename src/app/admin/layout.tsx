@@ -41,9 +41,8 @@ export default async function RootLayout({
   const userRole = (session as any)?.user?.role;
   const restrictedRoles = ['user']; 
   
-  // Check if user has restricted role
-  if (restrictedRoles.includes(userRole)) 
-    {
+  //Check if user has restricted role
+  if (restrictedRoles.includes(userRole)) {
     return (
       <html lang="en">
         <body>
@@ -72,7 +71,7 @@ export default async function RootLayout({
           <div className="flex-grow md:overflow-y-auto">
             <Header />
             <div className="p-4 lg:h-[calc(100vh-96px)] overflow-y-auto overflo-custom  lg:pb-9 lg:pt-6 lg:px-[30px]">
-              {children}
+            {children}
             </div>
           </div>
         </div>

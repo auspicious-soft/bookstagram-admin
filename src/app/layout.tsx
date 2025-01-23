@@ -34,14 +34,13 @@ export default async function RootLayout({
   const session = await auth();
   return (
     <html lang="en">
-      <body
-        className={`${AeonikBold.variable} ${AeonikRegular.variable} ${AeonikLight.variable} `}>
+      <body className={`${AeonikBold.variable} ${AeonikRegular.variable} ${AeonikLight.variable} `}>
         <SessionProvider session={session}>
           <Providers>
+          <Toaster richColors />
           <AppRouterCacheProvider>
             {children}
           </AppRouterCacheProvider>
-          <Toaster richColors />
           </Providers>
         </SessionProvider>
       </body>

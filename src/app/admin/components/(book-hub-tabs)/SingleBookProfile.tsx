@@ -2,7 +2,7 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import preview from "@/assets/images/preview.png"; 
-import CustomSelect from "../CustomSelect";
+import CustomSelect from "@/app/components/CustomSelect";
 
 const userData = [
     { label: "Male", value: "male" },
@@ -28,7 +28,7 @@ const SingleBookProfile = () => {
     startTime: "",
     endTime: "",
     image: "",
-    repeatDays: [], // Initialize as an empty array
+    repeatDays: [],
   });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
