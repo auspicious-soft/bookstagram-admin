@@ -8,6 +8,9 @@ import useSWR from 'swr';
 import { getAllUsers } from '@/services/admin-services';
 import AddNewUser from './AddNewUser';
 import ReactLoading from 'react-loading';
+import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
+import TableRowImage from '@/app/components/TableRowImage';
+import profile from '@/assets/images/preview.png';
 
 const AllUsersTable = () => {
   const router = useRouter();
@@ -16,7 +19,7 @@ const AllUsersTable = () => {
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchParams, setsearchParams] = useState('');
   const {data, error, isLoading, mutate} = useSWR(searchParams!=="" ? `/admin/users?description=${searchParams}`: `/admin/users?${query}`, getAllUsers)
-  const userData = data?.data?.data;  
+  const userData = data?.data?.data;   
   const [addUserModal, setAddUserModal] = useState(false);
 
   const handlePageChange = (newPage: number) => {
@@ -62,7 +65,9 @@ const userProfile = (id: string) => {
             userData?.map((row: any) => (
               <tr key={row?._id}>
                 <td>{row?._id}</td>
-                <td>{row?.fullName} </td>
+                <td><div className="flex items-center gap-[5px] capitalize"><TableRowImage image={row?.profilePic ? getImageClientS3URL(row?.profilePic) : profile}/>
+                 {row?.fullName}  </div>
+                  </td>
                 <td>Level 3</td>
                 <td>{row?.phoneNumber}</td>
                 <td>

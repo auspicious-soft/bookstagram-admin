@@ -24,6 +24,7 @@ const AllPublishersTable = () => {
   const [searchParams, setsearchParams] = useState("");
   const {data, error, isLoading} = useSWR(`/admin/publishers?description=${searchParams}&${query}`, getAllPublishers)
   const publishersData = data?.data?.data;  
+  
   const { category } = UseCategory(); 
   
 
@@ -72,15 +73,15 @@ const AllPublishersTable = () => {
           <tbody className="">
             {isLoading ? (
               <tr>
-                <td colSpan={6} className="">Loading...</td>
+                <td colSpan={5} className="">Loading...</td>
               </tr>
             ) : error ? (
               <tr>
-                <td colSpan={6} className="text-center text-red-500 ">Error loading data.</td>
+                <td colSpan={5} className="text-center text-red-500 ">Error loading data.</td>
               </tr>
             ) : publishersData?.length > 0 ? (
-                publishersData?.map((row: any) => (
-                <tr key={row?._id}>
+                publishersData?.map((row: any, index: number) => (
+                <tr key={row?._id || `publisher-${index}`}>
                   <td><div className="flex items-center gap-2.5 capitalize">
                   <TableRowImage image={row?.publisher?.image ? getImageClientS3URL(row?.publisher?.image) : profile}/>  {row?.publisher?.name} </div></td>
                   <td>
@@ -104,7 +105,7 @@ const AllPublishersTable = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={6}>{isLoading ? (<ReactLoading
+                <td colSpan={5}>{isLoading ? (<ReactLoading
                       type={"spin"}
                       color={"#26395e"}
                       height={"20px"}

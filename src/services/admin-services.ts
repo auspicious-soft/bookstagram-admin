@@ -93,7 +93,7 @@ export const getAllSummary = async (route: string) => {
 }
 
 //----------------Discount Page--------------------------------
-export const getDiscoutPageStats = async (route: string) => {
+export const getAllVouchers = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
 }

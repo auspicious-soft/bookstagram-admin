@@ -2,9 +2,8 @@
 import Button from "@/app/components/Button";
 import React, { useState } from "react";
 import SearchBar from "../components/SearchBar";
-import { useRouter } from "next-nprogress-bar";
-import useSWR from "swr";
-import { getDiscoutPageStats } from "@/services/admin-services";
+import { useRouter } from "next-nprogress-bar";  
+import AllVouchers from "../components/AllVouchers";
 
 const Page = () => {
   const [activeTab, setActiveTab] = useState("Discounted Books");
@@ -15,7 +14,7 @@ const Page = () => {
       case "Discounted Books":
         return <div>Hiiiiiiiii </div>;
       case "Vouchers":
-        return <div>Byeeeeeeeeeee</div>;
+        return <AllVouchers/>;
       default:
         return null;
     }
