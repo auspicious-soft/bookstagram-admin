@@ -27,7 +27,6 @@ const Page = () => {
   const publishersData = publisherResponse?.data?.data?.publisher;
   const book = publisherResponse?.data?.data?.booksCount;
   const bookData = publisherResponse?.data?.data?.publisherBooks;
-  console.log('bookData:', bookData);
   const session = useSession()
   const role= (session as any)?.data?.user?.role 
 
@@ -138,8 +137,8 @@ const Page = () => {
             throw new Error("Failed to upload image");
           }
 
-          if (publishersData?.profilePic) {
-            await deleteFileFromS3(publishersData.profilePic);
+          if (publishersData?.image) {
+            await deleteFileFromS3(publishersData.image);
           }
           profilePicKey = key;
         }

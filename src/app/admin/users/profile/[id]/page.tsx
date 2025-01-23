@@ -1,13 +1,8 @@
 import UserProfile from '@/app/admin/components/UserProfile';
 import React from 'react';
 
-interface Props {
-    params: {
-      id: string; 
-    };
-  }
 
-const Page = async({ params }: Props) => {
+const Page = async({ params }) => {
     const { id } = params;
     return (
        <div>

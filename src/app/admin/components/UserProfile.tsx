@@ -4,7 +4,7 @@ import React, { useEffect, useState, useTransition } from "react";
 import preview from "@/assets/images/preview.png"; 
 import useSWR from "swr";
 import { getSingleUsers, updateSingleUser } from "@/services/admin-services";
-import { deleteFileFromS3, generateUserProfilePicture, getImageUrl } from "@/actions";
+import { deleteFileFromS3, generateUserProfilePicture } from "@/actions";
 
 import { toast } from "sonner";
 import { DashboardIcon1, DashboardIcon2, DashboardIcon3, DashboardIcon4 } from "@/utils/svgicons";
@@ -58,7 +58,6 @@ const UserProfile = ({id}: Props) => {
         password: profileData.password || "",
         profilePic: profileData.profilePic || "",
       });
-      console.log('profileData.profilePic:', profileData.profilePic);
 
       if (profileData?.profilePic) {
        const imageUrl = getImageClientS3URL(profileData?.profilePic)?? '';
@@ -106,38 +105,50 @@ const UserProfile = ({id}: Props) => {
     e.preventDefault();
     startTransition(async () => {
       try {
-        const updatedFormData = { ...formData };
-        if (imageFile) {  // Changed this to check for new image file
-          const fileName = imageFile.name + '-' + new Date().getTime()
-          const email = formData.email
-          const uploadUrl: any = await generateUserProfilePicture(fileName, imageFile.type, email)
-          await fetch(uploadUrl, {
-            method: 'PUT',
+        let profilePicKey = formData.image;
+        if (imageFile) {
+          const { signedUrl, key } = await generateUserProfilePicture(
+            imageFile.name,
+            imageFile.type,
+            formData.email
+          );
+          const uploadResponse = await fetch(signedUrl, {
+            method: "PUT",
             body: imageFile,
             headers: {
-              'Content-Type': imageFile.type,
+              "Content-Type": imageFile.type,
             },
-          })
+            cache: "no-store",
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error("Failed to upload image");
+          }
 
           if (formData?.profilePic) {
             await deleteFileFromS3(formData.profilePic);
           }
-
-          updatedFormData.profilePic = `users/${formData.email}/${imageFile.name}`;
+          profilePicKey = key;
         }
+        const payload = {
+          ...formData,
+          profilePic: profilePicKey,
+          
+        };
+        const response = await updateSingleUser(
+          `/admin/users/${id}`,
+          payload
+        );
 
-        console.log('updatedFormData:', updatedFormData);
-
-        const response = await updateSingleUser(`/admin/users/${id}`, updatedFormData);
-        if (response?.status === 200) { 
-          await mutate();
-          toast.success("User details updated successfully", { position: 'bottom-left' });
+        if (response?.status === 200) {
+          toast.success("User details updated successfully");
+          mutate();
         } else {
-          toast.error("Failed to add User Data");
+          toast.error("Failed to update user");
         }
       } catch (error) {
-        console.error("Der opstod en fejl", error);
-        toast.error("Der opstod en fejl");
+        console.error("Error:", error);
+        toast.error("An error occurred while updating the user");
       }
     });
 };
@@ -207,7 +218,7 @@ const UserProfile = ({id}: Props) => {
             </label>
             <label>Phone Number
               <div className="grid grid-cols-[74px_1fr] gap-[5px]">
-                <input type="text" name="countryCode" value={formData.countryCode} placeholder="+91" />
+                <input type="text" name="countryCode" value={formData.countryCode} placeholder="+91" onChange={handleChange}/>
                 <input
                   type="tel"
                   name="phoneNumber"

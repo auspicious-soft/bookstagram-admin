@@ -69,7 +69,6 @@ export const generateUserProfilePicture = async (fileName: string, fileType: str
     }
     try {
         const command = new PutObjectCommand(uploadParams)
-        console.log('uploadParams:', uploadParams);
         const signedUrl = await getSignedUrl(await createS3Client(), command)
         return {signedUrl, key: uploadParams.Key}
     } catch (error) {
@@ -130,10 +129,12 @@ export const deleteFileFromS3 = async (imageKey: string) => {
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: imageKey,
     }
+    console.log('params: ', params);
     try {
         const s3Client = await createS3Client()
         const command = new DeleteObjectCommand(params)
         const response = await s3Client.send(command)
+        console.log('response: ', response);
         return response
     } catch (error) {
         console.error('Error deleting file from S3:', error)
