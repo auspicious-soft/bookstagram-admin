@@ -9,8 +9,10 @@ export const submitForm = async (
 ) => {    
       if (formData.image) {
         try {
+          const timestamp = Date.now();
+
           const { signedUrl, key } = await generateSignedUrlToUploadOn(
-            formData.image.name,
+           `${timestamp}-${formData.image.name}`,
             formData.image.type,
           );
           
@@ -35,7 +37,6 @@ export const submitForm = async (
       
           if (response?.status === 201 || response?.status === 200) {
             toast.success("Book Event data added successfully");
-            // redirect("/admin/book-events");
             router.push('/admin/book-events');
           
           } 
