@@ -13,6 +13,7 @@
     "@aws-sdk/s3-request-presigner": "^3.730.0",
     "@emotion/cache": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@hookform/resolvers": "^3.10.0",
     "@mui/material": "^6.4.1",
     "@mui/material-nextjs": "^6.3.1",
     "@syncfusion/ej2-react-richtexteditor": "^28.1.39",
@@ -26,11 +27,13 @@
     "next-nprogress-bar": "^2.4.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hook-form": "^7.54.2",
     "react-loading": "^2.0.3",
     "react-select": "^5.9.0",
     "sharp": "^0.33.5",
     "sonner": "^1.7.1",
-    "swr": "^2.3.0"
+    "swr": "^2.3.0",
+    "yup": "^1.6.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

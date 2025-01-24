@@ -32,7 +32,7 @@ const Header: React.FC = () => {
     "/admin/users": "Users",
     "/admin/notifications": "Notifications",
     "/admin/authors/add-author" : "Add New Author",
-    // `/admin/book-events/${id}`:  `${id}`,
+    "/admin/stories/add-new-story": "Add New Story"
     
   };
   const getPageName = (path: string): string => {
@@ -41,6 +41,9 @@ const Header: React.FC = () => {
     }
     if (path.startsWith("/admin/book-hub/profile/")) {
       return "Single Book";
+    }
+    if (path.startsWith("/admin/stories/single-story/")) {
+      return "Single Story";
     }
     if (path.startsWith("/admin/users/profile/")) {
       return "Single User";

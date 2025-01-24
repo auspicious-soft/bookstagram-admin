@@ -9,6 +9,7 @@ import DiscountBooks from "../components/DiscountBooks";
 import useSWR from "swr";
 import { getAllDiscountBooks, getAllVouchers } from "@/services/admin-services";
 import TablePagination from "../components/TablePagination";
+import AddBookToDiscount from "../components/AddBookToDiscount";
 
 const Page = () => {
   const router = useRouter();
@@ -16,11 +17,13 @@ const Page = () => {
   const [bookSearch, setBookSearch] = useState("");
   const [voucherSearch, setVoucherSearch] = useState("");
   const [isVoucher, setisVoucher] = useState(false);
+  const [discountBooksModal, setDiscountBooksModal] = useState(false);
   const [page, setPage] = useState(1); 
   const itemsPerPage = 10;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const {data: discountData, isLoading: bookIsLoading}= useSWR(bookSearch?`/admin/discounted-books?description=${bookSearch}$${query}&isDiscounted=true`:`/admin/discounted-books?${query}&isDiscounted=true`, getAllDiscountBooks)
   const bookData= discountData?.data?.data;
+  console.log('bookData:', bookData);
   const {data, error, isLoading, mutate} = useSWR(voucherSearch? `/admin/vouchers?description=${voucherSearch}&${query}` : `/admin/vouchers?${query}`, getAllVouchers)
   const vouchersData = data?.data?.data;
   const total = data?.data?.total
@@ -40,7 +43,7 @@ const Page = () => {
   const handleButtonAction = () => {
     switch (activeTab) {
       case "Discounted Books":
-        router.push("/admin/vouchers/create-voucher");
+        setDiscountBooksModal(true)
         break;
         case "Vouchers":
           setisVoucher(true);
@@ -104,6 +107,10 @@ const Page = () => {
       onClose={()=>setisVoucher(false)}
       />
 
+      <AddBookToDiscount
+      mutate={mutate}
+      open={discountBooksModal}
+      onClose= {()=>setDiscountBooksModal(false)}/>
     </div>
   );
 };

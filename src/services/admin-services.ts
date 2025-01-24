@@ -83,8 +83,11 @@ export const getAllCollection = async (route: string) => {
     return axiosInstance.get(route)
 }
 
-
-
+//----Book Pages------------------------
+export const getAllBooks = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
 
 //-----------------Summary Page--------------------------------
 export const getAllSummary = async (route: string) => {
@@ -110,7 +113,7 @@ export const getAllDiscountBooks = async (route: string) => {
     return axiosInstance.get(route)
 }
 
-//----------------Store Page--------------------------------
+//----------------Story Page--------------------------------
 
 export const getAllStories = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
@@ -121,7 +124,9 @@ export const getSingleStory = async (route: string) => {
     return axiosInstance.get(route)
 }
 
-//------- Book-------
+
+
+//------- Book Events------- 
 export const addBookEventFormData = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.post(route, payload)
