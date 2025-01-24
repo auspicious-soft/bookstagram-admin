@@ -36,6 +36,9 @@ const Header: React.FC = () => {
     
   };
   const getPageName = (path: string): string => {
+    if (path.startsWith("/admin/categories/") && path.endsWith("/sub-category")) {
+      return "Sub-Categories";
+    }
     if (path.startsWith("/admin/book-hub/profile/")) {
       return "Single Book";
     }

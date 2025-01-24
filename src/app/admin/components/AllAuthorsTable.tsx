@@ -44,7 +44,7 @@ const AllAuthorsTable = () => {
       <div className="flex gap-2.5 justify-end mb-5 ">
         <SearchBar setQuery={setsearchParams} query={searchParams} />
         <div>
-          <Button text="Add A New User" onClick={addNewAuthor} />
+          <Button text="Add A New Author" onClick={addNewAuthor} />
         </div>
       </div>
 

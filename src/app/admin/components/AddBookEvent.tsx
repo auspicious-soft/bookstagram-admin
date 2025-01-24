@@ -1,6 +1,6 @@
 "use client";
 import TextEditor from '@/app/components/Editor';
-import React, { useState, useCallback,useMemo } from 'react';
+import React, { useState, useCallback,useMemo, useTransition } from 'react';
 import Image from 'next/image';
 import preview from "@/assets/images/preview.png";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,7 @@ const AddBookEvent = () => {
   const [description, setDescription] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [image, setImage] = useState<any>();
+   const [isPending, startTransition] = useTransition();
   const disable = useMemo(() => !name || !image || !description, [name, image, description]);
 
   const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,7 +93,7 @@ const handleSave = async () => {
           </div>
          
           <button disabled={disable ? true : false} className={`w-full mt-4 text-[14px]  text-white py-3 rounded-[28px] transition-colors ${disable ? "bg-[#C0C0C0] ":"bg-[#ff4f0f] hover:bg-[#ff4f0f]"}  `} onClick={()=>handleSave()}>
-            Save
+          {!isPending ? "Save" : "Saving..." }
           </button>
         </div>
       </div>
