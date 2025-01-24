@@ -1,5 +1,5 @@
 "use client";
-import TextEditor from '@/app/components/Editor';
+// import TextEditor from '@/app/components/Editor';
 import React, { useState, useCallback,useMemo } from 'react';
 import Image from 'next/image';
 import preview from "@/assets/images/preview.png";
@@ -87,7 +87,7 @@ const handleSave = async () => {
           <div>
             <h2 className="text-sm mb-2">Text Editor</h2>
             <div className="border border-gray-200 rounded-lg">
-              <TextEditor setDescription={setDescription}/>
+              {/* <TextEditor setDescription={setDescription}/> */}
             </div>
           </div>
          

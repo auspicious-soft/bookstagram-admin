@@ -3,8 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "preinstall": "npx npm@latest install --legacy-peer-deps",
-    "postinstall": "npm install --legacy-peer-deps",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -18,7 +16,6 @@
     "@mui/material": "^6.4.1",
     "@mui/material-nextjs": "^6.3.1",
     "@syncfusion/ej2-react-richtexteditor": "^28.1.39",
-    "@tinymce/tinymce-react": "^5.1.1",
     "@tiptap/react": "^2.11.2",
     "@tiptap/starter-kit": "^2.11.2",
     "axios": "^1.7.9",
