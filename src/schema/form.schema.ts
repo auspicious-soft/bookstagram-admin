@@ -14,5 +14,6 @@ export const translationSchema = yup.object().shape({
         .required('Language is required'),
     })
   ),
-});
-// export type SecurityType = yup.InferType<typeof securitySchema>
+})
+
+export type translationType = yup.InferType<typeof translationSchema>
