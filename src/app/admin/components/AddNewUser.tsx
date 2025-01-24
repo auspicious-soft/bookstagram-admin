@@ -1,3 +1,4 @@
+'use client'
 import Modal from '@mui/material/Modal';
 import React, { FormEvent, useState, useTransition } from 'react';
 import Image from "next/image";
@@ -92,10 +93,12 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
                 }
 
                 const { confirmPassword, ...otherFields } = formData;
+                console.log('formData:', formData);
                 const payload = {
                     ...otherFields,
                     profilePic: profilePicKey,
                 };
+                console.log('payload:', payload);
                 const response = await addNewUser("/admin/users", payload);
                 
                 if (response?.status === 201) {
@@ -125,7 +128,6 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
     <div className="grid grid-cols-[1fr_2fr] gap-5  ">
       <div>
         <div className="custom relative p-5 bg-white rounded-[20px] h-full">
-          
           {imagePreview ? (
             <div className="relative ">
               <Image
@@ -136,7 +138,6 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
                 height={340}
                 className="rounded-[10px] w-full h-full object-cover"
               />
-              
             </div>
           ) : (
             <div className="grid place-items-center">
@@ -188,9 +189,9 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
             </label>
             <label>Phone Number
               <div className="grid grid-cols-[74px_1fr] gap-[5px]">
-                <input type="text" name="countryCode" value={formData.countryCode} onChange={handleChange} placeholder="+91" />
+                <input type="number" name="countryCode" value={formData.countryCode} onChange={handleChange} placeholder="+91" />
                 <input
-                  type="tel"
+                  type="number"
                   name="phoneNumber"
                   placeholder="1234567890"
                   value={formData.phoneNumber}

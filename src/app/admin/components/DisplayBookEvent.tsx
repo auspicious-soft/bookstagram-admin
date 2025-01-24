@@ -93,6 +93,8 @@ const handleUpload = async () => {
                   alt={eventName}
                   className="w-full h-full object-cover round-[10px]"
                   style={{borderRadius:"20px"}}
+                  width={340}
+                  height={340}
                 />
               ) }
                { imagePreview !=="" && (
@@ -101,6 +103,8 @@ const handleUpload = async () => {
                   alt={"Preview"}
                   className="w-full h-full object-cover round-[10px]"
                   style={{borderRadius:"20px"}}
+                  width={340}
+                  height={340}
                 />
               )} 
               {!eventImage && imagePreview ==="" &&(

@@ -59,7 +59,7 @@ const BooksEvents = () => {
                   className="round-[10px]"
                   style={{borderRadius:"10px"}}
                 /> */} 
-                <Image src={getImageClientS3URL(event.image)} alt={event.name} className="w-full h-full object-cover round-[10px]" style={{ borderRadius: "10px" }} />
+                <Image unoptimized src={getImageClientS3URL(event.image)} alt={event.name} width={263} height={263} className="w-full h-full object-cover round-[10px]" style={{ borderRadius: "10px" }} />
               </div>
               <div className="p-4">
                 <h3 className="text-[18px] font-medium text-color-[#060606]">{event.name}</h3>

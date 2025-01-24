@@ -1,5 +1,5 @@
 "use client";
-// import TextEditor from '@/app/components/Editor';
+import TextEditor from '@/app/components/Editor';
 import React, { useState, useCallback,useMemo } from 'react';
 import Image from 'next/image';
 import preview from "@/assets/images/preview.png";
@@ -38,10 +38,10 @@ const handleSave = async () => {
   return (
     <div className="flex gap-[20px] w-[100%] bg-red">
       <div className="w-[30%]">
-        <div className="bg-white rounded-[20px] p-4 shadow-sm h-[80%] w-[100%]">
-          <div className="aspect-square bg-gray-100 rounded-[10px] mb-4 flex items-center justify-center h-[80%] w-[100%]">
+        <div className="bg-white rounded-[20px] p-4 shadow-sm ">
+          <div className="aspect-square bg-gray-100 rounded-[10px] mb-4 flex items-center justify-center ">
             {imagePreview ? (
-              <Image src={ imagePreview !=null ? imagePreview : preview } alt="Preview" width={500} height={500} />
+              <Image unoptimized src={ imagePreview !=null ? imagePreview : preview } alt="Preview" width={500} height={500} />
             ) : (
               <div className="text-gray-400">
                 <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,7 +87,7 @@ const handleSave = async () => {
           <div>
             <h2 className="text-sm mb-2">Text Editor</h2>
             <div className="border border-gray-200 rounded-lg">
-              {/* <TextEditor setDescription={setDescription}/> */}
+              <TextEditor setDescription={setDescription}/>
             </div>
           </div>
          
