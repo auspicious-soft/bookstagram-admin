@@ -363,7 +363,7 @@ const TextEditor = ({setDescription}: any) => {
 
   return (
     <Editor
-      apiKey="dlpliwqcoggv1fdi4zy7xbju5vd8dkqmhepsf0jnqcdy7km6"
+      apiKey="cn7fp4jgljz9ci9zxpjsxt8kyi7i4370grt9ktu6lxke03eo"
       onInit={(evt, editor) => {
         editorRef.current = editor;
       }}
