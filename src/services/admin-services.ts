@@ -83,10 +83,22 @@ export const getAllCollection = async (route: string) => {
     return axiosInstance.get(route)
 }
 
-//----Book Pages------------------------
+//----Book Hub Pages------------------------
 export const getAllBooks = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
+}
+export const addBookToDiscount = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.put(route, payload)
+}
+export const getAllSchools = async (route: string) => {  //-----Book school tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const deleteSchool = async (route: string) => {  //-----Book school tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.delete(route)
 }
 
 //-----------------Summary Page--------------------------------
@@ -122,6 +134,25 @@ export const getAllStories = async (route: string) => {
 export const getSingleStory = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
+}
+export const deleteSingleStory = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.delete(route)
+}
+
+
+//------- Promotions Page --------------------------------
+export const getAllBanners = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const getSingleBanner = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const deleteSingleBanner = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.delete(route)
 }
 
 

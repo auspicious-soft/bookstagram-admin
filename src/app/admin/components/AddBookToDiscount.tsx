@@ -4,7 +4,7 @@ import Image from "next/image";
 import { toast } from "sonner"; 
 import { PlusIcon, SelectSvg } from "@/utils/svgicons";
 import useSWR from "swr";
-import { getAllBooks } from "@/services/admin-services";
+import { addBookToDiscount, getAllBooks } from "@/services/admin-services";
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL"; 
 
 interface ModalProp {
@@ -20,20 +20,20 @@ const AddBookToDiscount: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
   const [selectedCourses, setSelectedCourses] = useState<number[]>([]);
   const [isPending, startTransition] = useTransition();
   const {data, error, isLoading}= useSWR(`/admin/books?description=${searchParams}`, getAllBooks)
-  console.log('Book data:', data?.data?.data);
   const allBooks = data?.data?.data;
 
   useEffect(() => {
-      const handler = setTimeout(() => {
-    setsearchParams(`${inputValue ? 'description=' :''}${inputValue.trim()}`);
-      }, 500);
+    const handler = setTimeout(() => {
+      setsearchParams(`${inputValue ? 'description=' :''}${inputValue.trim()}`);
+    }, 500);
   
     return () => {
-          clearTimeout(handler);
-      };
+      clearTimeout(handler);
+    };
   }, [inputValue, setsearchParams]);
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-      setsearchParams(event.target.value);
+    setsearchParams(event.target.value);
   };
 
   const handleSelect = (id: number) => {
@@ -42,6 +42,39 @@ const AddBookToDiscount: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
     );
   };
 
+  const addToDiscount = async () => {
+    try {
+      // Validate inputs
+      if (!percentage || selectedCourses.length === 0) {
+        toast.error("Please select books and enter a discount percentage");
+        return;
+      }
+
+      const payload = {
+        discountPercentage: parseInt(percentage),
+        booksId: selectedCourses
+      };
+      console.log('payload:', payload);
+
+     startTransition(async () => {
+        const response = await addBookToDiscount('/admin/booksToDiscount', payload);
+
+        if (response.status===200 ) {
+          toast.success("Books added to discount successfully");
+          mutate();
+          onClose();
+          // Reset form
+          setPercentage('');
+          setSelectedCourses([]);
+        } else {
+          toast.error("Failed To add books to discount");
+        }
+      });
+    } catch (error) {
+      console.error('Error adding books to discount:', error);
+      toast.error("An error occurred while adding books to discount");
+    }
+  };
 
   return (
     <Modal
@@ -57,64 +90,58 @@ const AddBookToDiscount: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
             <label className="max-w-[143px] ">
               Discount Percentage
               <input type="number" name="percentage" value={percentage}
-                onChange={(e) => setPercentage(e.target.value)} placeholder="15%"  required
+                onChange={(e) => setPercentage(e.target.value)} placeholder="15%" required
                 min="1" max="100" />
             </label>
             <label className="w-full">Search
               <input type="search" name="" value={searchParams} onChange={handleInputChange} placeholder="Enter Name of the course" />
             </label>
-            </div>
-            <div className="grid grid-cols-4 gap-x-[15px] gap-y-5">
-        {isLoading ? (
-          <p>Loading...</p>
-        ) : error ? (
-          <p className="text-red-500">Error loading data.</p>
-        ) : allBooks?.length > 0 ? (
-          allBooks.map((book: any) => (
-            <div
-              key={book?._id}
-              onClick={() => handleSelect(book?._id)}
-              className="relative cursor-pointer"
-            >
-              <Image
-                unoptimized
-                src={getImageClientS3URL(book?.image)}
-                alt={book?.name}
-                width={216}
-                height={112}
-                className="rounded-lg w-full"
-              />
-              <p className="mt-[7px] text-darkBlack text-sm capitalize">
-                {book?.name}
-              </p>
-              <div className="absolute top-2 right-2">
-                {selectedCourses.includes(book?._id) ? (
-                  <SelectSvg color="var(--tw-bg-orange)" />
-                ) : (
-                  <SelectSvg color="#DADADA" />
-                )}
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>No data found</p>
-        )}
-      </div>
-
-        {/* {isLoading && (
-        <div className="flex justify-center items-center mt-5">
-          Loading...
-        </div>
-        )} */}
-                  <div className="mt-[30px] flex gap-2.5 justify-end">
-              <button
-                className="flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px]"
-                disabled={isPending}><PlusIcon />Add To Discounts</button>
-              <button
-                onClick={onClose}
-                className="rounded-[28px] border border-darkBlack py-2 px-5 text-sm"
-              >Cancel</button>
-            </div>
+          </div>
+          <div className="grid grid-cols-4 gap-x-[15px] gap-y-5">
+            {isLoading ? (
+              <p>Loading...</p>
+            ) : error ? (
+              <p className="text-red-500">Error loading data.</p>
+            ) : allBooks?.length > 0 ? (
+              allBooks.map((book: any) => (
+                <div
+                  key={book?._id}
+                  onClick={() => handleSelect(book?._id)}
+                  className="relative cursor-pointer"
+                >
+                  <Image
+                    unoptimized
+                    src={getImageClientS3URL(book?.image)}
+                    alt="books"
+                    width={216}
+                    height={112}
+                    className="rounded-lg w-full"
+                  />
+                  <p className="mt-[7px] text-darkBlack text-sm capitalize">
+                    {book?.name.eng}
+                  </p>
+                  <div className="absolute top-2 right-2">
+                    {selectedCourses.includes(book?._id) ? (
+                      <SelectSvg color="var(--tw-bg-orange)" />
+                    ) : (
+                      <SelectSvg color="#DADADA" />
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>No data found</p>
+            )}
+          </div>
+          <div className="mt-[30px] flex gap-2.5 justify-end">
+            <button onClick={addToDiscount}
+              className="flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px]"
+              disabled={isPending}><PlusIcon />Add To Discounts</button>
+            <button
+              onClick={onClose}
+              className="rounded-[28px] border border-darkBlack py-2 px-5 text-sm"
+            >Cancel</button>
+          </div>
         </div>
       </div>
     </Modal>

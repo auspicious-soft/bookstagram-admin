@@ -19,7 +19,7 @@ const AllUsersTable = () => {
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchParams, setsearchParams] = useState('');
   const {data, error, isLoading, mutate} = useSWR(searchParams!=="" ? `/admin/users?description=${searchParams}`: `/admin/users?${query}`, getAllUsers)
-  const userData = data?.data?.data;   
+  const userData = data?.data?.data;    
   const [addUserModal, setAddUserModal] = useState(false);
 
   const handlePageChange = (newPage: number) => {
@@ -66,7 +66,7 @@ const userProfile = (id: string) => {
               <tr key={row?._id}>
                 <td>{row?._id}</td>
                 <td><div className="flex items-center gap-[5px] capitalize"><TableRowImage image={row?.profilePic ? getImageClientS3URL(row?.profilePic) : profile}/>
-                 {row?.fullName}  </div>
+                 {row?.fullName?.eng}  </div>
                   </td>
                 <td>Level 3</td>
                 <td>{row?.phoneNumber}</td>

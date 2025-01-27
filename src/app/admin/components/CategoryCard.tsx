@@ -13,7 +13,7 @@ const CategoryCard:React.FC<CategoryProps> = ({image, name, onClick, displayMobi
     return (
         <div onClick={onClick}  className='grid place-items-center bg-white rounded-[20px] px-5 py-10 aspect-square '>
             <div className='text-center'>
-                <Image unoptimized src={image} alt={name} width={122} height={122} className='w-[122px] h-[122px] object-cover rounded-full mx-auto ' />
+                <Image unoptimized src={image} alt='dgv' width={122} height={122}  className='w-[122px] h-[122px] object-cover rounded-full mx-auto ' />
                 <p className='text-darkBlack text-[15px] leading-5 tracking-[-0.24px] mt-[23px] '>{name}</p>
                 {displayMobile !== undefined && (
           <p className="flex gap-2.5 items-center text-sm mt-5">

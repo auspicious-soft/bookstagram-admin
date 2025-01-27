@@ -83,7 +83,7 @@ const AllPublishersTable = () => {
                 publishersData?.map((row: any, index: number) => (
                 <tr key={row?._id || `publisher-${index}`}>
                   <td><div className="flex items-center gap-2.5 capitalize">
-                  <TableRowImage image={row?.publisher?.image ? getImageClientS3URL(row?.publisher?.image) : profile}/>  {row?.publisher?.name} </div></td>
+                  <TableRowImage image={row?.publisher?.image ? getImageClientS3URL(row?.publisher?.image) : profile}/>  {row?.publisher?.name.eng} </div></td>
                   <td>
                   <div className="flex flex-wrap gap-2">
                   {getCategoryNames(row?.publisher?.categoryId).slice(0, 3).map((categoryName, index) => (

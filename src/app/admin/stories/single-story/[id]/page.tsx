@@ -8,8 +8,7 @@ const Page = () => {
   const { id } = useParams();
   const { data } = useSWR(`/admin/stories/${id}`, getSingleStory);
 
-  const storyData = data?.data?.data;
-  console.log('storyData:', storyData);
+  const storyData = data?.data?.data; 
 
   return (
     <div className="p-5 bg-white rounded-[20px] ">

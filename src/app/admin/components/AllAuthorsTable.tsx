@@ -18,9 +18,7 @@ const AllAuthorsTable = () => {
   const itemsPerPage = 10;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchParams, setsearchParams] = useState("");
-  const { data, error, isLoading, mutate } = useSWR(
-    searchParams !== ""
-      ? `/admin/authors?description=${searchParams}`
+  const { data, error, isLoading, mutate } = useSWR(searchParams !== ""? `/admin/authors?description=${searchParams}`
       : `/admin/authors?${query}`,
     getAllAuthors
   );
@@ -74,7 +72,7 @@ const AllAuthorsTable = () => {
               authorsData?.map((row: any) => (
                 <tr key={row?._id}>
                   <td><div className="flex items-center gap-2.5 capitalize">
-                  <TableRowImage image={row?.image ? getImageClientS3URL(row?.image) : profile}/> {row?.name} 
+                  <TableRowImage image={row?.image ? getImageClientS3URL(row?.image) : profile}/> {row?.name.eng} 
                     </div></td>
                   <td className="capitalize"> {row?.profession.join(", ")}</td>
                   <td>{row?.dob}</td>

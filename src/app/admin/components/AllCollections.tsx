@@ -41,7 +41,7 @@ const AllCollections = () => {
             {collections?.map((row: any) => (
             <CategoryCard 
             key={row?._id}
-            name={row?.name}
+            name={row?.name.eng}
             image={getImageClientS3URL(row?.image)}
             onClick={()=>handleSubCategory(row?._id)}
             displayMobile={row?.displayOnMobile}

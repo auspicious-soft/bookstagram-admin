@@ -40,7 +40,7 @@ const AllSummary = () => {
             {summary?.map((row: any) => (
             <CategoryCard 
             key={row?._id}
-            name={row?.name}
+            name={row?.name.eng}
             image={getImageClientS3URL(row?.image)}
             onClick={()=>handleCategory(row?._id)}
             />

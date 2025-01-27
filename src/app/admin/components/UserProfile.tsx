@@ -198,7 +198,7 @@ const UserProfile = ({id}: Props) => {
         </div>
         </div>
       </div>
-      <div className="main-form bg-white p-[30px] rounded-[30px] ">
+      <div className="main-form bg-white p-[30px] rounded-[20px] ">
       <form onSubmit={handleSubmit} className="form-box">
         <div className="space-y-5 ">
          <label>Name of User
@@ -251,7 +251,7 @@ const UserProfile = ({id}: Props) => {
         <select name="user" 
         value={user} 
         onChange={handleUsersChange} 
-        className="py-[9px] px-[14px] rounded-[17px] ">
+        className="custom-arrow py-[9px] px-[14px] rounded-[17px] ">
         <option value="7">Last 7 days</option>
         <option value="30">Last 30 days</option>
         </select>

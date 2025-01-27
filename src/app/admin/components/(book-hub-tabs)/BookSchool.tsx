@@ -1,91 +1,117 @@
-import React, { useState } from "react";
-import SearchBar from "../SearchBar";
-import { PlusIcon } from "@/utils/svgicons";
-import TablePagination from "../TablePagination";
-import GenerateCouponModal from "../GenerateCouponModal";
+'use client'
+import React, { useState } from 'react'; 
+import Button from '@/app/components/Button'; 
+import { useRouter } from 'next/navigation';
+import useSWR from 'swr';
+import { deleteSchool, getAllSchools } from '@/services/admin-services'; 
+import ReactLoading from 'react-loading';
+import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
+import TableRowImage from '@/app/components/TableRowImage';
+import profile from '@/assets/images/preview.png';
+import GenerateCouponModal from '../GenerateCouponModal';
+import SearchBar from '../SearchBar';
+import TablePagination from '../TablePagination';
+import { DeleteIcon, ViewIcon } from '@/utils/svgicons';
+import { toast } from 'sonner';
 
-const initialData = [
-    {
-      id: 'F123',
-      status: 'Completed',
-      clientName: 'Herry',
-      contact: '1234567890',
-      memberSince: '01 Jan 2020',
-      assignments: 5,
-      actionss: "Action",
-      accountStatus: true,
-      action: true,
-    },
-    {
-      id: 'F545',
-      status: 'Completed',
-      clientName: 'Genny',
-      contact: '1234567890',
-      memberSince: '01 Jan 2020',
-      assignments: 5,
-      actionss: "Action",
-      accountStatus: "active",
-      action: "true",
-    },
-    {
-      id: 'F55',
-      status: 'Completed',
-      clientName: 'Genny',
-      contact: '1234567890',
-      memberSince: '01 Jan 2020',
-      assignments: 5,
-      actionss: "Action",
-      accountStatus: true,
-      action: true,
-    },
-    // Add more data as needed
-  ];
 const BookSchool = () => {
-  const [isopen, setIsOpen] = useState(false)
+  const router = useRouter();
+  const [page, setPage] = useState(1); 
+  const itemsPerPage = 10;
+  const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
+  const [searchParams, setsearchParams] = useState('');
+  const {data, error, isLoading, mutate} = useSWR(searchParams!=="" ? `/admin/book-schools?description=${searchParams}`: `/admin/book-schools?${query}`, getAllSchools)
+  const schoolData = data?.data?.data;    
+  console.log('schoolData:', schoolData);
+  const [isopen, setIsOpen] = useState(false);
 
-  return (
-    <div>
-      <div className="flex gap-2.5 justify-end mb-5 "> 
-        {/* <SearchBar /> */}
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    setQuery(`page=${newPage}&limit=${itemsPerPage}`);
+  };
+
+  const couponProfile = (id: string) => {
+    console.log('id:', id);
+  }
+  
+  const handleDelete = async (id: string) => {
+    try {
+      const response = await deleteSchool(`/admin/vouchers/${id}`);
+      if (response.status === 200) {
+        toast.success("deleted successfully");
+        mutate()
+      } else {
+      toast.error("Failed To Delete voucher");
+      }
+    } catch (error) {
+    toast.error("an Error Occurred While Deleting The voucher");
+    }
+  }
+
+    return (
         <div>
-          <button onClick={()=> setIsOpen(true)}
-            className="flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px] ">
-            <PlusIcon /> Generate A Coupon
-          </button>
+        <div className="flex gap-2.5 justify-end mb-5 "> 
+        <SearchBar setQuery={setsearchParams}  query={searchParams}/>
+        <div>
+        <Button text='Generate A Coupon' onClick={()=>setIsOpen(true)}  />
         </div>
       </div>
+
       <div className='table-common overflo-custom'>
         <h3>All Schools</h3>
             <table className="">
           <thead className="">
             <tr>
-              <th>ID</th>
-              <th>Status</th>
-              <th>Client</th>
-              <th>Contact</th>
-              <th>Member Since</th>
-              <th>Assignments</th>
-              <th>Actions</th>
+              <th>Name of School</th>
+              <th>Coupon Code</th>
+              <th>Created On</th>
+              <th>No of Activations</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody className=''>
-            {initialData.map((row) => (
-              <tr key={row.id}>
-                <td>{row.id}</td>
-                <td>{row.status} </td>
-                <td>{row.clientName}</td>
-                <td>{row.contact}</td>
-                <td>{row.memberSince}</td>
-                <td>{row.assignments}</td>
-                <td>{row.accountStatus}</td>
-                
+          {isLoading ? (
+              <tr>
+                <td colSpan={6} className="">Loading...</td>
               </tr>
-            ))}
+            ) : error ? (
+              <tr>
+                <td colSpan={6} className="text-center text-red-500 ">Error loading data.</td>
+              </tr>
+            ) : schoolData?.length > 0 ? (
+            schoolData?.map((row: any) => (
+              <tr key={row?._id}>
+                <td>{row?.name?.eng}</td>
+                <td>{row?.couponCode}</td>
+                <td>{row?.createdAt}</td>
+                <td>{row?.codeActivated}</td>
+                <td>
+                <div>
+                <button onClick={()=> couponProfile(row?._id)} className='p-2.5'><ViewIcon/></button>
+                <button onClick={()=>handleDelete(row?._id)} className='p-2.5'><DeleteIcon/> </button>
+                </div>
+                </td>
+              </tr>
+            ))
+         ) : (
+             <tr>
+               <td colSpan={6}>{isLoading ? (<ReactLoading type={"spin"} color={"#26395e"} height={"20px"} width={"20px"} />
+                 ) : (
+                   <p>No data found</p>
+                 )}
+               </td>
+             </tr>
+            )}
           </tbody>
         </table>
       </div>
         <div className="mt-10 flex justify-end">
-        {/* <TablePagination/> */}
+        <TablePagination
+          setPage={handlePageChange}
+          page={page}
+          totalData={data?.data?.total}
+          itemsPerPage={itemsPerPage}
+          />
         </div>
 
       <GenerateCouponModal

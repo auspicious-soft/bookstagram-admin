@@ -22,8 +22,7 @@ const Page = () => {
   const itemsPerPage = 10;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const {data: discountData, isLoading: bookIsLoading}= useSWR(bookSearch?`/admin/discounted-books?description=${bookSearch}$${query}&isDiscounted=true`:`/admin/discounted-books?${query}&isDiscounted=true`, getAllDiscountBooks)
-  const bookData= discountData?.data?.data;
-  console.log('bookData:', bookData);
+  const bookData= discountData?.data?.data; 
   const {data, error, isLoading, mutate} = useSWR(voucherSearch? `/admin/vouchers?description=${voucherSearch}&${query}` : `/admin/vouchers?${query}`, getAllVouchers)
   const vouchersData = data?.data?.data;
   const total = data?.data?.total
@@ -47,14 +46,14 @@ const Page = () => {
         break;
         case "Vouchers":
           setisVoucher(true);
-        break;
+      break;
     }
   };
   
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     setQuery(`page=${newPage}&limit=${itemsPerPage}`);
-    };
+  };
 
 
   return (
