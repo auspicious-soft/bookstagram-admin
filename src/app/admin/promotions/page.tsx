@@ -18,7 +18,7 @@ const Page = () => {
 
 
   const addBanner = () => {
-   router.push('/admin/stories/add-new-banner');
+   router.push('/admin/promotions/add-new-banner');
   };
 
   const handleDelete = async (id: string) => {
@@ -38,15 +38,15 @@ const Page = () => {
   }
   return (
     <div>
-      <div className="flex justify-end">
+      <div className="flex justify-end mb-5">
         <Button text="Add A New Banner" onClick={addBanner} />
         </div>
         <div className="grid grid-cols-4 gap-6">
             {stories?.map((banner): any =>(
             <div key={banner?._id} className="relative ">
-                  <Image unoptimized src={getImageClientS3URL(banner?.image)} width={264} height={163} alt="story"
-                className="rounded-[10px]  w-full "/>
-                <h2 className="font-aeonikBold text-lg capitalize text-darkBlack mt-[11px] ">{banner?.name}</h2>
+              <Image unoptimized src={getImageClientS3URL(banner?.image)} width={264} height={163} alt="story"
+              className="rounded-[10px]  w-full "/>
+              <h2 className="font-aeonikBold text-lg capitalize text-darkBlack mt-[11px] ">{banner?.name.eng}</h2>
               <div className="absolute top-[5px] right-[6px]  ">
               <button onClick={()=>handleDelete(banner?._id)} className="bg-white border border-orange rounded-[34px] flex items-center gap-[5px] py-2 px-4 text-orange ">
               <DeleteIcon stroke="var(--tw-bg-orange)"/>Remove</button>

@@ -3,11 +3,11 @@ import React, { useState, useTransition } from "react";
 import Image from "next/image";
 import preview from "@/assets/images/preview.png";
 import { toast } from "sonner";
-import { generateSignedUrlForBanners } from "@/actions";
+import { generateSignedUrlForStories } from "@/actions";
 import { FormProvider, useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { addNewBaner } from "@/services/admin-services";
+import { addNewStory } from "@/services/admin-services";
 
 type Language = "eng" | "kaz" | "rus";
 
@@ -34,7 +34,6 @@ const Page = () => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [usedLanguages, setUsedLanguages] = useState<Set<Language>>(new Set(["eng"]));
-
   const methods = useForm<FormValues>({
     resolver: yupResolver(validationSchema) as any,
     defaultValues: {
@@ -42,7 +41,6 @@ const Page = () => {
       link: "",
     },
   });
-  
   const {
     register,
     handleSubmit,
@@ -109,6 +107,10 @@ const Page = () => {
     });
   };
 
+  const repeatBox = ()=> {
+
+  }
+
   const onSubmit = async (data: FormValues) => {
     startTransition(async () => {
       try {
@@ -116,9 +118,9 @@ const Page = () => {
         const timestamp = Date.now();
         if (imageFile) {
 
-          const { signedUrl, key } = await generateSignedUrlForBanners(
-            `${timestamp}-${imageFile.name}`,
-            // imageFile.name,
+          const { signedUrl, key } = await generateSignedUrlForStories(
+            `${timestamp}-${name}`,
+             imageFile.name,
             imageFile.type
           );
 
@@ -150,7 +152,7 @@ const Page = () => {
         };
 
         console.log('payload:', payload);
-        const response = await addNewBaner("/admin/banners", payload);
+        const response = await addNewStory("/admin/banners", payload);
 
         if (response?.status === 201) {
           toast.success("Banner added successfully");
@@ -167,6 +169,7 @@ const Page = () => {
       }
     });
   };
+
 
   return ( 
       <div className="bg-white p-5 rounded-[20px]">
@@ -219,8 +222,9 @@ const Page = () => {
                         </p>
                       )}
                     </div>
-                  ))}
-            <div className="mt-10 max-w-[536px] ">
+              ))}
+            <div className="mt-10 ">
+            <div className="repeat-section">
             <div className="custom relative mb-5">
                 {imagePreview ? (
                   <div className="relative">
@@ -269,35 +273,32 @@ const Page = () => {
                     </p>
                   )}
                 </div>
+            </div>
+             <label>Link
+              <input
+                type="text" {...register("link")} placeholder="https://example.com" className="w-full"
+               />
+              {errors.link && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.link.message}
+                </p>
+              )}
+             </label>
+             </div>
+              <div> 
+                <button onClick={repeatBox}>Add</button>
               </div>
-                  <label>
-                    Link
-                    <input
-                      type="text"
-                      {...register("link")}
-                      placeholder="https://example.com"
-                      className="w-full"
-                    />
-                    {errors.link && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.link.message}
-                      </p>
-                    )}
-                  </label>
-
-                  <div>
+                  </div>
                     <button
                       type="submit"
                       disabled={isPending}
                       className="bg-orange text-white text-sm px-4 mt-10 py-[14px] text-center rounded-[28px] w-full"
                     >Add New Banner</button>
-                    </div>
-                  </div>
                 </div>
-            </form>
-        </FormProvider>
-            </div>
-          </div> 
+          </form>
+          </FormProvider>
+          </div>
+      </div> 
   );
 };
 

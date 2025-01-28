@@ -32,7 +32,8 @@ const Header: React.FC = () => {
     "/admin/users": "Users",
     "/admin/notifications": "Notifications",
     "/admin/authors/add-author" : "Add New Author",
-    "/admin/stories/add-new-story": "Add New Story"
+    "/admin/stories/add-new-story": "Add New Story",
+    "/admin/promotions/add-new-banner": "Add New Banner"
     
   };
   const getPageName = (path: string): string => {

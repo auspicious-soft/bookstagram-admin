@@ -139,7 +139,10 @@ export const deleteSingleStory = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.delete(route)
 }
-
+export const addNewStory = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)   
+}
 
 //------- Promotions Page --------------------------------
 export const getAllBanners = async (route: string) => {
@@ -154,7 +157,10 @@ export const deleteSingleBanner = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.delete(route)
 }
-
+export const addNewBaner = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)   
+}
 
 
 //------- Book Events------- 
