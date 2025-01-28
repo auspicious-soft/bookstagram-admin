@@ -85,6 +85,7 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
     formState: { errors },
     reset,
   } = methods;
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: "translations",
@@ -148,7 +149,7 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
           ...otherFields,
           profilePic: profilePicKey,
         };
-        console.log('payload:', payload);
+        console.log("payload:", payload);
 
         const response = await addNewUser("/admin/users", payload);
 
@@ -160,7 +161,11 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
           toast.error("Failed to add user");
         }
       } catch (error) {
-        toast.error(  error?.response?.status == 400  ? error?.response?.data?.message   : "An error occurred" );
+        toast.error(
+          error?.response?.status == 400
+            ? error?.response?.data?.message
+            : "An error occurred"
+        );
       }
     });
   };
@@ -258,11 +263,7 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
                             <p className="mb-1 text-sm text-darkBlack">Name</p>
                             <div className="flex items-center gap-[5px] w-full">
                               <label className="!flex bg-[#F5F5F5] rounded-[10px] w-full">
-                                <select
-                                  {...register(
-                                    `translations.${index}.language`,
-                                    {}
-                                  )}
+                                <select {...register(`translations.${index}.language`, {} )}
                                   className="!mt-0 max-w-[80px] !bg-[#D9D9D9] "
                                 >
                                   <option value="eng">Eng</option>
@@ -289,17 +290,8 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
                                 />
                               </label>
                               {index === 0 ? (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const unusedLanguage = [
-                                      "eng",
-                                      "kaz",
-                                      "rus",
-                                    ].find(
-                                      (lang) =>
-                                        !usedLanguages.has(lang as Language)
-                                    );
+                                <button type="button"
+                                  onClick={() => {const unusedLanguage = ["eng","kaz","rus",].find((lang) =>!usedLanguages.has(lang as Language));
                                     if (unusedLanguage) {
                                       append({
                                         id: String(fields.length + 1),
@@ -349,8 +341,6 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
                             )}
                           </div>
                         ))}
-
-                        {/* Rest of the form fields */}
                         <label>
                           Email Address
                           <input
