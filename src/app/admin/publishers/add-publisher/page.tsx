@@ -1,198 +1,429 @@
 'use client'
-import React, { FormEvent, useState, useTransition } from 'react';
+import React, { useState, useTransition } from 'react';
 import Image from "next/image";
-import preview from "@/assets/images/preview.png"; 
+import preview from "@/assets/images/preview.png";
 import { toast } from 'sonner';
 import { generatePublishersProfilePicture } from '@/actions';
 import { addNewPublisher } from '@/services/admin-services';
 import CustomSelect from '@/app/components/CustomSelect';
 import UseCategory from '@/utils/useCategory';
+import { useFieldArray, useForm, FormProvider } from "react-hook-form";
+import * as yup from 'yup';
+import { yupResolver } from "@hookform/resolvers/yup";
+
+type Language = "eng" | "kaz" | "rus";
+
+const validationSchema = yup.object({
+  translations: yup.array().of(
+    yup.object({
+      language: yup.string().required('Language is required'),
+      name: yup.string().required('Name is required')
+    })
+  ),
+  descriptionTranslations: yup.array().of(
+    yup.object({
+      language: yup.string().required('Language is required'),
+      content: yup.string().required('Description is required')
+    })
+  ),
+  categoryId: yup.array().min(1, 'At least one category is required'),
+  country: yup.string().required('Country is required'),
+  email: yup.string().email('Invalid email').required('Email is required'),
+  password: yup.string().required('Password is required'),
+});
+
+interface FormValues {
+  translations: {
+    id: string;
+    language: Language;
+    name: string;
+  }[];
+  descriptionTranslations: {
+    id: string;
+    language: Language;
+    content: string;
+  }[];
+  categoryId: string[];
+  country: string;
+  email: string;
+  password: string;
+}
 
 const Page = () => {
-    const [isPending, startTransition] = useTransition();
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const { category, isLoading } = UseCategory();
+  const [isPending, startTransition] = useTransition();
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const { category, isLoading } = UseCategory();
+  const [usedLanguages, setUsedLanguages] = useState<Set<Language>>(new Set(["eng"]));
+  const [usedDescLanguages, setUsedDescLanguages] = useState<Set<Language>>(new Set(["eng"]));
 
-
-  const [formData, setFormData] = useState<any>({
-      name: "",
-      email: "",
-      password: "",
-      image: null,
-      description: "",
+  const methods = useForm<FormValues>({
+    resolver: yupResolver(validationSchema) as any,
+    defaultValues: {
+      translations: [
+        { id: "1", language: "eng" as Language, name: "" }
+      ],
+      descriptionTranslations: [
+        { id: "1", language: "eng" as Language, content: "" }
+      ],
       categoryId: [],
       country: "",
+      email: "",
+      password: "",
+    }
   });
 
+  const { control, handleSubmit, register, watch, setValue, formState: { errors } } = methods;
 
-  const handleCategoryChange = (selectedOptions: any) => { 
-        const selectedValues = selectedOptions.map((option: any) => option.value);
-        setFormData((prevData: any) => ({
-          ...prevData,
-          categoryId: selectedValues,
-        }));
+  const { 
+    fields: nameFields, 
+    append: appendName, 
+    remove: removeName 
+  } = useFieldArray({
+    control,
+    name: "translations"
+  });
+
+  const { 
+    fields: descriptionFields, 
+    append: appendDescription, 
+    remove: removeDescription 
+  } = useFieldArray({
+    control,
+    name: "descriptionTranslations"
+  });
+
+  const handleCategoryChange = (selectedOptions: any) => {
+    const selectedValues = selectedOptions.map((option: any) => option.value);
+    setValue('categoryId', selectedValues);
   };
 
   const triggerFileInputClick = () => {
-      const fileInput = document.querySelector(
-        'input[type="file"]'
-      ) as HTMLInputElement;
-      if (fileInput) {
-        fileInput.click();
-      }
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput) fileInput.click();
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setImageFile(file); 
-          
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const result = e.target?.result as string;
-                setImagePreview(result);
-            };
-            reader.readAsDataURL(file);
-        }
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setImagePreview(result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-  };
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (data: FormValues) => {
     startTransition(async () => {
-    try {
+      try {
         let profilePicKey = null;
         if (imageFile) {
-        const { signedUrl, key } = await generatePublishersProfilePicture(imageFile.name, imageFile.type, formData.email);
-        const uploadResponse = await fetch(signedUrl, {
-                method: 'PUT',
-                body: imageFile,
-                headers: {
-                    'Content-Type': imageFile.type,
-                },
-            });
-            if (!uploadResponse.ok) {
-                throw new Error('Failed to upload image to S3');
-            }
-            profilePicKey = key;
+          const { signedUrl, key } = await generatePublishersProfilePicture(
+            imageFile.name, 
+            imageFile.type, 
+            data.email
+          );
+          
+          const uploadResponse = await fetch(signedUrl, {
+            method: 'PUT',
+            body: imageFile,
+            headers: {
+              'Content-Type': imageFile.type,
+            },
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error('Failed to upload image to S3');
+          }
+          profilePicKey = key;
         }
+
+        // Transform translations arrays to objects
+        const nameTransforms = data.translations.reduce((acc, curr) => ({
+          ...acc,
+          [curr.language]: curr.name
+        }), {});
+
+        const descriptionTransforms = data.descriptionTranslations.reduce((acc, curr) => ({
+          ...acc,
+          [curr.language]: curr.content
+        }), {});
+
+        const { translations, descriptionTranslations, ...filteredData } = data;
         const payload = {
-            ...formData,
-            image: profilePicKey, 
+          ...filteredData,
+          name: nameTransforms,
+          description: descriptionTransforms,
+          image: profilePicKey,
         };
+
         const response = await addNewPublisher("/admin/publishers", payload);
+        
         if (response?.status === 201) {
-            toast.success("User added successfully");
-        window.location.href = "/admin/publishers"
+          toast.success("Publisher added successfully");
+          window.location.href = "/admin/publishers";
         } else {
-            toast.error( "Failed to add user");
+          toast.error("Failed to add publisher");
         }
-    } catch (error) {
+      } catch (error) {
         console.error("Error", error);
-        toast.error("An error occurred while adding the user");
-    }
+        toast.error("An error occurred while adding the publisher");
+      }
     });
   };
-return (
-    <div> 
-    <form onSubmit={handleSubmit} className="form-box">
-    <div className="grid grid-cols-[1fr_2fr] gap-5  ">
-      <div>
-        <div className="custom relative p-5 bg-white rounded-[20px] h-full">
-        {imagePreview ? (
-            <div className="relative ">
-              <Image
-              unoptimized
-                src={imagePreview}
-                alt="Preview"
-                width={340}
-                height={340}
-                className="rounded-[10px] w-full h-full object-cover"
-              />
-              
-            </div>
-          ) : (
-        <div className="grid place-items-center">
-                <Image unoptimized
-                  src={preview}
-                  alt="upload"
-                  width={340}
-                  height={340}
-                  className="rounded-[10px] w-full"
-                /> 
-            </div>
-          )}
-            <div className='main-form mt-4 '>
-            <label htmlFor="">Name of Publisher
-                <input type="text" name='name' value={formData.name} onChange={handleChange} placeholder='Name' required />
-            </label>
-            </div>
-           <div className="relative mt-4 ">
-             <input
-            className="absolute top-0 left-0 h-full w-full opacity-0 p-0 cursor-pointer"
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-          />
-         {imagePreview ? (
-          <button
-            type="button"
-            onClick={triggerFileInputClick}
-            className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] w-full"
-          >Edit </button>
-        ) : (
-          <p className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] cursor-pointer"
-            onClick={triggerFileInputClick}> Upload Image </p>
-        )}
-        </div>
-        </div>
-      </div>
-      <div className="main-form bg-white p-[30px] rounded-[30px] ">
-        <div className="space-y-5 ">
-     <div className='grid grid-cols-2 gap-5'>
-         <label>Email
-            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder='email..' required />
-         </label>
-         <label>Password
-            <input type="text" name="password" value={formData.password} onChange={handleChange} placeholder='***'  required />
-        </label>
-         </div> 
-            <CustomSelect
-            name='Categories'
-            isMulti={true}
-            value = {category.filter((option) =>
-                formData.categoryId.includes(option.value)
-              )}  
-            options={category}
-            onChange={handleCategoryChange}
-            placeholder="Selected Categories"
-          />
-            <label>Country
-              <input type="text" name="country" value={formData.country} onChange={handleChange} placeholder='Enter Name' required/>
-            </label>
-            <label>Description
-            <textarea rows={5} name="description" value={formData.description} onChange={handleChange} placeholder="Add Description..."></textarea>
-            </label>
-           
+
+  return (
+    <div>
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)} className="form-box">
+          <div className="grid grid-cols-[1fr_2fr] gap-5">
             <div>
-            <button
-            type="submit" disabled={isPending}
-            className="bg-orange text-white text-sm px-4 mt-5 py-[14px] text-center rounded-[28px] w-full"
-          >{isPending ? " Adding..." :"Add A New Publisher"} </button>
+              <div className="custom relative p-5 bg-white rounded-[20px] h-full">
+                {imagePreview ? (
+                  <div className="relative">
+                    <Image
+                      unoptimized
+                      src={imagePreview}
+                      alt="Preview"
+                      width={340}
+                      height={340}
+                      className="rounded-[10px] w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="grid place-items-center">
+                    <Image
+                      unoptimized
+                      src={preview}
+                      alt="upload"
+                      width={340}
+                      height={340}
+                      className="rounded-[10px] w-full"
+                    />
+                  </div>
+                )}
+                <div className="main-form space-y-5 mt-4">
+                  {nameFields.map((field, index) => (
+                    <div key={field.id}>
+                     <p className="mb-1 text-sm text-darkBlack">Name of Publisher</p>
+                      <div className="flex items-center gap-[5px] w-full">
+                        <label className="!flex bg-[#F5F5F5] rounded-[10px] w-full">
+                          <select
+                            {...register(`translations.${index}.language`)}
+                            className="!mt-0 max-w-[80px] !bg-[#D9D9D9]"
+                          >
+                            <option value="eng">Eng</option>
+                            <option value="kaz">Kaz</option>
+                            <option value="rus">Rus</option>
+                          </select>
+                          <input
+                            type="text"
+                            {...register(`translations.${index}.name`)}
+                            placeholder="Enter name"
+                            className="!mt-0 flex-1"
+                          />
+                        </label>
+                        {index === 0 ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const unusedLanguage = ["eng", "kaz", "rus"].find(
+                                (lang) => !usedLanguages.has(lang as Language)
+                              );
+                              if (unusedLanguage) {
+                                appendName({
+                                  id: String(nameFields.length + 1),
+                                  language: unusedLanguage as Language,
+                                  name: "",
+                                });
+                                setUsedLanguages(
+                                  (prev) => new Set([...prev, unusedLanguage as Language])
+                                );
+                              }
+                            }}
+                            disabled={usedLanguages.size >= 3}
+                            className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm"
+                          >
+                            Add
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const languageToRemove = watch(`translations.${index}.language`);
+                              removeName(index);
+                              setUsedLanguages((prev) => {
+                                const updated = new Set(prev);
+                                updated.delete(languageToRemove as Language);
+                                return updated;
+                              });
+                            }}
+                            className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm"
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  <div className="relative mt-4">
+                    <input
+                      className="absolute top-0 left-0 h-full w-full opacity-0 p-0 cursor-pointer"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                    />
+                    {imagePreview ? (
+                      <button
+                        type="button"
+                        onClick={triggerFileInputClick}
+                        className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] w-full"
+                      >
+                        Edit
+                      </button>
+                    ) : (
+                      <p
+                        className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] cursor-pointer"
+                        onClick={triggerFileInputClick}
+                      >
+                        Upload Image
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="main-form bg-white p-[30px] rounded-[30px]">
+              <div className="space-y-5">
+                <div className="grid grid-cols-2 gap-5">
+                  <label>
+                    Email
+                    <input
+                      type="email"
+                      {...register("email")}
+                      placeholder="email.."
+                    />
+                    {errors.email && (
+                      <span className="text-red-500 text-sm">{errors.email.message}</span>
+                    )}
+                  </label>
+                  <label>
+                    Password
+                    <input
+                      type="text"
+                      {...register("password")}
+                      placeholder="***"
+                    />
+                    {errors.password && (
+                      <span className="text-red-500 text-sm">{errors.password.message}</span>
+                    )}
+                  </label>
+                </div>
+                <CustomSelect
+                  name="Categories"
+                  isMulti={true}
+                  options={category}
+                  value={category.filter((option) =>
+                    watch('categoryId').includes(option.value)
+                  )}
+                  onChange={handleCategoryChange}
+                  placeholder="Select Categories"
+                />
+                {errors.categoryId && (
+                  <span className="text-red-500 text-sm">{errors.categoryId.message}</span>
+                )}
+                <label>
+                  Country
+                  <input
+                    type="text"
+                    {...register("country")}
+                    placeholder="Enter Name"
+                  />
+                  {errors.country && (
+                    <span className="text-red-500 text-sm">{errors.country.message}</span>
+                  )}
+                </label>
+                {descriptionFields.map((field, index) => (
+                  <div key={field.id}>
+                    <p className="mb-1 text-sm text-darkBlack">Description</p>
+                    <div className="flex items-start gap-[5px] w-full">
+                      <label className="!flex items-start bg-[#F5F5F5] rounded-[10px] w-full">
+                        <select
+                          {...register(`descriptionTranslations.${index}.language`)}
+                          className="!mt-0 max-w-[80px] !bg-[#D9D9D9]"
+                        >
+                          <option value="eng">Eng</option>
+                          <option value="kaz">Kaz</option>
+                          <option value="rus">Rus</option>
+                        </select>
+                        <textarea
+                          {...register(`descriptionTranslations.${index}.content`)}
+                          rows={5}
+                          placeholder="Add Description..."
+                          className="!mt-0 flex-1"
+                        />
+                      </label>
+                      {index === 0 ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const unusedLanguage = ["eng", "kaz", "rus"].find(
+                              (lang) => !usedDescLanguages.has(lang as Language)
+                            );
+                            if (unusedLanguage) {
+                              appendDescription({
+                                id: String(descriptionFields.length + 1),
+                                language: unusedLanguage as Language,
+                                content: "",
+                              });
+                              setUsedDescLanguages(
+                                (prev) => new Set([...prev, unusedLanguage as Language])
+                              );
+                            }
+                          }}
+                          disabled={usedDescLanguages.size >= 3}
+                          className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm"
+                        >
+                          Add
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const languageToRemove = watch(`descriptionTranslations.${index}.language`);
+                            removeDescription(index);
+                            setUsedDescLanguages((prev) => {
+                              const updated = new Set(prev);
+                              updated.delete(languageToRemove as Language);
+                              return updated;
+                            });
+                          }}
+                          className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className="bg-orange text-white text-sm px-4 mt-5 py-[14px] text-center rounded-[28px] w-full"
+                >
+                  {isPending ? "Adding..." : "Add A New Publisher"}
+                </button>
+              </div>
             </div>
           </div>
-      </div>
-    </div> 
-    </form>
+        </form>
+      </FormProvider>
     </div>
-    );
-}
+  );
+};
 
 export default Page;

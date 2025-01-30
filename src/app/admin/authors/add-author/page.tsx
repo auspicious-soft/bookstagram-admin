@@ -10,13 +10,21 @@ import { useFieldArray, useForm, FormProvider } from "react-hook-form";
 import * as yup from 'yup';
 import { yupResolver } from "@hookform/resolvers/yup";
 
-const professions = [
+// Define types for select options
+interface OptionType {
+  value: string;
+  label: string;
+}
+
+type MultiValue<T> = T[];
+
+const professions: OptionType[] = [
   { value: "poet", label: "Poet" },
   { value: "writer", label: "Writer" },
   { value: "artist", label: "Artist" },
 ];
 
-const genresOptions = [
+const genresOptions: OptionType[] = [
   { value: "fiction", label: "Fiction" },
   { value: "non-fiction", label: "Non-Fiction" },
   { value: "poetry", label: "Poetry" },
@@ -31,15 +39,17 @@ const validationSchema = yup.object({
       name: yup.string().required('Name is required')
     })
   ),
+  descriptionTranslations: yup.array().of(
+    yup.object({
+      language: yup.string().required('Language is required'),
+      content: yup.string().required('Description is required')
+    })
+  ),
+  // fullName: yup.object().required(),
   profession: yup.array().min(1, 'At least one profession is required'),
   country: yup.string().required('Country is required'),
   dob: yup.string().required('Date of birth is required'),
   genres: yup.array().min(1, 'At least one genre is required'),
-  description: yup.object({
-    eng: yup.string().required('English description is required'),
-    kaz: yup.string(),
-    rus: yup.string()
-  })
 });
 
 interface FormValues {
@@ -48,13 +58,15 @@ interface FormValues {
     language: Language;
     name: string;
   }[];
+  descriptionTranslations: {
+    id: string;
+    language: Language;
+    content: string;
+  }[];
   profession: string[];
   country: string;
   dob: string;
   genres: string[];
-  description: {
-    [key in Language]?: string;
-  };
 }
 
 const Page = () => {
@@ -70,23 +82,44 @@ const Page = () => {
       translations: [
         { id: "1", language: "eng" as Language, name: "" }
       ],
+      descriptionTranslations: [
+        { id: "1", language: "eng" as Language, content: "" }
+      ],
       profession: [],
       country: "",
       dob: "",
       genres: [],
-      description: { eng: "" },
     }
   });
 
   const { control, handleSubmit, register, watch, setValue, getValues, formState: { errors } } = methods;
-  const { fields, append, remove } = useFieldArray({
+  
+  const { 
+    fields: nameFields, 
+    append: appendName, 
+    remove: removeName 
+  } = useFieldArray({
     control,
     name: "translations"
   });
 
-  const handleGenresChange = (selectedOptions: any) => {
-    const selectedValues = selectedOptions.map((option: any) => option.value);
+  const { 
+    fields: descriptionFields, 
+    append: appendDescription, 
+    remove: removeDescription 
+  } = useFieldArray({
+    control,
+    name: "descriptionTranslations"
+  });
+
+  const handleGenresChange = (selectedOptions: MultiValue<OptionType>) => {
+    const selectedValues = selectedOptions.map((option) => option.value);
     setValue('genres', selectedValues);
+  };
+
+  const handleProfessionChange = (selectedOptions: MultiValue<OptionType>) => {
+    const selectedValues = selectedOptions.map((option) => option.value);
+    setValue('profession', selectedValues);
   };
 
   const triggerFileInputClick = () => {
@@ -106,36 +139,6 @@ const Page = () => {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const addLanguage = (type: 'description') => {
-    const targetSet = usedDescLanguages;
-    const setFunction = setUsedDescLanguages;
-    
-    const unusedLanguage = ["eng", "kaz", "rus"].find(
-      lang => !targetSet.has(lang as Language)
-    );
-
-    if (unusedLanguage) {
-      const currentValues = watch('description');
-      setValue('description', {
-        ...currentValues,
-        [unusedLanguage]: ""
-      });
-      setFunction(prev => new Set([...prev, unusedLanguage as Language]));
-    }
-  };
-
-  const removeLanguage = (language: Language, type: 'description') => {
-    const currentValues = { ...watch('description') };
-    delete currentValues[language];
-    setValue('description', currentValues);
-    
-    setUsedDescLanguages(prev => {
-      const updated = new Set(prev);
-      updated.delete(language);
-      return updated;
-    });
   };
 
   const onSubmit = async (data: FormValues) => {
@@ -160,19 +163,25 @@ const Page = () => {
           imageUrl = key;
         }
 
-        // Transform translations array to name object
+        // Transform translations arrays to objects
         const nameTransforms = data.translations.reduce((acc, curr) => ({
           ...acc,
           [curr.language]: curr.name
         }), {});
 
+        const descriptionTransforms = data.descriptionTranslations.reduce((acc, curr) => ({
+          ...acc,
+          [curr.language]: curr.content
+        }), {});
+
+        const { translations, descriptionTranslations, ...filteredData } = data;
         const payload = {
-          ...data,
+          ...filteredData,
           name: nameTransforms,
+          description: descriptionTransforms,
           image: imageUrl,
         };
         
-        console.log('payload:', payload);
         
         const response = await addNewAuthor("/admin/authors", payload);
         
@@ -220,17 +229,18 @@ const Page = () => {
                   </div>
                 )}
                 <div className="main-form space-y-5 mt-4">
-                  {fields.map((field, index) => (
+                  {nameFields.map((field, index) => (
                     <div key={field.id}>
+                      <p className="mb-1 text-sm text-darkBlack">Name of Author</p>
                       <div className="flex items-center gap-[5px] w-full">
                         <label className="!flex bg-[#F5F5F5] rounded-[10px] w-full">
                           <select
                             {...register(`translations.${index}.language`)}
                             className="!mt-0 max-w-[80px] !bg-[#D9D9D9]"
                           >
-                            <option value="eng">ENG</option>
-                            <option value="kaz">KAZ</option>
-                            <option value="rus">RUS</option>
+                            <option value="eng">Eng</option>
+                            <option value="kaz">Kaz</option>
+                            <option value="rus">Rus</option>
                           </select>
                           <input
                             type="text"
@@ -247,8 +257,8 @@ const Page = () => {
                                 (lang) => !usedLanguages.has(lang as Language)
                               );
                               if (unusedLanguage) {
-                                append({
-                                  id: String(fields.length + 1),
+                                appendName({
+                                  id: String(nameFields.length + 1),
                                   language: unusedLanguage as Language,
                                   name: "",
                                 });
@@ -267,7 +277,7 @@ const Page = () => {
                             type="button"
                             onClick={() => {
                               const languageToRemove = field.language;
-                              remove(index);
+                              removeName(index);
                               setUsedLanguages((prev) => {
                                 const updated = new Set(prev);
                                 updated.delete(languageToRemove);
@@ -311,35 +321,30 @@ const Page = () => {
             </div>
             <div className="main-form bg-white p-[30px] rounded-[30px]">
               <div className="space-y-5">
-              <CustomSelect
-                name="profession"
-                isMulti={true}
-                options={professions}
-                value={professions.filter((option) =>
-                  watch('profession').includes(option.value)
-                )}
-                onChange={(selectedOptions: any) => {
-                  const selectedValues = selectedOptions.map((option: any) => option.value);
-                  setValue('profession', selectedValues);
-                }}
-                placeholder="Select Profession"
-              />
+                <CustomSelect
+                  name="profession"
+                  isMulti={true}
+                  options={professions}
+                  value={professions.filter((option) =>
+                    watch('profession').includes(option.value)
+                  )}
+                  onChange={handleProfessionChange}
+                  placeholder="Select Profession"
+                />
                 <div className="grid grid-cols-2 gap-[5px]">
                   <label>
                     Country
                     <input
                       type="text"
                       {...register("country")}
-                      placeholder="Enter Name"
-                      className="w-full p-2 border rounded"
+                      placeholder="Enter Name" 
                     />
                   </label>
                   <label>
                     Date Of Birth
                     <input
                       type="date"
-                      {...register("dob")}
-                      className="w-full p-2 border rounded"
+                      {...register("dob")} 
                     />
                   </label>
                 </div>
@@ -353,44 +358,67 @@ const Page = () => {
                   onChange={handleGenresChange}
                   placeholder="Select Genres"
                 />
-                {(["eng", "kaz", "rus"] as Language[]).map((lang) => (
-                  <div key={lang}>
-                    {(usedDescLanguages.has(lang) || lang === "eng") && (
-                      <div className="flex items-center gap-[5px] w-full">
-                        <label className="!flex bg-[#F5F5F5] rounded-[10px] w-full">
-                          <select
-                            disabled
-                            className="!mt-0 max-w-[80px] !bg-[#D9D9D9]"
-                          >
-                            <option value={lang}>{lang.toUpperCase()}</option>
-                          </select>
-                          <textarea
-                            {...register(`description.${lang}`)}
-                            rows={5}
-                            placeholder="Add Description..."
-                            className="!mt-0 flex-1"
-                          />
-                        </label>
-                        {lang === "eng" ? (
-                          <button
-                            type="button"
-                            onClick={() => addLanguage('description')}
-                            disabled={usedDescLanguages.size >= 3}
-                            className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm"
-                          >
-                            Add
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => removeLanguage(lang, 'description')}
-                            className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm"
-                          >
-                            Remove
-                          </button>
-                        )}
-                      </div>
-                    )}
+                {descriptionFields.map((field, index) => (
+                  <div key={field.id}>
+                    <p className="mb-1 text-sm text-darkBlack">Description</p>
+                    <div className="flex items-start gap-[5px] w-full">
+                      <label className="!flex items-start bg-[#F5F5F5] rounded-[10px] w-full">
+                        <select
+                          {...register(`descriptionTranslations.${index}.language`)}
+                          className="!mt-0 max-w-[80px] !bg-[#D9D9D9]"
+                        >
+                          <option value="eng">Eng</option>
+                          <option value="kaz">Kaz</option>
+                          <option value="rus">Rus</option>
+                        </select>
+                        <textarea
+                          {...register(`descriptionTranslations.${index}.content`)}
+                          rows={5}
+                          placeholder="Add Description..."
+                          className="!mt-0 flex-1"
+                        />
+                      </label>
+                      {index === 0 ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const unusedLanguage = ["eng", "kaz", "rus"].find(
+                              (lang) => !usedDescLanguages.has(lang as Language)
+                            );
+                            if (unusedLanguage) {
+                              appendDescription({
+                                id: String(descriptionFields.length + 1),
+                                language: unusedLanguage as Language,
+                                content: "",
+                              });
+                              setUsedDescLanguages(
+                                (prev) => new Set([...prev, unusedLanguage as Language])
+                              );
+                            }
+                          }}
+                          disabled={usedDescLanguages.size >= 3}
+                          className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm"
+                        >
+                          Add
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const languageToRemove = field.language;
+                            removeDescription(index);
+                            setUsedDescLanguages((prev) => {
+                              const updated = new Set(prev);
+                              updated.delete(languageToRemove);
+                              return updated;
+                            });
+                          }}
+                          className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
                 <button

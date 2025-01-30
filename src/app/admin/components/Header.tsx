@@ -49,6 +49,12 @@ const Header: React.FC = () => {
     if (path.startsWith("/admin/users/profile/")) {
       return "Single User";
     }
+    if (path.startsWith("/admin/authors/profile/")) {
+      return "Single Author";
+    }
+    if (path.startsWith("/admin/publishers/profile/")) {
+      return "Single Publisher";
+    }
     return pageNames[path] || "Bookstagram";
   };
   const currentPageName = nameParam || getPageName(pathname);

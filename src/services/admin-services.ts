@@ -76,12 +76,35 @@ export const getSubCategory = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
 }
+export const addNewCategory = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+
+export const addSubCategory = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
 
 //----Collection Pages------------------------
 export const getAllCollection = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
 }
+export const addNewCollection = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+export const getSingleCollection = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const addBookToCollectio = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.put(route, payload)
+}
+
+
 
 //----Book Hub Pages------------------------
 export const getAllBooks = async (route: string) => {
@@ -101,10 +124,23 @@ export const deleteSchool = async (route: string) => {  //-----Book school tab
     return axiosInstance.delete(route)
 }
 
+
 //-----------------Summary Page--------------------------------
 export const getAllSummary = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
+}
+export const postNewSummary = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+export const getSingleSummary = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const addBookToSummary = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.put(route, payload)
 }
 
 //----------------Discount Page--------------------------------
@@ -179,4 +215,14 @@ export const DeleteBookEvent = async (route: any) => {
 export const updateBookEvent = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance();
     return axiosInstance.put(route, payload);
-  };
+};
+
+//-------------------------Book Life Pages------------------------
+export const getAllBookLives = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}   
+export const addNewBookLife = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}

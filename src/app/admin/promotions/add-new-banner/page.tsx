@@ -149,7 +149,6 @@ const Page = () => {
           link: data.link
         };
 
-        console.log('payload:', payload);
         const response = await addNewBaner("/admin/banners", payload);
 
         if (response?.status === 201) {

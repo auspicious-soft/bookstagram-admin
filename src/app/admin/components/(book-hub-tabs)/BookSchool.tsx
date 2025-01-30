@@ -22,7 +22,6 @@ const BookSchool = () => {
   const [searchParams, setsearchParams] = useState('');
   const {data, error, isLoading, mutate} = useSWR(searchParams!=="" ? `/admin/book-schools?description=${searchParams}`: `/admin/book-schools?${query}`, getAllSchools)
   const schoolData = data?.data?.data;    
-  console.log('schoolData:', schoolData);
   const [isopen, setIsOpen] = useState(false);
 
   const handlePageChange = (newPage: number) => {
@@ -31,7 +30,6 @@ const BookSchool = () => {
   };
 
   const couponProfile = (id: string) => {
-    console.log('id:', id);
   }
   
   const handleDelete = async (id: string) => {

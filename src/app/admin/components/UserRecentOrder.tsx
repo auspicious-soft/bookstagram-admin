@@ -8,7 +8,7 @@ interface Props {
 }
 const UserRecentOrder = ({id}:Props) => {
 const {data, isLoading, mutate, error} = useSWR(`/admin/user/${id}`, getSingleUserOrders) 
-const orders = data?.data?.data?.userOrders
+const orders = data?.data?.data?.userOrders 
 
 return (
     <div className='mt-[30px] '>
@@ -36,8 +36,8 @@ return (
                 orders?.map((row: any) => (
               <tr key={row?._id}>
                 <td>{row?.identifier}</td>
-                <td className='capitalize'>{row?.productIds[0].name}</td>
-                <td>{row?.productIds[0]?.authorId[0]?.name} </td>
+                <td className='capitalize'>{row?.productIds[0].name.eng}</td>
+                <td>{row?.productIds[0]?.authorId[0]?.name.eng} </td>
                 <td className='text-right'>${row?.totalAmount}</td> 
                 
               </tr>

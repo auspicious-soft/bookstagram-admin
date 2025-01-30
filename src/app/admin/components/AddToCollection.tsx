@@ -4,16 +4,17 @@ import Image from "next/image";
 import { toast } from "sonner"; 
 import { PlusIcon, SelectSvg } from "@/utils/svgicons";
 import useSWR from "swr";
-import { addBookToDiscount, getAllBooks } from "@/services/admin-services";
+import { addBookToCollectio, getAllBooks } from "@/services/admin-services";
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL"; 
 
 interface ModalProp {
   open: boolean;
   onClose: () => void;
   mutate: any;
+  id: any;
 }
 
-const AddBookToDiscount: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
+const AddToCollection: React.FC<ModalProp> = ({ open, onClose, mutate, id }) => { 
   const [searchParams, setsearchParams] = useState("");
   const [inputValue, setInputValue] = useState('');
   const [percentage, setPercentage] = useState('');
@@ -42,36 +43,30 @@ const AddBookToDiscount: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
     );
   };
 
-  const addToDiscount = async () => {
+  const addToSummaries = async () => {
     try {
-      // Validate inputs
-      if (!percentage || selectedCourses.length === 0) {
-        toast.error("Please select books and enter a discount percentage");
-        return;
-      }
 
       const payload = {
-        discountPercentage: parseInt(percentage),
         booksId: selectedCourses
-      };
+      }; 
 
      startTransition(async () => {
-        const response = await addBookToDiscount('/admin/booksToDiscount', payload);
+        const response = await addBookToCollectio(`/admin/collections/${id}/books`, payload);
 
         if (response.status===200 ) {
-          toast.success("Books added to discount successfully");
+          toast.success("Books added to collection successfully");
           mutate();
           onClose();
           // Reset form
           setPercentage('');
           setSelectedCourses([]);
         } else {
-          toast.error("Failed To add books to discount");
+          toast.error("Failed To add books to collection");
         }
       });
     } catch (error) {
-      console.error('Error adding books to discount:', error);
-      toast.error("An error occurred while adding books to discount");
+      console.error('Error adding books to collection:', error);
+      toast.error("An error occurred while adding books to collection");
     }
   };
 
@@ -84,14 +79,8 @@ const AddBookToDiscount: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
     >
       <div className="modal bg-white py-[30px] px-5 max-w-[950px] mx-auto rounded-[20px] w-full h-full">
         <div className="max-h-[80vh] overflow-auto overflo-custom">
-          <h2 className="text-[32px] text-darkBlack mb-5">Add To Discounts</h2>
-          <div className="main-form flex gap-5 pb-5 border-dashed border-b border-[#d0d0d0] mb-5">
-            <label className="max-w-[143px] ">
-              Discount Percentage
-              <input type="number" name="percentage" value={percentage}
-                onChange={(e) => setPercentage(e.target.value)} placeholder="15%" required
-                min="1" max="100" />
-            </label>
+          <h2 className="text-[32px] text-darkBlack mb-5">Add To Collection</h2>
+          <div className="main-form pb-5 border-dashed border-b border-[#d0d0d0] mb-5">
             <label className="w-full">Search
               <input type="search" name="" value={searchParams} onChange={handleInputChange} placeholder="Enter Name of the course" />
             </label>
@@ -133,9 +122,9 @@ const AddBookToDiscount: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
             )}
           </div>
           <div className="mt-[30px] flex gap-2.5 justify-end">
-            <button onClick={addToDiscount}
+            <button onClick={addToSummaries}
               className="flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px]"
-              disabled={isPending}><PlusIcon />Add To Discounts</button>
+              disabled={isPending}><PlusIcon />Add To Collection</button>
             <button
               onClick={onClose}
               className="rounded-[28px] border border-darkBlack py-2 px-5 text-sm"
@@ -146,5 +135,4 @@ const AddBookToDiscount: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
     </Modal>
   );
 };
-
-export default AddBookToDiscount;
+export default AddToCollection;

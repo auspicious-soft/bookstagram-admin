@@ -149,7 +149,6 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
           ...otherFields,
           profilePic: profilePicKey,
         };
-        console.log("payload:", payload);
 
         const response = await addNewUser("/admin/users", payload);
 

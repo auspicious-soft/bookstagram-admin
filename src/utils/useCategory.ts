@@ -5,7 +5,7 @@ const UseCategory = () => {
     const { data, error, isLoading } = useSWR(`/admin/categories`, getAllCategories);
 
     const category = data?.data?.data?.map((row: any) => ({
-        label: `${row?.name}`,
+        label: `${row?.name.eng}`,
         value: row._id,
     })) || []; 
 

@@ -57,7 +57,6 @@ const UserProfile = ({ id }: Props) => {
   const { data, isLoading, error, mutate } = useSWR(`/admin/users/${id}?duration=${user}`, getSingleUsers);
   const overviews = data?.data?.data;
   const profileData = data?.data?.data?.data;
-  console.log('profileData:', profileData);
   const [isPending, startTransition] = useTransition();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -93,7 +92,7 @@ const UserProfile = ({ id }: Props) => {
   const OverviewData = [
     { id: "1", title: "Total Amount Paid", value: overviews?.amountPaid, icon: <DashboardIcon1 /> },
     { id: "2", title: "New Books", value: overviews?.booksPurchasedCount, icon: <DashboardIcon2 /> },
-    { id: "3", title: "Courses", value: overviews?.countCount, icon: <DashboardIcon3 /> },
+    { id: "3", title: "Courses", value: overviews?.courseCount, icon: <DashboardIcon3 /> },
     { id: "4", title: "Events", value: overviews?.Events, icon: <DashboardIcon4 /> },
   ];
 

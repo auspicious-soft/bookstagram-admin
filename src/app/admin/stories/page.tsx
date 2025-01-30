@@ -13,7 +13,6 @@ const Page = () => {
   const router = useRouter();
   const { data, mutate } = useSWR(`/admin/stories`, getAllStories);
   const stories= data?.data?.data;
-  console.log('stories:', stories);
   const [isPending , startTransition]= useTransition();
  
 
