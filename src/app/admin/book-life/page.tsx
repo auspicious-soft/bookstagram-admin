@@ -1,5 +1,5 @@
 'use client'
-import { getAllBookLives, addNewBookLife } from '@/services/admin-services';
+import { getAllBookLives, addNewBookLife, deleteBookLife } from '@/services/admin-services';
 import React, { useState, useTransition } from 'react';
 import useSWR from 'swr';
 import Button from '@/app/components/Button'; 
@@ -43,8 +43,8 @@ const Page = () => {
     setIsAddModalOpen(true);
   };
 
-  const handleSummary = (id: string) => {
-    router.push(`/admin/summary/${id}`) 
+  const openBookLife = (id: string) => {
+    router.push(`/admin/book-life/single-category/${id}`) 
   };
 
   const handleSubmit = async (formData: FormValues) => {
@@ -94,6 +94,22 @@ const Page = () => {
       }
     });
   };
+  const deleteBookLives = async (id: string) => {
+    try {
+      startTransition(async()=>{
+      const response = await deleteBookLife(`/admin/book-lives/${id}`);
+      if (response.status === 200) {
+        toast.success("deleted successfully");
+        mutate()
+      } else {
+      toast.error("Failed To Delete Story");
+      }
+    });
+    } catch (error) {
+    toast.error("an Error Occurred While Deleting The Story");
+    }
+  }
+
 
   return (
     <div>
@@ -108,7 +124,8 @@ const Page = () => {
               key={row?._id}
               name={row?.name.eng}
               image={getImageClientS3URL(row?.image)}
-              onClick={() => handleSummary(row?._id)}
+              onClick={() => openBookLife(row?._id)}
+              handleDelete={()=>deleteBookLives(row?._id)}
             />
           ))
         ) : (

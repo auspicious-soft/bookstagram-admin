@@ -221,8 +221,12 @@ export const updateBookEvent = async (route: string, payload: any) => {
 export const getAllBookLives = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
-}   
+};   
 export const addNewBookLife = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.post(route, payload)
-}
+};
+export const deleteBookLife = async (route: any) => {
+    const axiosInstance = await getAxiosInstance();
+    return axiosInstance.delete(route);
+};

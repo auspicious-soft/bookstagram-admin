@@ -149,6 +149,23 @@ export const generateSignedUrlForBookLives = async (fileName: string, fileType: 
         throw error
     }
 }
+export const generateSignedUrlBooks = async (fileName: string, fileType: string, name: string) => {
+    const uploadParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `summary/${name}/${fileName}`,
+        ContentType: fileType,
+        acl: "public-read"
+    }
+    try {
+        const command = new PutObjectCommand(uploadParams)
+        const signedUrl = await getSignedUrl(await createS3Client(), command)
+        // const signedUrl = await getSignedUrl(s3, command, { expiresIn: 900 });
+        return { signedUrl, key: uploadParams.Key }
+    } catch (error) {
+        console.error("Error generating signed URL:", error);
+        throw error
+    }
+}
 
 export const generateSignedUrlForCategory = async (fileName: string, fileType: string, name: string) => {
     const uploadParams = {

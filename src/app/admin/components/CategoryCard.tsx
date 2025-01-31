@@ -1,4 +1,4 @@
-import { SelectSvg } from '@/utils/svgicons';
+import { DeleteIcon, SelectSvg } from '@/utils/svgicons';
 import Image, { StaticImageData } from 'next/image';
 import React from 'react';
 
@@ -7,11 +7,12 @@ import React from 'react';
     name: string;
     onClick?: React.MouseEventHandler;
     displayMobile?: boolean;
+    handleDelete?: React.MouseEventHandler;
  }
  
-const CategoryCard:React.FC<CategoryProps> = ({image, name, onClick, displayMobile}) => {
+const CategoryCard:React.FC<CategoryProps> = ({image, name, onClick, displayMobile, handleDelete}) => {
     return (
-        <div onClick={onClick}  className='grid place-items-center cursor-pointer bg-white rounded-[20px] px-5 py-10 aspect-square '>
+        <div onClick={onClick}  className='grid place-items-center cursor-pointer bg-white rounded-[20px] px-5 py-10 aspect-square relative'>
             <div className='text-center'>
                 <Image unoptimized src={image} alt='dgv' width={122} height={122}  className='w-[122px] h-[122px] object-cover rounded-full mx-auto ' />
                 <p className='text-darkBlack text-[15px] leading-5 tracking-[-0.24px] mt-[23px] '>{name}</p>
@@ -21,7 +22,13 @@ const CategoryCard:React.FC<CategoryProps> = ({image, name, onClick, displayMobi
             Display on the mobile app
           </p>
         )}
-            </div>
+        {handleDelete &&(
+        <div className="absolute top-[5px] right-[6px] z-10 ">
+        <button onClick={handleDelete} className="bg-white border border-orange rounded-[34px] flex items-center gap-[5px] py-2 px-4 text-orange ">
+        <DeleteIcon stroke="var(--tw-bg-orange)"/>Remove</button>
+        </div>
+        )}
+        </div>
         </div>
     );
 }
