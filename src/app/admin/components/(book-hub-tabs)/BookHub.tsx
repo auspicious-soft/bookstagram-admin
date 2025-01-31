@@ -2,6 +2,9 @@
 import React, { useState } from 'react';
 import BookMarket from './BookMarket';
 import BookSchool from './BookSchool';
+import BookStudy from './BookStudy';
+import BookUniversity from './BookUniversity';
+import BookMasters from './BookMasters';
 
 const BookHub = () => {
   const [activeTab, setActiveTab] = useState('Book Market');
@@ -10,9 +13,15 @@ const BookHub = () => {
 const renderTabContent = () => {
     switch (activeTab) {
       case "Book Market":
-        return <div><BookMarket/></div>;
+        return <BookMarket/>;
       case "Book School":
-        return <div><BookSchool/></div>;
+        return <BookSchool/>;
+      case "Book Study":
+        return <BookStudy/>
+      case "Book University":
+        return <BookUniversity/>;
+      case "Book Masters":
+        return <BookMasters/>
      default:
         return null;
     }

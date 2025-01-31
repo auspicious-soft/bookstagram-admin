@@ -111,6 +111,10 @@ export const getAllBooks = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
 }
+export const addNewBook = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
 export const addBookToDiscount = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.put(route, payload)
@@ -123,6 +127,19 @@ export const deleteSchool = async (route: string) => {  //-----Book school tab
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.delete(route)
 }
+export const getAllBookStudy = async (route: string) => {  //-----Book Study tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const getAllBookUniversity = async (route: string) => {  //-----Book University tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const getAllBookMasters = async (route: string) => {  //-----Book Master tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+
 
 
 //-----------------Summary Page--------------------------------

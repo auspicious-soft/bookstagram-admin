@@ -26,6 +26,7 @@ interface CardProps {
         {discount && (
           <p className='text-lg text-orange '>{discount}% Off</p>
           )} 
+          
          {handleDelete &&(
         <div className="absolute top-[5px] right-[6px] z-10 ">
         <button onClick={handleDelete} className="bg-white border border-orange rounded-[34px] flex items-center gap-[5px] py-2 px-4 text-orange ">

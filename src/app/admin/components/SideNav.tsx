@@ -56,25 +56,25 @@ const SideNav = () => {
               {!isCollapsed && <span>Dashboard</span>}
             </Link>
           </li>
-          <li className={isActive('/admin/book-hub')}>
+          <li className={`${isActive('/admin/book-hub')} ${pathname.startsWith('/admin/book-hub') ? 'active' : ''}`}>
             <Link href="/admin/book-hub">
               <BookHubIcon />
               {!isCollapsed && <span>Book Hub</span>}
             </Link>
           </li>
-          <li className={isActive('/admin/categories')}>
+          <li className={`${isActive('/admin/categories')} ${pathname.startsWith('/admin/categories') ? 'active' : ''}`}>
             <Link href="/admin/categories">
               <CategoryIcon />
                {!isCollapsed && <span>Categories</span>}               
             </Link>
           </li>
-          <li className={isActive('/admin/collection')}>
+          <li className={`${isActive('/admin/collection')} ${pathname.startsWith('/admin/collection') ? 'active' : ''}`}>
             <Link href="/admin/collection">
               <CollectionIcon />
               {!isCollapsed &&  <span>Collection</span>}
             </Link>
           </li>
-          <li className={isActive('/admin/summary')}>
+          <li className={`${isActive('/admin/summary')} ${pathname.startsWith('/admin/summary') ? 'active' : ''}`}>
             <Link href="/admin/summary">
               <SummaryIcon />
               {!isCollapsed &&  <span>Summary</span>}
@@ -86,25 +86,25 @@ const SideNav = () => {
               {!isCollapsed &&  <span>Discounts</span>}
             </Link>
           </li>
-          <li className={isActive('/admin/book-life')}>
+          <li className={`${isActive('/admin/book-life')} ${pathname.startsWith('/admin/book-life') ? 'active' : ''}`}>
             <Link href="/admin/book-life">
               <BookLifeIcon />
               {!isCollapsed &&  <span>Book Life</span>}
             </Link>
           </li>
-          <li className={isActive('/admin/book-events')}>
+          <li className={`${isActive('/admin/book-events')} ${pathname.startsWith('/admin/book-events') ? 'active' : ''}`}>
             <Link href="/admin/book-events">
               <BookEventsIcon />
               {!isCollapsed &&  <span>Book Events</span>}
             </Link>
           </li>
-          <li className={isActive('/admin/authors')}>
+          <li className={`${isActive('/admin/authors')} ${pathname.startsWith('/admin/authors') ? 'active' : ''}`}>
             <Link href="/admin/authors">
               <AuthorsIcon />
               {!isCollapsed &&  <span>Authors</span>}
             </Link>
           </li>
-          <li className={isActive('/admin/publishers')}>
+          <li className={`${isActive('/admin/publishers')} ${pathname.startsWith('/admin/publishers') ? 'active' : ''}`}>
             <Link href="/admin/publishers">
               <PublishersIcon />
               {!isCollapsed &&  <span>Publishers</span>}
@@ -122,7 +122,7 @@ const SideNav = () => {
               {!isCollapsed &&  <span>Promotions</span>}
             </Link>
           </li>
-          <li className={isActive('/admin/users')}>
+          <li className={`${isActive('/admin/users')} ${pathname.startsWith('/admin/users') ? 'active' : ''}`}>
             <Link href="/admin/users">
               <UsersIcon />
               {!isCollapsed &&  <span>Users</span>}

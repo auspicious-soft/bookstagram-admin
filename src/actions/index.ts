@@ -152,14 +152,29 @@ export const generateSignedUrlForBookLives = async (fileName: string, fileType: 
 export const generateSignedUrlBooks = async (fileName: string, fileType: string, name: string) => {
     const uploadParams = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `summary/${name}/${fileName}`,
+        Key: `books/${name}/${fileName}`,
         ContentType: fileType,
         acl: "public-read"
     }
     try {
         const command = new PutObjectCommand(uploadParams)
         const signedUrl = await getSignedUrl(await createS3Client(), command)
-        // const signedUrl = await getSignedUrl(s3, command, { expiresIn: 900 });
+        return { signedUrl, key: uploadParams.Key }
+    } catch (error) {
+        console.error("Error generating signed URL:", error);
+        throw error
+    }
+}
+export const generateSignedUrlBookFiles = async (fileName: string, fileType: string, name: string, language: string) => {
+    const uploadParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `books/${name}/files/${language}/${fileName}`,
+        ContentType: fileType,
+        acl: "public-read"
+    }
+    try {
+        const command = new PutObjectCommand(uploadParams)
+        const signedUrl = await getSignedUrl(await createS3Client(), command)
         return { signedUrl, key: uploadParams.Key }
     } catch (error) {
         console.error("Error generating signed URL:", error);
@@ -250,22 +265,6 @@ export const generatePublishersProfilePicture = async (fileName: string, fileTyp
     }
 }
 
-// export const generateSignedUrlForUserProfile = async (fileName: string, fileType: string, userEmail: string) => {
-//     const uploadParams = {
-//         Bucket: process.env.AWS_BUCKET_NAME,
-//         Key: `users/${userEmail}/${fileName}`,
-//         ContentType: fileType,
-//     }
-//     try {
-//         const command = new PutObjectCommand(uploadParams)
-//         const signedUrl = await getSignedUrl(await createS3Client(), command)
-//         return signedUrl
-//     } catch (error) {
-//         console.error("Error generating signed URL:", error);
-//         throw error
-//     }
-// }
-
 export const deleteFileFromS3 = async (imageKey: string) => {
     const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
@@ -280,23 +279,9 @@ export const deleteFileFromS3 = async (imageKey: string) => {
         console.error('Error deleting file from S3:', error)
         throw error
     }
-}
+} 
 
 
-// export const generateSignedUrlToGet = async (imageKey: string) => {
-//     const params = {
-//         Bucket: process.env.AWS_BUCKET_NAME,
-//         Key: imageKey,
-//     }
-//     try {
-//         const command = new GetObjectCommand(params)
-//         const url = await getSignedUrl(await createS3Client(), command)
-//         return url;
-//     } catch (error) {
-//         throw error
-//     }
+// export const getImageUrl = async (subPath: string) => {
+//     return `${process.env.NEXT_PUBLIC_AWS_BUCKET_PATH}${subPath}`
 // }
-
-export const getImageUrl = async (subPath: string) => {
-    return `${process.env.NEXT_PUBLIC_AWS_BUCKET_PATH}${subPath}`
-}

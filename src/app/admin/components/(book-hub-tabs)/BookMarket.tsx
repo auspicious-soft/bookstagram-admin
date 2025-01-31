@@ -31,6 +31,7 @@ const BookMarket = () => {
 
  const {data, isLoading, error} = useSWR (`/admin/books?${query}&description=${searchParams}&type=${getTypeParam(activeTab)}`, getAllBooks)
  const booksdata= data?.data?.data;
+ console.log('booksdata:', booksdata);
 
  const handleTabClick = (tab) => {
   setActiveTab(tab);
@@ -68,11 +69,11 @@ const bookTypes = [
             className='flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px] '>
             <PlusIcon/> Add <span>|</span> <DropWhite/></button>
           {showData && (
-           <div className="space-y-2 absolute z-[2] top-[45px] right-0 w-full h-auto bg-white p-4 rounded-lg shadow-lg [&_*]:!text-darkBlack [&_*]:!w-full [&_*]:!text-left">
+           <div className="space-y-2 absolute z-[2] top-[45px] right-0 w-full h-auto bg-white p-2 rounded-lg shadow-lg">
             {bookTypes.map((type) => (
             <button
               key={type.value}
-              className="w-full text-left px-4 py-2 hover:bg-gray-100 rounded"
+              className="w-full text-left px-2 py-1 hover:bg-gray-100 rounded"
               onClick={() => {
                 onTypeSelect(type.value);
                 setShowData(false);
@@ -99,11 +100,11 @@ const bookTypes = [
           {booksdata?.map((book: any) => (
             <BookCard
               key={book?._id}
-              title={book?.name?.en}
+              title={book?.name?.eng}
               price={`$${book?.price}`}
               handleClick={()=>openBookProfile(book?._id)}
               imgSrc={getImageClientS3URL(book?.image)}
-              author={book?.authorId[0]?.name}
+              author={book?.authorId[0]?.name.eng}
             />
           ))}
         </div>

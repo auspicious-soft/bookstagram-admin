@@ -34,7 +34,8 @@ const Page = () => {
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchParams, setsearchParams] = useState("");
   const { data, error, isLoading, mutate } = useSWR(`/admin/categories/${id}/sub-categories?description=${searchParams}&${query}`, getSubCategory);
-  const subCategory = data?.data?.data
+  const subCategory = data?.data?.data?.response
+  console.log('subCategory:', subCategory);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const handlePageChange = (newPage: number) => {
