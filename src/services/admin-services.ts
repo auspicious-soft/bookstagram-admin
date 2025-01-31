@@ -225,6 +225,7 @@ export const getBookEvents = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
 }
+
 export const DeleteBookEvent = async (route: any) => {
     const axiosInstance = await getAxiosInstance();
     return axiosInstance.delete(route);
@@ -244,6 +245,17 @@ export const addNewBookLife = async (route: string, payload: any) => {
     return axiosInstance.post(route, payload)
 };
 export const deleteBookLife = async (route: any) => {
+    const axiosInstance = await getAxiosInstance();
+    return axiosInstance.delete(route);
+};export const addBlogFormData = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+export const getBlog = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const DeleteBlog = async (route: any) => {
     const axiosInstance = await getAxiosInstance();
     return axiosInstance.delete(route);
 };

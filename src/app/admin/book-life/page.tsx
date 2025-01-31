@@ -44,7 +44,7 @@ const Page = () => {
   };
 
   const openBookLife = (id: string) => {
-    router.push(`/admin/book-life/single-category/${id}`) 
+    router.push(`/admin/book-life/${id}`) 
   };
 
   const handleSubmit = async (formData: FormValues) => {
