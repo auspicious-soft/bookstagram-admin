@@ -44,7 +44,7 @@ const Page = () => {
   };
 
   const handleSummary = (id: string) => {
-    router.push(`/admin/summary/${id}`) 
+    router.push(`/admin/book-life/${id}`) 
   };
 
   const handleSubmit = async (formData: FormValues) => {

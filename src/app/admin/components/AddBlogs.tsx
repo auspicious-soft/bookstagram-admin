@@ -3,12 +3,13 @@ import TextEditor from '@/app/components/Editor';
 import React, { useState, useCallback,useMemo, useTransition } from 'react';
 import Image from 'next/image';
 import preview from "@/assets/images/preview.png";
-import { useRouter } from "next/navigation";
-import { submitForm } from '@/utils/forms-submit';
+import { useParams, useRouter } from "next/navigation";
+import { submitBlogForm } from '@/utils/forms-submit';
 
-const AddBookEvent = () => {
+const AddBlogs = () => {
   const router = useRouter();
-
+  const Id = useParams()
+  const categoryId= Id.id
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -32,9 +33,10 @@ const handleSave = async () => {
   const formData ={
     name,
     description,
-   image
+    image,
+    categoryId
   }
-  await submitForm(formData, router);
+  await submitBlogForm(formData, router);
 };
   return (
     <div className="flex gap-[20px] w-[100%] bg-red">
@@ -101,4 +103,4 @@ const handleSave = async () => {
   );
 };
 
-export default AddBookEvent;
+export default AddBlogs;
