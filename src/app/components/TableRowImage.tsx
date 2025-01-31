@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import Image from "next/image";
-import { getImageUrl } from '@/actions';
 import { StaticImageData } from 'next/image';
 
 
