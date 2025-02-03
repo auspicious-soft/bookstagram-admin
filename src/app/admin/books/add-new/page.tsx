@@ -218,14 +218,12 @@ const BookForm = () => {
           image: imageUrl
         };
 
-        console.log('payload:', payload);
        const response = await addNewBook("/admin/books", payload);
         if (response?.status === 201) {
           toast.success("Book added successfully");
           window.location.href = "/admin/book-hub";
         } else {
           toast.error("Failed to add Book");
-          console.log('response?.status:', response?.status);
         }
       } catch (error) {
         console.error("Error", error);
@@ -283,7 +281,7 @@ const BookForm = () => {
                   <div className='bg-white p-5 rounded-[20px]'>
                   <input
                       type="file"
-                      className="border border-[#BDBDBD] py-5 rounded-[10px] px-5 bg-[#F5F5F5] flex-1"
+                      className="border border-[#BDBDBD] py-5 rounded-[10px] px-5 bg-[#F5F5F5] flex-1 w-full"
                       onChange={(e) => {
                         if (e.target.files?.[0]) {
                           setValue(`fileTranslations.${index}.file`, e.target.files[0]);

@@ -68,7 +68,6 @@ const SingleBookProfile = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form Data Submitted: ", formData);
   };
   const handleUserChange = () => {
    setAutherName(authorName)

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import avatar from '@/assets/images/avatar.png';
 import { usePathname, useSearchParams } from "next/navigation";
@@ -13,6 +13,14 @@ const Header: React.FC = () => {
   const pathname = usePathname(); 
   const searchParams = useSearchParams();
   const nameParam = searchParams.get("name");
+  const [categoryName, setCategoryName] = useState("");
+  console.log('categoryName:', categoryName);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCategoryName(localStorage.getItem("subCategoryName") || "");
+    }
+  }, []);
 
 
   const pageNames: { [key: string]: string } = {
@@ -33,8 +41,8 @@ const Header: React.FC = () => {
     "/admin/notifications": "Notifications",
     "/admin/authors/add-author" : "Add New Author",
     "/admin/stories/add-new-story": "Add New Story",
-    "/admin/promotions/add-new-banner": "Add New Banner"
-    
+    "/admin/promotions/add-new-banner": "Add New Banner",
+    "/admin/books/add-new": "Add New Book",
   };
   const getPageName = (path: string): string => {
     if (path.startsWith("/admin/categories/") && path.endsWith("/sub-category")) {
@@ -55,8 +63,8 @@ const Header: React.FC = () => {
     if (path.startsWith("/admin/publishers/profile/")) {
       return "Single Publisher";
     }
-    if (path.startsWith("/admin/books/add-new")) {
-      return "Add New Book";
+    if (path.startsWith("/admin/categories/sub-category/")) {
+      return categoryName;
     }
     return pageNames[path] || "Bookstagram";
   };

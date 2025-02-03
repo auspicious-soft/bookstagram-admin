@@ -1,19 +1,22 @@
 'use client'
-import { addSubCategory, getSubCategory } from '@/services/admin-services';
 import React, { useState, useTransition } from 'react';
 import useSWR from 'swr';
-import Button from '@/app/components/Button';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import Button from '@/app/components/Button';
 import SearchBar from '@/app/admin/components/SearchBar';
 import CategoryCard from '@/app/admin/components/CategoryCard';
 import TablePagination from '@/app/admin/components/TablePagination';
-import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
-import subCatImg from '@/assets/images/subCat.png'
-import { toast } from 'sonner';
 import AddCommonModal from '@/app/admin/components/AddCommonModal';
+import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
+import { addBookToCategory, addSubCategory, getSubCategory } from '@/services/admin-services';
 import { generateSignedUrlForSubCategory } from '@/actions';
-import cartoon from '@/assets/images/1.png'
-import Image from 'next/image';
+import subCatImg from '@/assets/images/subCat.png';
+import cartoon from '@/assets/images/1.png';
+import BookCard from '@/app/admin/components/BookCard';
+import AddToBookCommon from '@/app/admin/components/AddToBookCommon';
+
 type Language = "eng" | "kaz" | "rus";
 interface FormValues {
   image: File | null;
@@ -24,34 +27,40 @@ interface FormValues {
   }[];
 }
 
-
 const Page = () => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const {id} = useParams();
+  const { id } = useParams();
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
-  const [searchParams, setsearchParams] = useState("");
-  const { data, error, isLoading, mutate } = useSWR(`/admin/categories/${id}/sub-categories?description=${searchParams}&${query}`, getSubCategory);
-  const subCategory = data?.data?.data?.response
-  console.log('subCategory:', subCategory);
+  const [searchParams, setSearchParams] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedBooks, setSelectedBooks] = useState<string[]>([]);
+  console.log('selectedBooks:', selectedBooks);
+  const [bookModal, setBookModal] = useState(false);
+
+  const { data, error, isLoading, mutate } = useSWR(
+    `/admin/categories/${id}/sub-categories?description=${searchParams}&${query}`,
+    getSubCategory
+  );
+
+  const subCategory = data?.data?.data?.subcategory ;
+  console.log('subCategory:', subCategory);
+  const booksData = data?.data?.data?.books;
+  console.log('booksData:', booksData);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     setQuery(`page=${newPage}&limit=${itemsPerPage}`);
   };
 
-  const addNewSubCategory = ()=>{
-    setIsAddModalOpen(true)
-  }
-  
-  const handleSubCategory = (id: string,  name: string) => {
-    //router.push(`/admin/categories/sub-category/${id}?name=${name}`); 
-  }
+  const handleSubCategory = (id: string, name: string) => {
+    localStorage.setItem("subCategoryName", name);
+    router.push(`/admin/categories/sub-category/${id}`);
+  };
 
-  const handleSubmit = async (formData: FormValues) => {
+  const handleAddSubmit = async (formData: FormValues) => {
     startTransition(async () => {
       try {
         let imageUrl = null;
@@ -95,60 +104,119 @@ const Page = () => {
     });
   };
 
+    const handeAddBookToSubCategory = async() => {
+      try {
+        const payload = {
+          booksId: selectedBooks
+        };
   
+        console.log('payload:', payload);
+       startTransition(async () => {
+          const response = await addBookToCategory(`/admin/categories/${id}/add`, payload);
+  
+          if (response.status===200 ) {
+            toast.success("Books added to Book Masters successfully");
+            mutate();
+            setBookModal(false); 
+            setSelectedBooks([]);
+          } else {
+            toast.error("Failed To add books");
+          }
+        });
+      } catch (error) {
+        console.error('Error adding books:', error);
+        toast.error("An error occurred while adding books");
+      }
+    }
 
   return (
-    <div className='h-full'>
+    <div className="h-full">
       {subCategory?.length > 0 ? (
-      <>
-       <div className="flex gap-2.5 justify-end mb-5 ">
-        <SearchBar setQuery={setsearchParams} query={searchParams} />
-         <div><Button text="Add A Sub-Category" onClick={addNewSubCategory} /></div>
-      </div>
-       <div className='grid grid-cols-4 gap-6'>
+        <>
+          <div className="flex gap-2.5 justify-end mb-5">
+            <SearchBar setQuery={setSearchParams} query={searchParams} />
+            <Button text="Add A Sub-Category" onClick={() => setIsAddModalOpen(true)} />
+          </div>
+          <div className="grid grid-cols-4 gap-6">
             {subCategory?.map((row: any) => (
-            <CategoryCard 
-            key={row?._id}
-            name={row?.name.eng}
-            image={getImageClientS3URL(row?.image)}
-            onClick={()=>handleSubCategory(row?._id, row?.name)}
-            />
+              <CategoryCard
+                key={row?._id}
+                name={row?.name.eng}
+                image={getImageClientS3URL(row?.image)}
+                onClick={() => handleSubCategory(row?._id, row?.name?.eng)}
+              />
             ))}
+          </div>
+          <div className="mt-10 flex justify-end">
+            <TablePagination
+              setPage={handlePageChange}
+              page={page}
+              totalData={subCategory.length}
+              itemsPerPage={itemsPerPage}
+            />
+          </div>
+        </>
+      ) : booksData?.length > 0 ? (
+        <>
+          <div className="flex gap-2.5 justify-end mb-5">
+            <SearchBar setQuery={setSearchParams} query={searchParams} />
+            <Button text="Add A Book" onClick={() => setIsAddModalOpen(true)} />
+          </div>
+          <div className="grid grid-cols-4 gap-6">
+            {booksData?.map((row: any) => (
+              <BookCard 
+               key={row?._id}
+               author={row?.authorId?.[0]?.name?.eng}
+               title={row?.name?.eng}
+               price={`$${row?.price}`}
+               imgSrc={getImageClientS3URL(row?.image)}
+             />
+            ))}
+          </div>
+          <div className="mt-10 flex justify-end">
+            <TablePagination
+              setPage={handlePageChange}
+              page={page}
+              totalData={booksData.length}
+              itemsPerPage={itemsPerPage}
+            />
+          </div>
+        </>
+      ) : (
+        <div className="h-full grid place-items-center">
+          <div className="text-center">
+            <Image src={cartoon} alt="cartoon" width={154} height={181} className="mx-auto" />
+            <h2 className="text-[32px] text-darkBlack mt-5 mb-2.5">No Books Found Here!</h2>
+            <p className="text-sm text-darkBlack mb-5">Add a book or a sub category.</p>
+            <div className='flex justify-center gap-[9px] '>
+            <Button text="Add a Sub-Category" onClick={() => setIsAddModalOpen(true)} />
+            <Button text="Add A Book" onClick={() => setBookModal(true)} />
+            </div>
+          </div>
         </div>
-        <div className="mt-10 flex justify-end">
-        <TablePagination
-          setPage={handlePageChange}
-          page={page}
-          totalData={subCategory?.length}
-          itemsPerPage={itemsPerPage}
-        />
-      </div>
-      </>
-    ) : (
-      <div className='h-full grid place-items-center '>
-        <div className="text-center ">
-        <Image src={cartoon} alt='cartoon' width={154} height={181} className='mx-auto'/>
-        <h2 className='text-[32px] text-darkBlack mt-5 mb-2.5  '>No Books Found Here!</h2>
-        <p className="text-sm text-darkBlack mb-5 ">Add a book or a sub category.</p>
-        <div className="flex items-center gap-[9px] justify-center">
-        <Button text="Add a Sub-Category" onClick={addNewSubCategory} />
-        <Button text="Add a Book" onClick={addNewSubCategory} />
-        </div>
-      </div>
-      </div>
-    )}
+      )}
 
       <AddCommonModal
         open={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        onSubmit={handleSubmit}
+        onSubmit={handleAddSubmit}
         buttonText="Create a Sub-Category"
         image={subCatImg}
         title="Add a Sub-Category"
         labelname="Name of Sub-Category"
       />
+
+    <AddToBookCommon
+        open={bookModal}
+        onClose={() => setBookModal(false)}
+        title="Add book to Category"
+        selectedBooks={selectedBooks}
+        onSelectBooks={setSelectedBooks}
+        handleSubmit={handeAddBookToSubCategory} 
+        isPending={isPending}    
+      />      
     </div>
   );
-}
+};
 
 export default Page;

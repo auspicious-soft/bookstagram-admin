@@ -20,16 +20,14 @@ const CouponCode: React.FC<ModalProp> = ({ open, onClose, couponCode,close }) =>
           await navigator.clipboard.writeText(couponCode);
           setCopied(true);
           
-          // Reset the copied state after a short delay
-          setTimeout(() => setCopied(false), 2000);
+          setTimeout(() => setCopied(false), 3000);
         } catch (error) {
           console.error("Failed to copy text: ", error);
         }
       };
       const handleCancel =() => {
         onClose();
-        close();
-        
+        if(close) close();
       };
   return (
     <Modal

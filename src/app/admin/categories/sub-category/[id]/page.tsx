@@ -4,12 +4,11 @@ import useSWR from 'swr';
 import Button from '@/app/components/Button'; 
 import { useParams, useRouter } from 'next/navigation';
 import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
-import { getSingleCollection } from '@/services/admin-services';
-import SearchBar from '../../components/SearchBar';
-import BookCard from '../../components/BookCard';
-import TablePagination from '../../components/TablePagination';
-import AddToSummaryModal from '../../components/AddToSummaryModal';
-import AddToCollection from '../../components/AddToCollection';
+import BookCard from '@/app/admin/components/BookCard';
+import SearchBar from '@/app/admin/components/SearchBar';
+import { getSubCategoryData } from '@/services/admin-services';
+import TablePagination from '@/app/admin/components/TablePagination';
+
 
 const Page = () => {
   const router = useRouter();
@@ -18,11 +17,11 @@ const Page = () => {
   const itemsPerPage = 10;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchParams, setsearchParams] = useState("");
-  const { data, error, isLoading, mutate } = useSWR(`/admin/collections/${id}?description=${searchParams}&${query}`, getSingleCollection);
+  const { data, error, isLoading, mutate } = useSWR(`/admin/sub-categories`, getSubCategoryData);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const books = data?.data?.data?.booksId
-  console.log('books:', books);
+  console.log('SubBoks', data?.data?.data);
+  const books = data?.data?.data 
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -69,19 +68,19 @@ const Page = () => {
         <TablePagination
           setPage={handlePageChange}
           page={page}
-          totalData={data?.data?.data?.booksId?.length}
+          totalData={books?.length}
           itemsPerPage={itemsPerPage}
         />
       </div>
       </>
       )}
 
-      <AddToCollection
+      {/* <AddToCollection
       mutate={mutate}
       open={isModalOpen}
       onClose= {()=>setIsModalOpen(false)}
       id= {id}
-      />
+      /> */}
      
     </div>
   );

@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react"; 
+import React, { useState, useTransition } from "react"; 
 import Button from "@/app/components/Button"; 
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import { getAllBookMasters } from "@/services/admin-services";
+import { addToBookMasters, deleteBookMasters, getAllBookMasters } from "@/services/admin-services";
 import ReactLoading from "react-loading";
 import { DeleteIcon, ViewIcon } from "@/utils/svgicons";
 import TableRowImage from "@/app/components/TableRowImage";
@@ -11,9 +11,14 @@ import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 import profile from '@/assets/images/preview.png';
 import SearchBar from "../SearchBar";
 import TablePagination from "../TablePagination";
+import { toast } from "sonner";
+import AddToBookCommon from "../AddToBookCommon";
 
 const BookMasters = () => {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [openModal, setOpenModal] = useState(false)
+  const [selectedBooks, setSelectedBooks] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
@@ -23,27 +28,59 @@ const BookMasters = () => {
       getAllBookMasters
   );
   const masters = data?.data?.data;
-  console.log('masters:', masters);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     setQuery(`page=${newPage}&limit=${itemsPerPage}`);
   };
 
-  const addNewAuthor = () => {
-    router.push(`/admin/authors/add-author`);
-  };
 
-  const handleDelete = (id: string) => {
-    router.push(`/admin/authors/profile/${id}`);
-  };
+  const handleDelete = async (id: string) => {
+    try {
+      startTransition(async()=>{
+      const response = await deleteBookMasters(`/admin/book-masters/${id}`);
+      if (response.status === 200) {
+        toast.success("deleted successfully");
+        mutate()
+      } else {
+      toast.error("Failed To Delete");
+      }
+    });
+    } catch (error) {
+    toast.error("an Error Occurred While Deleting");
+    }
+  }
+
+  const addBookToBookMaster = async() => {
+    try {
+      const payload = {
+        productsId: selectedBooks
+      };
+
+     startTransition(async () => {
+        const response = await addToBookMasters('/admin/book-masters', payload);
+
+        if (response.status===201 ) {
+          toast.success("Books added to Book Masters successfully");
+          mutate();
+          setOpenModal(false); 
+          setSelectedBooks([]);
+        } else {
+          toast.error("Failed To add books");
+        }
+      });
+    } catch (error) {
+      console.error('Error adding books:', error);
+      toast.error("An error occurred while adding books");
+    }
+  }
 
   return (
     <div>
       <div className="flex gap-2.5 justify-end mb-5 ">
         <SearchBar setQuery={setsearchParams} query={searchParams} />
         <div>
-          <Button text="Add To Masters" onClick={addNewAuthor} />
+          <Button text="Add To Masters" onClick={()=>setOpenModal(true)} />
         </div>
       </div>
 
@@ -119,7 +156,15 @@ const BookMasters = () => {
           itemsPerPage={itemsPerPage}
         />
       </div>
-
+      <AddToBookCommon
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        title="Add To Book Master"
+        selectedBooks={selectedBooks}
+        onSelectBooks={setSelectedBooks}
+        handleSubmit={addBookToBookMaster} 
+        isPending={isPending}    
+      />      
     </div>
   );
 };

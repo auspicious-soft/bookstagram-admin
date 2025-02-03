@@ -31,7 +31,6 @@ const BookMarket = () => {
 
  const {data, isLoading, error} = useSWR (`/admin/books?${query}&description=${searchParams}&type=${getTypeParam(activeTab)}`, getAllBooks)
  const booksdata= data?.data?.data;
- console.log('booksdata:', booksdata);
 
  const handleTabClick = (tab) => {
   setActiveTab(tab);

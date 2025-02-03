@@ -80,10 +80,21 @@ export const addNewCategory = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.post(route, payload)
 }
-
 export const addSubCategory = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.post(route, payload)
+}
+export const getSubCategoryData = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const addBookToCategory = async (route: string, payload: any) => { 
+    const axiosInstance= await getAxiosInstance()
+    return axiosInstance.put(route, payload)
+}
+export const addBookToSubCategory = async (route: string, payload: any) => { 
+    const axiosInstance= await getAxiosInstance()
+    return axiosInstance.put(route, payload)
 }
 
 //----Collection Pages------------------------
@@ -103,7 +114,10 @@ export const addBookToCollectio = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.put(route, payload)
 }
-
+export const updateCollectionStatus = async (route: string, payload: any) => {
+    const axiosInstance= await getAxiosInstance()
+    return axiosInstance.put(route, payload)
+}
 
 
 //----Book Hub Pages------------------------
@@ -115,6 +129,14 @@ export const addNewBook = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.post(route, payload)
 }
+export const getSingleBook = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const updateSingleBook = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.put(route, payload)
+}
 export const addBookToDiscount = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.put(route, payload)
@@ -123,7 +145,11 @@ export const getAllSchools = async (route: string) => {  //-----Book school tab
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
 }
-export const deleteSchool = async (route: string) => {  //-----Book school tab
+export const addToBookSchool = async (route: string, payload: any) => {  //-----Book school tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+export const deleteBookSchool = async (route: string) => {  //-----Book school tab
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.delete(route)
 }
@@ -131,13 +157,38 @@ export const getAllBookStudy = async (route: string) => {  //-----Book Study tab
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
 }
+export const addToBookStudy = async (route: string, payload: any) => {  //-----Book Study tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+export const deleteBookStudy = async (route: string) => {  //-----Book Study tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.delete(route)
+}
 export const getAllBookUniversity = async (route: string) => {  //-----Book University tab
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
 }
+export const addToBookUniversity = async (route: string, payload: any) => {  //-----Book University tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+export const deleteBookUniversity = async (route: string) => {  //-----Book University tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.delete(route)
+}
+
 export const getAllBookMasters = async (route: string) => {  //-----Book Master tab
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
+}
+export const addToBookMasters = async (route: string, payload: any) => {  //-----Book Master tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+export const deleteBookMasters = async (route: string) => {  //-----Book Master tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.delete(route)
 }
 
 

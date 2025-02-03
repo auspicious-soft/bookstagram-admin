@@ -5,7 +5,7 @@ import React from "react";
 interface CourseCardProps {
   title: string;
   image: string | StaticImageData; 
-  selected: boolean;
+  selected?: boolean;
   onSelect: () => void; 
 }
 
@@ -15,9 +15,10 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, image, selected, onSelec
       onClick={onSelect} >
       <Image
         src={image}
+        unoptimized
         width={217}
         height={113}
-        alt={title}
+        alt="image"
         className="w-full rounded-lg object-cover"
       />
       <div className="absolute top-2 right-2  ">

@@ -45,7 +45,7 @@ const SideNav = () => {
           )}
            {!isCollapsed && (
           <div className="mb-[60px] ">
-           <Link href="/admin/new-book" className="flex gap-2.5 p-[7px] items-center bg-white text-darkBlack w-full rounded-[24px] text-sm ">
+           <Link href="/admin/books/add-new" className="flex gap-2.5 p-[7px] items-center bg-white text-darkBlack w-full rounded-[24px] text-sm ">
             <NewBookIcon/>Add a new book </Link> 
           </div>
            )}

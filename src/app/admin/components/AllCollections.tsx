@@ -1,5 +1,5 @@
 'use client'
-import { addNewCollection, getAllCollection } from '@/services/admin-services';
+import { addNewCollection, getAllCollection, updateCollectionStatus } from '@/services/admin-services';
 import React, { useState, useTransition } from 'react';
 import useSWR from 'swr';
 import CategoryCard from './CategoryCard';
@@ -33,6 +33,7 @@ const AllCollections = () => {
   const [searchParams, setsearchParams] = useState("");
   const { data, error, isLoading, mutate } = useSWR(`/admin/collections?description=${searchParams}&${query}`, getAllCollection);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedBooks, setSelectedBooks] = useState<string[]>([]);
   const collections = data?.data?.data
 
   const handlePageChange = (newPage: number) => {
@@ -96,7 +97,32 @@ const AllCollections = () => {
     });
   };
 
-  
+  const updateCollection = async(id: string) => {
+    try {
+      // Find the current collection to get its displayOnMobile status
+      const currentCollection = collections.find((collection: any) => collection._id === id);
+      
+      // Create payload with opposite of current displayOnMobile status
+      const payload = {
+        displayOnMobile: !currentCollection?.displayOnMobile
+      };
+      console.log('payload:', payload);
+      
+      startTransition(async () => {
+        const response = await updateCollectionStatus(`/admin/collections/${id}`, payload);
+        if (response.status === 200) {
+          toast.success("Status updated successfully");
+          mutate(); // Refresh the data
+        } else {
+          toast.error("Failed to update status");
+        }
+      });
+    } catch (error) {
+      console.error("Error", error);
+      toast.error("An error occurred while updating the collection status");
+    }
+  };
+
   return (
     <div>
        <div className="flex gap-2.5 justify-end mb-5 ">
@@ -111,6 +137,8 @@ const AllCollections = () => {
             image={getImageClientS3URL(row?.image)}
             onClick={()=>handleSubCollection(row?._id)}
             displayMobile={row?.displayOnMobile}
+            selected={selectedBooks.includes(row?._id)}
+            onSelect={() => updateCollection(row?._id)}
             />
             ))}
         </div>

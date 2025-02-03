@@ -1,9 +1,9 @@
 'use client'
-import React, { useState } from 'react'; 
+import React, { useState, useTransition } from 'react'; 
 import Button from '@/app/components/Button'; 
 import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
-import { deleteSchool, getAllSchools } from '@/services/admin-services'; 
+import { deleteBookSchool, getAllSchools } from '@/services/admin-services'; 
 import ReactLoading from 'react-loading';
 import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import TableRowImage from '@/app/components/TableRowImage';
@@ -13,9 +13,11 @@ import SearchBar from '../SearchBar';
 import TablePagination from '../TablePagination';
 import { DeleteIcon, ViewIcon } from '@/utils/svgicons';
 import { toast } from 'sonner';
+import CouponCode from '../CouponCode';
 
 const BookSchool = () => {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [page, setPage] = useState(1); 
   const itemsPerPage = 10;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
@@ -23,26 +25,32 @@ const BookSchool = () => {
   const {data, error, isLoading, mutate} = useSWR(searchParams!=="" ? `/admin/book-schools?description=${searchParams}`: `/admin/book-schools?${query}`, getAllSchools)
   const schoolData = data?.data?.data;    
   const [isopen, setIsOpen] = useState(false);
+  const [couponModal, setCouponModal] = useState(false);
+  const [coupon, setCoupon] = useState();
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     setQuery(`page=${newPage}&limit=${itemsPerPage}`);
   };
 
-  const couponProfile = (id: string) => {
-  }
+  const openCouponModal = (code: any) => {
+    setCouponModal(true)
+    setCoupon(code);
+  };
   
   const handleDelete = async (id: string) => {
     try {
-      const response = await deleteSchool(`/admin/vouchers/${id}`);
+      startTransition(async()=>{
+      const response = await deleteBookSchool(`/admin/book-schools/${id}`);
       if (response.status === 200) {
         toast.success("deleted successfully");
         mutate()
       } else {
-      toast.error("Failed To Delete voucher");
+      toast.error("Failed To Delete");
       }
+    });
     } catch (error) {
-    toast.error("an Error Occurred While Deleting The voucher");
+    toast.error("an Error Occurred While Deleting");
     }
   }
 
@@ -85,7 +93,7 @@ const BookSchool = () => {
                 <td>{row?.codeActivated}</td>
                 <td>
                 <div>
-                <button onClick={()=> couponProfile(row?._id)} className='p-2.5'><ViewIcon/></button>
+                <button onClick={()=> openCouponModal(row?.couponCode)} className='p-2.5'><ViewIcon/></button>
                 <button onClick={()=>handleDelete(row?._id)} className='p-2.5'><DeleteIcon/> </button>
                 </div>
                 </td>
@@ -111,10 +119,14 @@ const BookSchool = () => {
           itemsPerPage={itemsPerPage}
           />
         </div>
-
-      <GenerateCouponModal
-      open={isopen}
-      onClose={()=>setIsOpen(false)}
+        <CouponCode 
+          couponCode={coupon} 
+          open={couponModal} 
+          onClose={() => setCouponModal(false)}
+        /> 
+        <GenerateCouponModal
+        open={isopen}
+        onClose={()=>setIsOpen(false)}
         />
     </div>
   );

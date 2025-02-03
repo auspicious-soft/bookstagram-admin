@@ -231,4 +231,12 @@ font-size: 14px;
     left: 0;
     z-index: 400;
   }
+  .navList li a {
+    padding: 8px 10px;
+    grid-gap: 8px;
+}
+.navList li a svg {
+  width: 18px;
+  height: 18px;
+}
 }

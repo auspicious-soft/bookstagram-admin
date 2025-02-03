@@ -22,7 +22,7 @@ interface FormValues {
     content: string;
   }[];
 }
-const AllCategories = () => {
+const   AllCategories = () => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [page, setPage] = useState(1);
