@@ -4,21 +4,14 @@ import { toast } from 'sonner';
 import useSWR from 'swr';
 import Select, { StylesConfig } from 'react-select'
 import CustomSelect from '@/app/components/CustomSelect';
+import UseUsers from '@/utils/useUsers';
 
-const users =[
-    {label: 'user1', value: '1'},
-    {label: 'user2', value: '2'},
-    {label: 'user3', value: '3'},
-    {label: 'user4', value: '4'},
-    {label: 'user5', value: '5'},
-    {label: 'user6', value: '6'},
-]
 const Page = () => {
   const [activeTab, setActiveTab] = useState<'notification' | 'newsletter'>('notification');
   const [sendToSpecific, setSendToSpecific] = useState(false);
   const [formData, setFormData] = useState({ title: '', message: '' });
   const [isPending, startTranstion] = useTransition()
- 
+  const {users} = UseUsers();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
