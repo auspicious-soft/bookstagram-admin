@@ -357,7 +357,7 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             </div>
           </div>
 
-            <div className=" mt-5">
+          <div className=" mt-5">
            {fileFields.map((field, index) => (
              <div key={field.id} className="mb-4">
                <div className="w-full">
@@ -415,7 +415,7 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                     )}
                   </div>
                 </div>
-              ))}
+            ))}
             </div>
           </div>
 
@@ -466,7 +466,7 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                         setUsedLanguages(prev => {
                           const updated = new Set(prev);
                           updated.delete(languageToRemove);
-                          return updated;
+                          return updated; 
                         });
                       }}
                       className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm" >

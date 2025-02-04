@@ -104,7 +104,7 @@ const Page = () => {
     });
   };
 
-    const handeAddBookToSubCategory = async() => {
+  const handleAddBookToCategory = async() => {
       try {
         const payload = {
           booksId: selectedBooks
@@ -127,7 +127,7 @@ const Page = () => {
         console.error('Error adding books:', error);
         toast.error("An error occurred while adding books");
       }
-    }
+  }
 
   return (
     <div className="h-full">
@@ -160,7 +160,7 @@ const Page = () => {
         <>
           <div className="flex gap-2.5 justify-end mb-5">
             <SearchBar setQuery={setSearchParams} query={searchParams} />
-            <Button text="Add A Book" onClick={() => setIsAddModalOpen(true)} />
+            <Button text="Add A Book" onClick={() => setBookModal(true)} />
           </div>
           <div className="grid grid-cols-4 gap-6">
             {booksData?.map((row: any) => (
@@ -212,7 +212,7 @@ const Page = () => {
         title="Add book to Category"
         selectedBooks={selectedBooks}
         onSelectBooks={setSelectedBooks}
-        handleSubmit={handeAddBookToSubCategory} 
+        handleSubmit={handleAddBookToCategory} 
         isPending={isPending}    
       />      
     </div>

@@ -95,7 +95,7 @@ const eventsProfile = (id: string) => {
                 </select>
             </div>
             </div>
-            <div className='table-normal overflo-custom'>
+        <div className='table-normal overflo-custom'>
             <table className="">
           <thead className="">
             <tr>

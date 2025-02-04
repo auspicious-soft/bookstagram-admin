@@ -8,71 +8,27 @@ import { signOut } from "next-auth/react";
 
 
 
-const Header: React.FC = () => {
+const HeaderPublisher: React.FC = () => {
   const [showData, setShowData] = useState(false);
   const pathname = usePathname(); 
   const searchParams = useSearchParams();
   const nameParam = searchParams.get("name");
-  const [categoryName, setCategoryName] = useState("");
-  const [collections, setCollections] = useState("") 
+  const [bookName, setBookName] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setCategoryName(localStorage.getItem("subCategoryName") || "");
-      setCollections(localStorage.getItem("collectionName") || "");
+      setBookName(localStorage.getItem("getbookName") || "");
     }
   }, [pathname]);
   
 
-
   const pageNames: { [key: string]: string } = {
-    "/admin/dashboard": "dashboard",
-    "/admin/book-hub": "Book Hub",
-    "/admin/categories": "Categories",
-    "/admin/collection": "Collection",  
-    "/admin/summary": "Summary",
-    "/admin/discounts": "Discounts",
-    "/admin/book-life": "Book Life",
-    "/admin/book-events":  "Book Events",
-    "/admin/book-events/add":  "Add New Event",
-    "/admin/authors": "Authors",
-    "/admin/publishers": "Publishers",
-    "/admin/stories": "Stories",
-    "/admin/promotions": "Promotions",
-    "/admin/users": "Users",
-    "/admin/notifications": "Notifications",
-    "/admin/authors/add-author" : "Add New Author",
-    "/admin/stories/add-new-story": "Add New Story",
-    "/admin/promotions/add-new-banner": "Add New Banner",
-    "/admin/books/add-new": "Add New Book",
+    "/publisher/dashboard": "Dashboard",
+    "/publisher/all-books": "All Books",
   };
   const getPageName = (path: string): string => {
-    if (path.startsWith("/admin/categories/") && path.endsWith("/sub-category")) {
-      return "Sub-Categories";
-    }
-    if (path.startsWith("/admin/book-hub/profile/")) {
-      return "Single Book";
-    }
-    if (path.startsWith("/admin/stories/single-story/")) {
-      return "Single Story";
-    }
-    if (path.startsWith("/admin/users/profile/")) {
-      return "Single User";
-    }
-    if (path.startsWith("/admin/authors/profile/")) {
-      return "Single Author";
-    }
-    if (path.startsWith("/admin/publishers/profile/")) {
-      return "Single Publisher";
-    }
-    if (path.startsWith("/admin/categories/sub-category/")) {
-      return categoryName;
-    }
-    if (path.startsWith("/admin/books/")) {
-      return "Single Book";
-    }
-    if (path.startsWith("/admin/collection/")){
-      return collections;
+    if (path.startsWith("/publisher/all-books/")) {
+      return bookName;
     }
     return pageNames[path] || "Bookstagram";
   };
@@ -96,7 +52,7 @@ const Header: React.FC = () => {
             />
             <div className="pr-1">
               <p className="text-darkBlack text-sm  ">Alex meian</p>
-              <p className="text-[#A1A3A5] text-xs ">Administrator</p>
+              <p className="text-[#A1A3A5] text-xs ">Publisher</p>
             </div>
             <DropIcon/>
           </div>
@@ -111,4 +67,4 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header;
+export default HeaderPublisher;

@@ -19,8 +19,8 @@ export default function Page() {
   const [isPending, startTransition] = React.useTransition();
   useEffect(() => {
     if (session) {
-      if ((session as any)?.user?.role === "user") {
-        window.location.href = "/customer/dashboard";
+      if ((session as any)?.user?.role === "publisher") {
+        window.location.href = "/publisher/dashboard";
       } else {
         window.location.href = "/admin/dashboard";
       }
@@ -41,7 +41,7 @@ export default function Page() {
     } else if (phoneRegex.test(username)) {
       loginFieldType = 'username';
     } else {
-      toast.error('Please enter a valid email or Danish phone number (+45).');
+      toast.error('Please enter a valid email');
       return;
     }
 
@@ -55,8 +55,8 @@ export default function Page() {
 
         if (response?.success) {
           toast.success('Logged in successfully');
-          if (response?.data?.user?.role === 'user') {
-            window.location.href = '/customer/dashboard';
+          if (response?.data?.user?.role === 'publisher') {
+            window.location.href = '/publisher/dashboard';
           } else {
             window.location.href = '/admin/dashboard';
           }

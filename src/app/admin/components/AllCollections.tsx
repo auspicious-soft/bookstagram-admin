@@ -12,6 +12,8 @@ import AddCommonModal from './AddCommonModal';
 import bookImg from '@/assets/images/collection.png'
 import { toast } from 'sonner';
 import { generateSignedUrlForCollection } from '@/actions';
+import { SelectSvg } from '@/utils/svgicons';
+import Image from 'next/image';
 
 type Language = "eng" | "kaz" | "rus";
 interface FormValues {
@@ -45,7 +47,8 @@ const AllCollections = () => {
     setIsAddModalOpen(true);
   }
   
-  const handleSubCollection = (id: string) => {
+  const handleSubCollection = (id: string, name: string) => {
+    localStorage.setItem("collectionName", name);
     router.push(`/admin/collection/${id}`); 
   }
 
@@ -101,8 +104,7 @@ const AllCollections = () => {
     try {
       // Find the current collection to get its displayOnMobile status
       const currentCollection = collections.find((collection: any) => collection._id === id);
-      
-      // Create payload with opposite of current displayOnMobile status
+       
       const payload = {
         displayOnMobile: !currentCollection?.displayOnMobile
       };
@@ -130,16 +132,18 @@ const AllCollections = () => {
          <div><Button text="Add A New collection" onClick={addCollection} /></div>
       </div>
        <div className='grid grid-cols-4 gap-6'>
-            {collections?.map((row: any) => (
-            <CategoryCard 
-            key={row?._id}
-            name={row?.name.eng}
-            image={getImageClientS3URL(row?.image)}
-            onClick={()=>handleSubCollection(row?._id)}
-            displayMobile={row?.displayOnMobile}
-            selected={selectedBooks.includes(row?._id)}
-            onSelect={() => updateCollection(row?._id)}
-            />
+          {collections?.map((row: any) => (
+            <div key={row?._id} className='bg-white rounded-[20px] relative'>
+            <div onClick={()=>handleSubCollection(row?._id, row?.name.eng )} 
+              className='text-center px-5 pt-[30px] pb-5 cursor-pointer '>
+                <Image unoptimized src={getImageClientS3URL(row?.image)} alt='dgv' width={122} height={122}  className='w-[122px] h-[122px] object-cover rounded-full mx-auto ' />
+                <p className='text-darkBlack text-[15px] leading-5 tracking-[-0.24px] mt-[23px] '>{row?.name.eng}</p>
+              </div>
+                <p onClick={() => updateCollection(row?._id)} className="flex gap-2.5 justify-center pt-1 pb-[30px] px-5 items-center text-sm">
+                  <SelectSvg color={row?.displayOnMobile===true ? 'var(--tw-bg-orange)' : '#C1C1C1'} /> 
+                  Display on the mobile app
+                </p>
+            </div>
             ))}
         </div>
         <div className="mt-10 flex justify-end">

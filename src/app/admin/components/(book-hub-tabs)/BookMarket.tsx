@@ -7,6 +7,7 @@ import useSWR from 'swr';
 import { getAllBooks } from '@/services/admin-services';
 import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import { useRouter } from 'next/navigation';
+import TablePagination from '../TablePagination';
 
 
 const BookMarket = () => {
@@ -32,6 +33,10 @@ const BookMarket = () => {
  const {data, isLoading, error} = useSWR (`/admin/books?${query}&description=${searchParams}&type=${getTypeParam(activeTab)}`, getAllBooks)
  const booksdata= data?.data?.data;
 
+ const handlePageChange = (newPage: number) => {
+  setPage(newPage);
+  setQuery(`page=${newPage}&limit=${itemsPerPage}`);
+};
  const handleTabClick = (tab) => {
   setActiveTab(tab);
   setPage(1);
@@ -109,6 +114,14 @@ const bookTypes = [
         </div>
       )}
     </div>
+    <div className="mt-10 flex justify-end">
+        <TablePagination
+          setPage={handlePageChange}
+          page={page}
+          totalData={data?.data?.total}
+          itemsPerPage={itemsPerPage}
+        />
+      </div>
         </div>
         
         </div>
