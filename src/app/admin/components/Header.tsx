@@ -4,7 +4,7 @@ import Image from "next/image";
 import avatar from '@/assets/images/avatar.png';
 import { usePathname, useSearchParams } from "next/navigation";
 import { DropIcon } from "@/utils/svgicons";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 
 
@@ -15,11 +15,16 @@ const Header: React.FC = () => {
   const nameParam = searchParams.get("name");
   const [categoryName, setCategoryName] = useState("");
   const [collections, setCollections] = useState("") 
-
+  const [bookName, setBookName] = useState("");
+  const [summary, setSummary] = useState("");
+  const {data} = useSession();  
+  const name = (data as any)?.user?.fullName; 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setCategoryName(localStorage.getItem("subCategoryName") || "");
       setCollections(localStorage.getItem("collectionName") || "");
+      setBookName(localStorage.getItem("getbookName") || "");
+      setSummary(localStorage.getItem("summaryName") || "");
     }
   }, [pathname]);
   
@@ -34,7 +39,7 @@ const Header: React.FC = () => {
     "/admin/discounts": "Discounts",
     "/admin/book-life": "Book Life",
     "/admin/book-events":  "Book Events",
-    "/admin/book-events/add":  "Add New Event",
+    // "/admin/book-events/add":  "Add New Event",
     "/admin/authors": "Authors",
     "/admin/publishers": "Publishers",
     "/admin/stories": "Stories",
@@ -44,7 +49,7 @@ const Header: React.FC = () => {
     "/admin/authors/add-author" : "Add New Author",
     "/admin/stories/add-new-story": "Add New Story",
     "/admin/promotions/add-new-banner": "Add New Banner",
-    "/admin/books/add-new": "Add New Book",
+    "/admin/add-new": "Add New Book",
   };
   const getPageName = (path: string): string => {
     if (path.startsWith("/admin/categories/") && path.endsWith("/sub-category")) {
@@ -69,10 +74,19 @@ const Header: React.FC = () => {
       return categoryName;
     }
     if (path.startsWith("/admin/books/")) {
-      return "Single Book";
+      return bookName;
     }
     if (path.startsWith("/admin/collection/")){
       return collections;
+    }
+    if (path.startsWith("/admin/summary/")) {
+      return summary;
+    }
+    if (path === "/admin/book-events/add") {
+      return "Add New Event";
+    }
+    if (path.startsWith("/admin/book-events/")) {
+      return `Single Event`;
     }
     return pageNames[path] || "Bookstagram";
   };
@@ -95,7 +109,7 @@ const Header: React.FC = () => {
               className="rounded-full w-[38px] h-[38px]"
             />
             <div className="pr-1">
-              <p className="text-darkBlack text-sm  ">Alex meian</p>
+              <p className="text-darkBlack text-sm capitalize ">{name}</p>
               <p className="text-[#A1A3A5] text-xs ">Administrator</p>
             </div>
             <DropIcon/>

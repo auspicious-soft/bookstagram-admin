@@ -114,7 +114,7 @@ const AddBookToDiscount: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
                     alt="books"
                     width={216}
                     height={112}
-                    className="rounded-lg w-full"
+                    className="rounded-lg object-cover aspect-square w-full"
                   />
                   <p className="mt-[7px] text-darkBlack text-sm capitalize">
                     {book?.name.eng}

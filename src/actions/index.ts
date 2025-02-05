@@ -1,4 +1,3 @@
-
 'use server'
 
 import { signIn, signOut } from "@/auth"
@@ -10,15 +9,16 @@ import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand } from "@aws-sd
 
 export const loginAction = async (payload: any) => {
     try {
-        const res: any = await loginService(payload)
-        
+        const res: any = await loginService(payload) 
+        const user = res?.data?.data?.user 
+        const userName =user.name ? user.name.eng : user.fullName
         if (res && res?.data?.success) {
             await signIn('credentials', {
                 username: payload.username,
-                fullName: res?.data?.data?.user?.fullName,
+                fullName: userName,
                 _id: res?.data?.data?.user?._id,
                 role: res?.data?.data?.user?.role,
-                profilePic: res?.data?.data?.user?.profilePic,
+                profilePic: res?.data?.data?.user?.image,
                 redirect: false,
             })
         }

@@ -9,6 +9,7 @@ import { useParams } from 'next/navigation'
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { DeleteIcon } from "@/utils/svgicons";
 
 const DisplayBookEvent = () => {
   const Params = useParams()
@@ -144,7 +145,7 @@ const handleUpload = async () => {
           <div className="w-full text-[14px] text-white text-center flex items-center justify-end gap-2 mb-[10px] ">
             <div className="bg-[#FF0004] rounded-[28px] w-[211px] flex items-center justify-center cursor-pointer">
               <button className="flex items-center justify-end gap-2  py-[16px] " onClick={()=> handleDelete()}>
-                {/* <DeleteIcon /> */}
+                <DeleteIcon stroke="#fff"/>
                 <h6 className="text-[14px] font-medium">Delete Event</h6>
               </button>
             </div>

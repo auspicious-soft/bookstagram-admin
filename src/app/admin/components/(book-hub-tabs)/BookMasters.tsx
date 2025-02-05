@@ -121,10 +121,17 @@ const BookMasters = () => {
                     {key === "eng" ? "English" : key === "rus" ? "Russian" : key ==="kaz" ? "Kazakh": key}
                     </p>))}
                   </td>
-                  <td className="space-x-2">
-                  {row?.productsId?.categoryId?.map((item) => (
-                    <p key={item?._id}>{item?.name?.eng}</p>
+                  <td>
+                  <div className="flex flex-wrap gap-2">
+                  {(row?.productsId?.categoryId).slice(0, 3).map((item) => (
+                      <span key={item?._id} className="bg-[#EDEDED] px-2.5 py-1 rounded-full capitalize" >
+                        {item?.name.eng}
+                      </span>
                     ))}
+                  {(row?.productsId?.categoryId).length > 3 && (
+                    <span className="bg-[#EDEDED] px-2.5 py-1 rounded-full">...</span>
+                  )}
+                </div>
                   </td>
                   <td className="space-x-1">
                     <button onClick={() => handleDelete(row?._id)} className="p-[10px]"><DeleteIcon/></button>

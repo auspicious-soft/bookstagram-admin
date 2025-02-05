@@ -22,7 +22,6 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const books = data?.data?.data?.booksId
-  console.log('books:', books);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -32,7 +31,10 @@ const Page = () => {
   const addToCOllections = ()=>{
     setIsModalOpen(true)
   }
-  
+  const openBookProfile =(id: string, name: string) => {
+    localStorage.setItem("getbookName", name);
+    router.push(`/admin/books/${id}`)
+  }
   return (
     <div>
        <div className="flex gap-2.5 justify-end mb-5 ">
@@ -57,6 +59,7 @@ const Page = () => {
             {books.map((row: any) => (
               <BookCard 
                 key={row?._id}
+                handleClick={()=>openBookProfile(row?._id, row?.name?.eng)}
                 author={row?.authorId?.[0]?.name?.eng}
                 title={row?.name?.eng}
                 price={`$${row?.price}`}

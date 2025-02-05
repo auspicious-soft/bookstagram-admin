@@ -247,6 +247,10 @@ export const addNewStory = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.post(route, payload)   
 }
+export const updateStory = async (route: string, payload: any) =>{
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.put(route, payload)
+}
 
 //------- Promotions Page --------------------------------
 export const getAllBanners = async (route: string) => {
@@ -298,7 +302,8 @@ export const addNewBookLife = async (route: string, payload: any) => {
 export const deleteBookLife = async (route: any) => {
     const axiosInstance = await getAxiosInstance();
     return axiosInstance.delete(route);
-};export const addBlogFormData = async (route: string, payload: any) => {
+};
+export const addBlogFormData = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.post(route, payload)
 }
@@ -310,3 +315,15 @@ export const DeleteBlog = async (route: any) => {
     const axiosInstance = await getAxiosInstance();
     return axiosInstance.delete(route);
 };
+
+//--------------Notifications page  ---------------
+export const postNotificationToAll = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+export const postNotificationToSpecific = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+
+

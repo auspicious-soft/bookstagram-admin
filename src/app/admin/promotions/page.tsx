@@ -45,7 +45,7 @@ const Page = () => {
             {stories?.map((banner): any =>(
             <div key={banner?._id} className="relative ">
               <Image unoptimized src={getImageClientS3URL(banner?.image)} width={264} height={163} alt="story"
-              className="rounded-[10px]  w-full "/>
+              className="rounded-[10px] aspect-[3/2] object-cover w-full "/>
               <h2 className="font-aeonikBold text-lg capitalize text-darkBlack mt-[11px] ">{banner?.name.eng}</h2>
               <div className="absolute top-[5px] right-[6px]  ">
               <button onClick={()=>handleDelete(banner?._id)} className="bg-white border border-orange rounded-[34px] flex items-center gap-[5px] py-2 px-4 text-orange ">

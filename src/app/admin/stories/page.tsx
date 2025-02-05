@@ -49,7 +49,7 @@ const Page = () => {
                {story?.file && Object.entries(story?.file).slice(0, 1).map(([key, value]: [string, string], index) => (
                 <div key={index} onClick={()=>openSingleStory(story?._id)} className="cursor-pointer">
                 <Image unoptimized src={getImageClientS3URL(key)} width={264} height={260} alt="story"
-                className="rounded-[10px] aspect-square w-full "/>
+                className="rounded-[10px] aspect-square object-cover w-full "/>
               </div>
             ))}
                 <h2 className="font-aeonikBold text-lg capitalize text-darkBlack mt-[11px] ">{story?.name.eng}</h2>

@@ -30,7 +30,10 @@ const Page = () => {
   const addToSummary = ()=>{
     setIsModalOpen(true)
   }
-  
+  const openBookProfile =(id: string, name: string) => {
+    localStorage.setItem("getbookName", name);
+    router.push(`/admin/books/${id}`)
+  }
   return (
     <div>
        <div className="flex gap-2.5 justify-end mb-5 ">
@@ -55,9 +58,11 @@ const Page = () => {
        {books?.map((row: any) => (
             <BookCard 
             key={row?._id}
-            author={row?.authorId[0]?.name}
+            handleClick={()=>openBookProfile(row?._id, row?.name.eng)}
+            author={row?.authorId[0]?.name.eng}
             title={row?.name.eng}
             price={`$${row?.price}`}
+            
             // discount={row?.discountPercentage}
             imgSrc={getImageClientS3URL(row?.image)}
             />

@@ -1,4 +1,4 @@
-import { axiosInstance, getAxiosInstance, getAxiosInstanceForPublisher } from "@/config/axios";
+import { axiosInstance, getAxiosInstanceForPublisher } from "@/config/axios";
 
 
 export const getPublisherDashboard = async (route: string) => {
@@ -9,7 +9,7 @@ export  const getPublisherAllBooks = async (route: string) => {
   const axiosInstance = await getAxiosInstanceForPublisher()
   return axiosInstance.get(route)
 }
-const getPublisherSingleBook = async (route: string) => {
+export const getPublisherSingleBook = async (route: string) => {
   const axiosInstance = await getAxiosInstanceForPublisher()
   return axiosInstance.get(route)
 }

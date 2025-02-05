@@ -5,7 +5,8 @@ import Link from "next/link";
 import { AuthorsIcon, BookEventsIcon, BookHubIcon, BookLifeIcon, CategoryIcon, CollectionIcon, DashboardIcon, DiscountIcon, HamburgerIcon, NotificationsIcon, PromotionsIcon, PublishersIcon, StoriesIcon, SummaryIcon, UsersIcon } from "@/utils/svgicons";
 import Image from "next/image";
 import logo from '@/assets/images/logo.png';
-import { signOut } from "@/auth";
+import { signOut } from "next-auth/react";
+  
 
 const MobileHeader = () => {
   const pathname = usePathname(); 
@@ -128,7 +129,7 @@ const MobileHeader = () => {
         <div className="">
           <ul className="navList">
             <li className="!m-0">
-            <button onClick={() => signOut({ redirectTo: '/' })} 
+            <button onClick={() => signOut({ redirectTo: '/' })}
               className="w-full bg-orange text-white py-2 px-4 rounded-[28px] text-sm">
                {/* <span className="text-[#283C63] text-[600]"> */}
                 Log Out

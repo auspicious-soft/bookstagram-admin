@@ -10,7 +10,7 @@ import {
 } from "@/services/admin-services";
 import CustomSelect from "@/app/components/CustomSelect";
 import useSWR from "swr";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 import UseCategory from "@/utils/useCategory";
 import { useSession } from "next-auth/react";
@@ -62,6 +62,7 @@ const Page = () => {
   const [isPending, startTransition] = useTransition();
   const [imagePreview, setImagePreview] = useState<string | null>();
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const router = useRouter();
   const { category } = UseCategory();
   const { data: publisherResponse, mutate } = useSWR(
     `/admin/publishers/${id}`,
@@ -178,6 +179,11 @@ const Page = () => {
   const handleCategoryChange = (selectedOptions: any) => {
     setValue("categoryId", selectedOptions || [], { shouldValidate: true });
   };
+
+  const openBookProfile =(id: string, name: string) => {
+    localStorage.setItem("getbookName", name);
+    router.push(`/admin/books/${id}`)
+  }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -539,6 +545,7 @@ const Page = () => {
             bookData?.map((data: any) => (
               <BookCard
                 key={data?._id}
+                handleClick={()=>openBookProfile(data?._id, data?.name.eng)}
                 title={data?.name?.eng}
                 price={`$${data?.price}`}
                 imgSrc={getImageClientS3URL(data?.image)}

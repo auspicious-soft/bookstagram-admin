@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { usePathname } from 'next/navigation'; 
 import Link from "next/link";
-import { AuthorsIcon, BookEventsIcon, BookHubIcon, BookLifeIcon, CategoryIcon, CollectionIcon, DashboardIcon, DiscountIcon, HamburgerIcon, NotificationsIcon, PromotionsIcon, PublishersIcon, StoriesIcon, SummaryIcon, UsersIcon } from "@/utils/svgicons";
+import { BookHubIcon, DashboardIcon, HamburgerIcon } from "@/utils/svgicons";
 import Image from "next/image";
 import logo from '@/assets/images/logo.png';
 import { signOut } from "@/auth";

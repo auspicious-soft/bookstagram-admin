@@ -3,7 +3,7 @@ import { useState } from "react";
 import { usePathname } from 'next/navigation';
 import logo from '@/assets/images/logo.png';
 import Link from "next/link";
-import { ALlBookIcon, AuthorsIcon, BookEventsIcon, BookHubIcon, BookLifeIcon, CategoryIcon, CollectionIcon, DashboardIcon, DiscountIcon, NewBookIcon, NotificationsIcon, PromotionsIcon, PublishersIcon, SideBarIcon, StoriesIcon, SummaryIcon, UsersIcon } from "@/utils/svgicons";
+import { ALlBookIcon, DashboardIcon, SideBarIcon } from "@/utils/svgicons";
 import Image from "next/image";
 
 const SideBarPublisher = () => {
@@ -26,7 +26,7 @@ const SideBarPublisher = () => {
       <div className="">
           {!isCollapsed && (
         <div className="mb-[71px] ">
-              <Link href="/admin/dashboard">
+              <Link href="/publisher/dashboard">
                 <Image src={logo} alt="logo" width={185} height={35} className="mx-auto" />
               </Link>
             </div> 

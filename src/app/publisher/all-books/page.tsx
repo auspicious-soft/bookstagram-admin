@@ -34,8 +34,7 @@ const Page = () => {
     )}`,
     getPublisherAllBooks
   );
-  const booksdata = data?.data?.data;
-  console.log('booksdata:', booksdata);
+  const booksdata = data?.data?.data; 
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);

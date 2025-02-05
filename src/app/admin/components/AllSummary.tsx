@@ -43,7 +43,8 @@ const AllSummary = () => {
     setIsAddModalOpen(true);
   };
 
-  const handleSummary = (id: string) => {
+  const handleSummary = (id: string, name: string) => {
+    localStorage.setItem("summaryName", name);
     router.push(`/admin/summary/${id}`) 
   };
 
@@ -108,7 +109,7 @@ const AllSummary = () => {
               key={row?._id}
               name={row?.name.eng}
               image={getImageClientS3URL(row?.image)}
-              onClick={() => handleSummary(row?._id)}
+              onClick={() => handleSummary(row?._id, row?.name.eng)}
             />
           ))
         ) : (

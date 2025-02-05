@@ -19,10 +19,8 @@ const SalesChart = ({selectedYear, data, onYearChange}: Props) => {
   const years = Array.from({ length: 6 }, (_, i) => currentYear - i);
 
   const monthlyCounts = useMemo(() => data?.monthlyCounts || [], [data]);
-  console.log('monthlyCounts:', monthlyCounts);
 
   const [userGrowth, setUserGrowth] = useState<{ name: string; value: number }[]>([]);
-  console.log('userGrowth:', userGrowth);
 
   useEffect(() => {
     // Convert incoming data into the required format

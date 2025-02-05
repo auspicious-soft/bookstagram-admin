@@ -4,7 +4,8 @@ import Image from "next/image";
 import avatar from '@/assets/images/avatar.png';
 import { usePathname, useSearchParams } from "next/navigation";
 import { DropIcon } from "@/utils/svgicons";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 
 
 
@@ -14,7 +15,8 @@ const HeaderPublisher: React.FC = () => {
   const searchParams = useSearchParams();
   const nameParam = searchParams.get("name");
   const [bookName, setBookName] = useState("");
-
+  const {data} = useSession();  
+  const publisher = (data as any)?.user; 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setBookName(localStorage.getItem("getbookName") || "");
@@ -44,14 +46,15 @@ const HeaderPublisher: React.FC = () => {
           <div onClick={() => setShowData(!showData)}
           className="flex gap-2.5 items-center bg-white p-[5px] pr-5 rounded-[24px] cursor-pointer ">
           <Image
-              src={avatar}
-              alt="User Profile"
+              src={getImageClientS3URL(publisher?.image)}
+              unoptimized
+              alt="Profile"
               width={38}
               height={38}
               className="rounded-full w-[38px] h-[38px]"
             />
             <div className="pr-1">
-              <p className="text-darkBlack text-sm  ">Alex meian</p>
+              <p className="text-darkBlack text-sm capitalize ">{publisher?.fullName}</p>
               <p className="text-[#A1A3A5] text-xs ">Publisher</p>
             </div>
             <DropIcon/>

@@ -97,7 +97,6 @@ const BookForm = () => {
   const isFormPopulated = useRef(false);
   const isImageChanged = useRef(false);
   const bookData = data?.data?.data?.books?.[0];
-  console.log('bookData:', bookData);
   const upperData = data?.data?.data
   const searchParams = useSearchParams();
   const bookType = searchParams.get('type') || 'e-book';

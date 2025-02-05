@@ -37,7 +37,6 @@ const Page = () => {
   const [searchParams, setSearchParams] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedBooks, setSelectedBooks] = useState<string[]>([]);
-  console.log('selectedBooks:', selectedBooks);
   const [bookModal, setBookModal] = useState(false);
 
   const { data, error, isLoading, mutate } = useSWR(
@@ -46,9 +45,7 @@ const Page = () => {
   );
 
   const subCategory = data?.data?.data?.subcategory ;
-  console.log('subCategory:', subCategory);
   const booksData = data?.data?.data?.books;
-  console.log('booksData:', booksData);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -60,6 +57,10 @@ const Page = () => {
     router.push(`/admin/categories/sub-category/${id}`);
   };
 
+  const openBookProfile =(id: string, name: string) => {
+    localStorage.setItem("getbookName", name);
+    router.push(`/admin/books/${id}`)
+  } 
   const handleAddSubmit = async (formData: FormValues) => {
     startTransition(async () => {
       try {
@@ -110,7 +111,6 @@ const Page = () => {
           booksId: selectedBooks
         };
   
-        console.log('payload:', payload);
        startTransition(async () => {
           const response = await addBookToCategory(`/admin/categories/${id}/add`, payload);
   
@@ -165,6 +165,7 @@ const Page = () => {
           <div className="grid grid-cols-4 gap-6">
             {booksData?.map((row: any) => (
               <BookCard 
+              handleClick={()=>openBookProfile(row?._id, row?.name.eng)}
                key={row?._id}
                author={row?.authorId?.[0]?.name?.eng}
                title={row?.name?.eng}

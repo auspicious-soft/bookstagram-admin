@@ -267,7 +267,7 @@ const Page = () => {
                             alt="Preview"
                             width={340}
                             height={340}
-                            className="rounded-[10px] w-full h-full object-cover"
+                            className="rounded-[10px] aspect-square w-full h-full object-cover"
                           />
                         </div>
                       ) : (
@@ -278,7 +278,7 @@ const Page = () => {
                             alt="upload"
                             width={340}
                             height={340}
-                            className="rounded-[10px] w-full"
+                            className="rounded-[10px] aspect-square object-cover w-full"
                           />
                         </div>
                       )}
@@ -344,7 +344,7 @@ const Page = () => {
                 disabled={isPending}
                 className="bg-orange text-white text-sm px-4 mt-10 py-[14px] text-center rounded-[28px] w-full"
               >
-                {isPending ? "Adding Banner..." : "Add New Banner"}
+                {isPending ? "Adding Story..." : "Add New Story"}
               </button>
             </div>
           </form>

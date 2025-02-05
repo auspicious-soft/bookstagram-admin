@@ -7,7 +7,7 @@ import { deleteFileFromS3, generateAuthorsProfilePicture } from '@/actions';
 import { getSingleAuthor, updateSingleAuthor } from '@/services/admin-services';
 import CustomSelect from '@/app/components/CustomSelect';
 import useSWR from 'swr';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import BookCard from '@/app/admin/components/BookCard';
 import { useFieldArray, useForm, FormProvider } from "react-hook-form";
@@ -72,6 +72,7 @@ interface FormValues {
 
 const Page = () => {
   const { id } = useParams();
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [imagePreview, setImagePreview] = useState<string | null>();
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -267,6 +268,11 @@ const Page = () => {
       }
     });
   };
+
+  const openBookProfile =(id: string, name: string) => {
+    localStorage.setItem("getbookName", name);
+    router.push(`/admin/books/${id}`)
+  }
 
   return (
     <div>
@@ -510,11 +516,12 @@ const Page = () => {
        {authorBooks?.length > 0 ? (
           authorBooks?.map((data: any) => (
             <BookCard
-              key={data?._id}
-              title={data?.name}
+            key={data?._id}
+            handleClick={()=>openBookProfile(data?._id, data?.name.eng)}
+              title={data?.name?.eng}
               price={`$${data?.price}`}
               imgSrc={getImageClientS3URL(data?.image)}
-              author={authorData?.name}
+              author={authorData?.name?.eng}
             />
           ))
         ) : (

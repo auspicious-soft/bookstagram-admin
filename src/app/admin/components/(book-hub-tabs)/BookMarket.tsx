@@ -41,7 +41,8 @@ const BookMarket = () => {
   setActiveTab(tab);
   setPage(1);
 };
-const openBookProfile =(id: string) => {
+const openBookProfile =(id: string, name: string) => {
+  localStorage.setItem("getbookName", name);
   router.push(`/admin/books/${id}`)
 }
 const bookTypes = [
@@ -52,7 +53,7 @@ const bookTypes = [
 ];
   const onTypeSelect = (type: string) =>{
     const encodedType = encodeURIComponent(type);
-    router.push(`/admin/books/add-new?type=${encodedType}`)
+    router.push(`/admin/add-new?type=${encodedType}`)
   }
     return (
         <div>
@@ -106,7 +107,7 @@ const bookTypes = [
               key={book?._id}
               title={book?.name?.eng}
               price={`$${book?.price}`}
-              handleClick={()=>openBookProfile(book?._id)}
+              handleClick={()=>openBookProfile(book?._id, book?.name?.eng)}
               imgSrc={getImageClientS3URL(book?.image)}
               author={book?.authorId[0]?.name.eng}
             />
