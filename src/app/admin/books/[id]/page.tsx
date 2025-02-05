@@ -31,6 +31,7 @@ const genresOptions: OptionType[] = [
   { value: "fiction", label: "Fiction" },
   { value: "non-fiction", label: "Non-Fiction" },
   { value: "poetry", label: "Poetry" },
+  { value: "anti", label: "Anti" },
 ];  
 
 const validationSchema = yup.object({
@@ -97,6 +98,7 @@ const BookForm = () => {
   const isFormPopulated = useRef(false);
   const isImageChanged = useRef(false);
   const bookData = data?.data?.data?.books?.[0];
+  console.log('bookData:', bookData);
   const upperData = data?.data?.data
   const searchParams = useSearchParams();
   const bookType = searchParams.get('type') || 'e-book';
@@ -179,7 +181,7 @@ const BookForm = () => {
         publisherId: bookData.publisherId._id,
         categoryId: bookData.categoryId.map((cat: any) => cat._id),
         subCategoryId: bookData.subCategoryId?.map((subCat: any) => subCat._id) || [],
-        genre: bookData.genre,
+        genre: bookData.genre?.map((g: any) => g),
         type: bookData.type,
         image: null
       });
