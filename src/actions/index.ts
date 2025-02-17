@@ -182,7 +182,7 @@ export const generateSignedUrlBooks = async (fileName: string, fileType: string,
   }
 };
 
-export const generateSignedUrlAudioBookFile = async (fileName: string, fileType: string, name: string, language: string, metadata: any) => {
+export const generateSignedUrlAudioBookFile = async (fileName: string, fileType: string, name: any, language: string, metadata: any) => {
   const fileKey = `books/${name}/files/${language}/${fileName}`;
   const uploadParams = {
     Bucket: process.env.AWS_BUCKET_NAME!,
@@ -190,7 +190,9 @@ export const generateSignedUrlAudioBookFile = async (fileName: string, fileType:
     ContentType: fileType,
     // ACL: ObjectCannedACL.public_read,
     Metadata: {
+      // timestamps: (JSON.stringify(metadata.timestamps)),
       timestamps: Buffer.from(JSON.stringify(metadata.timestamps)).toString("base64"),
+
     },
   };
   try {
@@ -334,7 +336,9 @@ export const getFileWithMetadata = async (fileKey: string) => {
     const metadata = headData.Metadata || {};
     if (metadata.timestamps) {
       try {
-        metadata.timestamps = JSON.parse(Buffer.from(metadata.timestamps, "base64").toString("utf-8"));
+        const firstDecode = Buffer.from(metadata.timestamps, "base64").toString("utf-8");
+        const secondDecode = Buffer.from(firstDecode, "base64").toString("utf-8");
+        metadata.timestamps = JSON.parse(secondDecode);
       } catch (error) {
         console.error("Error decoding metadata timestamps:", error);
       }

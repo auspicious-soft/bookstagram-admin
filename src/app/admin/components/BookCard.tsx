@@ -1,7 +1,8 @@
 "use client";
-import React from 'react';  
+import React, {useEffect, useState} from 'react';  
 import Image, {StaticImageData} from 'next/image';
 import { DeleteIcon } from '@/utils/svgicons';
+import { getFileWithMetadata } from "@/actions";
 
 interface CardProps {
     title: string;
@@ -11,8 +12,20 @@ interface CardProps {
     discount?: string | number;
     handleDelete?: React.MouseEventHandler;
     handleClick?: React.MouseEventHandler;
+    file?:any;
   }
-  const BookCard: React.FC<CardProps> = ({ title, author, price, imgSrc, discount, handleDelete, handleClick }) => {
+  const BookCard: React.FC<CardProps> = ({ title, author, price, imgSrc, discount, handleDelete, handleClick ,file}) => {
+        // const [fileUrls, setFileUrls] = useState(null);
+    
+        // const [metadatas, setMetadatas] = useState(null);
+        // useEffect(() => {
+        //   const fetchFileMetadata = async () => {
+        //     const { fileUrl, metadata } = await getFileWithMetadata("books/rwerwfsfsdfdsfs/files/rus/Invoice_EUINKZ25_14245.pdf");
+        //     setFileUrls(fileUrl);
+        //     setMetadatas(metadata);
+        //   };
+        //   fetchFileMetadata();
+        // }, [file]);
     return (
         <div onClick={handleClick} className="relative cursor-pointer">
         <div className='relative'>
