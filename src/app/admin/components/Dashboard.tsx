@@ -14,6 +14,7 @@ const Dashboard = () => {
 const [overview, setOverview] = useState<string>("7");
 const [user, setUser] = useState<string>("7");
 const {data, error, mutate, isLoading} = useSWR(`/admin/dashboard?overviewDuration=${overview}&usersDuration=${user}`, getDashboardStats)
+console.log('data: ', data);
 const overviewData= data?.data?.data  
 const router = useRouter();
 
@@ -124,7 +125,7 @@ const eventsProfile = (id: string) => {
               <tr key={row?._id}>
                 <td>{row?._id}</td>
                 <td><div className='flex items-center gap-[5px]'><TableRowImage image={row?.profilePic ? getImageClientS3URL(row?.profilePic) : profile}/> {row?.fullName?.eng}</div> </td>
-                <td>Level 3</td>
+                <td>Level {row.award===null? 0 : row.award.level}</td>
                 <td>{row?.phoneNumber}</td>
                 <td><button onClick={() => userProfile(row?._id)} className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]  '>View</button></td>
               </tr>
