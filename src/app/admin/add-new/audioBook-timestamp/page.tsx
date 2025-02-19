@@ -202,13 +202,16 @@ const TimestampsFieldArray = ({ control, langIndex, register }) => {
   return (
     <>
       {fields.map((field, index) => (
-        <div key={field.id} className="flex gap-4 items-center mb-4">
-          <input type="text" {...register(`languages.${langIndex}.timestamps.${index}.chapterName`)} placeholder="Name of chapter" className="flex-1 p-3 border rounded-lg" />
+        <div key={field.id} className="flex gap-4 items-center mb-4 flex-wrap">
+          <input type="text" {...register(`languages.${langIndex}.timestamps.${index}.chapterName`)} placeholder="Name of chapter" className="flex-1 p-3 border rounded-lg"  />
+          <div className="space-x-4  ">
+
           <input type="time" step="1" {...register(`languages.${langIndex}.timestamps.${index}.startTime`)} className="p-3 border rounded-lg" />
           <input type="time" step="1" {...register(`languages.${langIndex}.timestamps.${index}.endTime`)} className="p-3 border rounded-lg" />
           <button type="button" onClick={() => remove(index)} className="border-[#989898] border-[1px] text-white px-2 py-2 rounded-[28px]">
             <CrossIcon />
           </button>
+          </div>
         </div>
       ))}
       <button type="button" onClick={() => append({ id: Date.now().toString(), chapterName: "", startTime: "00:00:00", endTime: "00:00:00" })} className="bg-blue-600 text-white px-5 py-2 rounded-lg">

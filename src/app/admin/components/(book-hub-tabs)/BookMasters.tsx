@@ -123,12 +123,12 @@ const BookMasters = () => {
                   </td>
                   <td>
                   <div className="flex flex-wrap gap-2">
-                  {(row?.productsId?.categoryId).slice(0, 3).map((item) => (
+                  {(row?.productsId?.categoryId)?.slice(0, 3)?.map((item) => (
                       <span key={item?._id} className="bg-[#EDEDED] px-2.5 py-1 rounded-full capitalize" >
                         {item?.name.eng}
                       </span>
                     ))}
-                  {(row?.productsId?.categoryId).length > 3 && (
+                  {(row?.productsId?.categoryId)?.length > 3 && (
                     <span className="bg-[#EDEDED] px-2.5 py-1 rounded-full">...</span>
                   )}
                 </div>
