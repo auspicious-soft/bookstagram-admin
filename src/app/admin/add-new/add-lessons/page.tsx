@@ -1,13 +1,59 @@
-
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { DeleteIcon, CrossIcon, FileIcon, DustbinIcon, AddIcon } from "@/utils/svgicons";
+import { generateSignedUrlCoursesFiles,generateSignedUrlCourseAdditionalFiles } from "@/actions";
+import { toast } from 'sonner';
+import { addNewCourse } from "@/services/admin-services";
+
+// Yup validation schema
+const schema = yup.object().shape({
+  languages: yup.array().of(
+    yup.object().shape({
+      language: yup.string().required("Language is required"),
+      lessons: yup.array().of(
+        yup.object().shape({
+          srNo: yup.string(),
+          name: yup.string().required("Lesson name is required"),
+          subLessons: yup.array().of(
+            yup.object().shape({
+              srNo: yup.string(),
+              name: yup.string().required("Sub-lesson name is required"),
+              description: yup.string().required("Sub-lesson description is required"),
+              file: yup.mixed().required("file is required"),
+              additionalFiles: yup.array().of(
+                yup.object().shape({
+                  file: yup.mixed().nullable(),
+                  name: yup.string(),
+                })
+              ),
+              links: yup.array().of(
+                yup.object().shape({
+                  url: yup.string().nullable(),
+                  name: yup.string(),
+                })
+              ),
+            })
+          ),
+        })
+      ),
+    })
+  ),
+});
 
 const CourseForm = () => {
-  const { register, control, handleSubmit, watch, setValue } = useForm({
+  const {
+    register,
+    control,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
     defaultValues: {
-      courseName: "",
       languages: [
         {
           language: "",
@@ -25,10 +71,6 @@ const CourseForm = () => {
                   links: [{ url: "", name: "" }],
                 },
               ],
-              description: "",
-              file: null,
-              additionalFiles: [{ file: null, name: "" }],
-              links: [{ url: "", name: "" }],
             },
           ],
         },
@@ -46,10 +88,76 @@ const CourseForm = () => {
   });
 
   const [selectedLanguages, setSelectedLanguages] = useState([]);
+  const [formData, setFormData] = useState(null);
 
-  const onSubmit = (data) => {
-    console.log(data);
-  };
+  useEffect(() => {
+    const data = sessionStorage.getItem("courseData");
+    if (data) {
+      setFormData(JSON.parse(data));
+    }
+  }, []);
+const onSubmit = async (data) => {
+  console.log('data: ', data);
+  try {
+    // Loop over languages, lessons, and subLessons to process file uploads
+    for (const language of data.languages) {
+      for (const lesson of language.lessons) {
+        for (const subLesson of lesson.subLessons) {
+          if (subLesson.file) {
+
+
+            console.log('subLesson: ', subLesson);
+            const file = subLesson.file[0]; 
+            const { signedUrl, key } = await generateSignedUrlCoursesFiles(
+              file?.name,
+              file?.type,
+              subLesson.name,
+              language.language
+            );
+            await fetch(signedUrl, {
+              method: "PUT",
+              body: file,
+              headers: { "Content-Type": file.type },
+            });
+            subLesson.file = key;
+          }
+          if (subLesson.additionalFiles && subLesson.additionalFiles.length > 0) {
+            for (const additionalFileObj of subLesson.additionalFiles) {
+              if (additionalFileObj.file) {
+                const file = additionalFileObj.file[0];
+                console.log('additionalFileObj.file: ', file);
+                const { signedUrl, key } = await generateSignedUrlCourseAdditionalFiles(
+                  file.name,
+                  file.type,
+                  subLesson.name,
+                  language.language
+                );
+                await fetch(signedUrl, {
+                  method: "PUT",
+                  body: file,
+                  headers: { "Content-Type": file.type },
+                });
+                additionalFileObj.file = key;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    const response = await addNewCourse("/admin/course-lessons", {bookDetails:formData, lessons:data});
+    console.log('response: ', response);
+    if (response?.status === 201) {
+      toast.success("Book added successfully");
+      window.location.href = "/admin/book-hub";
+    } else {
+      toast.error("Failed to add Book");
+    }
+  } catch (error) {
+    console.error("Error uploading files: ", error);
+    toast.error("An error occurred while uploading files");
+  }
+};
 
   const handleLanguageSelect = (language) => {
     setSelectedLanguages((prev) => [...prev, language]);
@@ -73,10 +181,6 @@ const CourseForm = () => {
                 links: [{ url: "", name: "" }],
               },
             ],
-            description: "",
-            file: null,
-            additionalFiles: [{ file: null, name: "" }],
-            links: [{ url: "", name: "" }],
           },
         ],
       });
@@ -88,11 +192,7 @@ const CourseForm = () => {
       <div className="space-y-4">
         <div className="h-10 flex justify-between items-center">
           <h2 className="text-lg font-medium">Name of the Course</h2>
-          <button
-            type="button"
-            onClick={handleAddLanguage}
-            className="text-white text-sm font-normal px-5 py-3 bg-[#f96815] rounded-[28px] justify-center items-center gap-2.5 inline-flex"
-          >
+          <button type="button" onClick={handleAddLanguage} className="text-white text-sm font-normal px-5 py-3 bg-[#f96815] rounded-[28px] justify-center items-center gap-2.5 inline-flex">
             Add New Language
           </button>
         </div>
@@ -100,11 +200,7 @@ const CourseForm = () => {
         {languageFields.map((languageField, languageIndex) => (
           <div key={languageField.id} className="bg-[#fef7f3] p-6 rounded-xl shadow-md mb-6">
             <div className="flex items-center gap-2 mb-4">
-              <select
-                {...register(`languages.${languageIndex}.language`)}
-                onChange={(e) => handleLanguageSelect(e.target.value)}
-                className="w-full p-3 border rounded-lg"
-              >
+              <select required {...register(`languages.${languageIndex}.language`)} onChange={(e) => handleLanguageSelect(e.target.value)} className="w-full p-3 border rounded-lg">
                 <option value="" disabled>
                   Select Language
                 </option>
@@ -124,14 +220,8 @@ const CourseForm = () => {
                 </button>
               )}
             </div>
-
-            <LessonFieldArray 
-              nestIndex={languageIndex} 
-              control={control} 
-              register={register} 
-              watch={watch} 
-              setValue={setValue}
-            />
+            {/* {errors.languages?.[languageIndex]?.language && <p className="text-red-500">{errors.languages[languageIndex].language.message}</p>} */}
+            <LessonFieldArray nestIndex={languageIndex} control={control} register={register} watch={watch} setValue={setValue} errors={errors} />
           </div>
         ))}
 
@@ -148,7 +238,7 @@ const CourseForm = () => {
   );
 };
 
-const LessonFieldArray = ({ nestIndex, control, register, watch, setValue }) => {
+const LessonFieldArray = ({ nestIndex, control, register, watch, setValue, errors }) => {
   const { fields, append, remove } = useFieldArray({
     control,
     name: `languages.${nestIndex}.lessons`,
@@ -170,10 +260,6 @@ const LessonFieldArray = ({ nestIndex, control, register, watch, setValue }) => 
           links: [{ url: "", name: "" }],
         },
       ],
-      description: "",
-      file: null,
-      additionalFiles: [{ file: null, name: "" }],
-      links: [{ url: "", name: "" }],
     });
   };
 
@@ -198,7 +284,9 @@ const LessonFieldArray = ({ nestIndex, control, register, watch, setValue }) => 
                 {...register(`languages.${nestIndex}.lessons.${index}.name`)}
                 placeholder="Enter Name of the course"
                 className="w-full px-[14px] py-[15px] rounded-[10px] bg-[#f5f5f5] border-none"
+                required
               />
+              {errors.languages?.[nestIndex]?.lessons?.[index]?.name && <p className="text-red-500">{errors.languages[nestIndex].lessons[index].name.message}</p>}
             </div>
             <div className="flex items-end">
               <button type="button" onClick={() => remove(index)} className="text-sm text-white rounded-[28px] flex items-center gap-2">
@@ -207,29 +295,37 @@ const LessonFieldArray = ({ nestIndex, control, register, watch, setValue }) => 
             </div>
           </div>
 
-          <SubLessonFieldArray 
-            control={control} 
-            register={register} 
-            nestIndex={nestIndex} 
-            lessonIndex={index} 
-            watch={watch}
-            setValue={setValue}
-          />
+          <SubLessonFieldArray control={control} register={register} nestIndex={nestIndex} lessonIndex={index} watch={watch} setValue={setValue} errors={errors} />
+          {/* <div className="mt-4">
+            <span className="text-[#060606] text-sm font-normal">
+              Lesson Description
+            </span>
+            <textarea
+              {...register(`languages.${nestIndex}.lessons.${index}.description`)}
+              placeholder="Lesson description"
+              className="w-full px-[14px] py-3.5 text-[#6e6e6e] text-sm font-normal rounded-[10px] border border-[#eaeaea]"
+              rows={3}
+            />
+            {errors.languages?.[nestIndex]?.lessons?.[index]?.description && (
+              <p className="text-red-500">
+                {
+                  errors.languages[nestIndex].lessons[index].description
+                    .message
+                }
+              </p>
+            )}
+          </div> */}
         </div>
       ))}
 
-      <button
-        type="button"
-        onClick={handleAddLesson}
-        className="h-11 px-5 py-3 bg-[#157ff9] rounded-[28px] text-white text-sm font-normal w-auto"
-      >
+      <button type="button" onClick={handleAddLesson} className="h-11 px-5 py-3 bg-[#157ff9] rounded-[28px] text-white text-sm font-normal w-auto">
         + Add New Lesson
       </button>
     </div>
   );
 };
 
-const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch, setValue }) => {
+const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch, setValue, errors }) => {
   const { fields, append, remove } = useFieldArray({
     control,
     name: `languages.${nestIndex}.lessons.${lessonIndex}.subLessons`,
@@ -248,48 +344,42 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
 
   const handleAddAdditionalFile = (subIndex) => {
     const currentFiles = watch(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.additionalFiles`) || [];
-    setValue(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.additionalFiles`, [
-      ...currentFiles,
-      { file: null, name: "" }
-    ]);
+    setValue(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.additionalFiles`, [...currentFiles, { file: null, name: "" }]);
   };
 
   const handleAddLink = (subIndex) => {
     const currentLinks = watch(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.links`) || [];
-    setValue(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.links`, [
-      ...currentLinks,
-      { url: "", name: "" }
-    ]);
+    setValue(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.links`, [...currentLinks, { url: "", name: "" }]);
   };
 
   return (
     <div className="space-y-4 mt-4 border-[#EEE]">
       {fields.map((subField, subIndex) => (
-        <div key={subField.id} className="rounded-[10px] border-2 border-[#EEE] p-4 space-y-3 w-full mb-1">
+        <div key={subField.id} className="rounded-[10px] border-2 border-[#EEE] p-4 space-y-3 w-full mb-5">
           <div className="h-11 flex gap-[10px] w-full">
             <input
               {...register(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.srNo`)}
               value={`${lessonIndex + 1}.${subIndex + 1}`}
-              className="w-[50px] py-[14px] px-[15px] text-[#6e6e6e] text-sm font-normal rounded-[10px] border border-[#eaeaea] flex-col justify-center items-center"
+              className="w-[50px] py-[14px] px-[15px] text-[#6e6e6e] text-sm font-normal rounded-[10px] border border-[#eaeaea]"
               disabled
             />
-
-            <input
-              {...register(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.name`)}
-              placeholder="Sub-lesson name"
-              className="text-[#6e6e6e] w-[50%] h-[46px] px-[15px] py-[14px] text-sm font-normal rounded-[10px] border border-[#eaeaea]"
-            />
-            <CustomFileUpload
-              register={register}
-              langIndex={`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.file`}
-              aditionalFile={false}
-            />
+            <div className="w-[50%] ">
+              <input
+                {...register(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.name`)}
+                placeholder="Sub-lesson name"
+                className="text-[#6e6e6e] w-full  h-[46px] px-[15px] py-[14px] text-sm font-normal rounded-[10px] border border-[#eaeaea]"
+                required
+              />
+             
+            </div>
+            <div className="flex flex-col w-[50%]">
+              <div className="w-full">
+                <CustomFileUpload isRequired="true" width="full" register={register} langIndex={`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.file`} aditionalFile={false} />
+              </div>
+              
+            </div>
             <div className="flex items-center">
-              <button
-                type="button"
-                onClick={() => remove(subIndex)}
-                className="text-sm border-[#989898] border-[1px] text-white px-2 py-2 rounded-[28px]"
-              >
+              <button type="button" onClick={() => remove(subIndex)} className="text-sm border-[#989898] border-[1px] text-white px-2 py-2 rounded-[28px]">
                 <CrossIcon />
               </button>
             </div>
@@ -301,17 +391,21 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
               placeholder="Description"
               className="w-full px-[15px] py-3.5 text-[#6e6e6e] text-sm font-normal rounded-[10px] border border-[#eaeaea]"
               rows={3}
+              required
             />
+          
 
             <div className="mt-4">
-              <div className="flex flex-col gap-4 mb-2">
-                <label className="font-medium">Additional Files</label>
+              <div className="flex flex-col gap-[5px] ">
+                <label className="text-[#060606] text-sm font-normal">Additional Files</label>
                 {watch(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.additionalFiles`)?.map((_, fileIndex) => (
                   <div key={fileIndex} className={`flex gap-[10px] ${fileIndex !== 0 ? "pr-[55px]" : ""}`}>
                     <CustomFileUpload
                       register={register}
                       langIndex={`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.additionalFiles.${fileIndex}.file`}
                       aditionalFile={true}
+                      width="50%"
+                      isRequired="false"
                     />
                     <input
                       {...register(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.additionalFiles.${fileIndex}.name`)}
@@ -319,11 +413,7 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
                       className="text-[#6e6e6e] w-[100%] px-[15px] py-[14px] text-sm font-normal rounded-[10px] border border-[#eaeaea] h-[48px]"
                     />
                     {fileIndex === 0 && (
-                      <button
-                        type="button"
-                        onClick={() => handleAddAdditionalFile(subIndex)}
-                        className="flex items-center"
-                      >
+                      <button type="button" onClick={() => handleAddAdditionalFile(subIndex)} className="flex items-top">
                         <AddIcon />
                       </button>
                     )}
@@ -331,12 +421,12 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
                 ))}
               </div>
 
-              <div className="flex flex-col gap-4">
-                <label className="font-medium">Links</label>
+              <div className="flex flex-col gap-[5px]">
+                <label className="text-[#060606] text-sm font-normal">Links</label>
                 {watch(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.links`)?.map((_, linkIndex) => (
-                  <div key={linkIndex} className={`flex gap-[10px] w-full ${linkIndex !== 0 ? "pr-[55px]" : ""} `}>
+                  <div key={linkIndex} className={`flex gap-[10px] w-full ${linkIndex !== 0 ? "pr-[55px]" : ""}`}>
                     <input
-                      type="url"
+                      // type="url"
                       {...register(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.links.${linkIndex}.url`)}
                       placeholder="Link"
                       className="text-[#6e6e6e] w-[50%] h-[46px] px-[15px] py-[14px] text-sm font-normal rounded-[10px] border border-[#eaeaea]"
@@ -347,11 +437,7 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
                       className="text-[#6e6e6e] w-[50%] h-[46px] px-[15px] py-[14px] text-sm font-normal rounded-[10px] border border-[#eaeaea]"
                     />
                     {linkIndex === 0 && (
-                      <button
-                        type="button"
-                        onClick={() => handleAddLink(subIndex)}
-                        className="flex items-center"
-                      >
+                      <button type="button" onClick={() => handleAddLink(subIndex)} className="flex items-center">
                         <AddIcon />
                       </button>
                     )}
@@ -363,34 +449,30 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
         </div>
       ))}
 
-    
-      <button
-        type="button"
-        onClick={handleAddSubLesson}
-        className="px-5 py-3 rounded-[28px] border border-[#157ff9] mt-2 flex items-center gap-1 text-[#157ff9] text-sm font-normal"
-      >
+      <button type="button" onClick={handleAddSubLesson} className="px-5 py-3 rounded-[28px] border border-[#157ff9] mt-2 flex items-center gap-1 text-[#157ff9] text-sm font-normal">
         Add More Video Lessons
       </button>
     </div>
   );
 };
-const CustomFileUpload = ({ register, langIndex, aditionalFile }) => {
+
+const CustomFileUpload = ({ register, langIndex, aditionalFile, width, isRequired }) => {
   const [fileName, setFileName] = useState("");
 
   return (
-    <div className="mb-4 w-[50%]">
-      {/* <label className="block mb-1 text-sm font-medium">Select File</label> */}
+    <div className={`mb-4 w-[${width}]`}>
       <div className="relative border rounded-lg p-3 flex items-center bg-white cursor-pointer">
         <input
           type="file"
           {...register(`${langIndex}`)}
+          required={isRequired ==="true"?true :false}
           className="absolute inset-0 opacity-0 cursor-pointer h-11 text-[#6e6e6e]"
           onChange={(e) => {
             const selectedFile = e.target.files?.[0]?.name || "Select File";
             setFileName(selectedFile);
           }}
         />
-        <span className="flex-1 text-[#6e6e6e] opacity-0.5 text-sm font-normal">{fileName ? fileName : aditionalFile == true ? "Additional files" : "Select File"}</span>
+        <span className="flex-1 text-[#6e6e6e] opacity-0.5 text-sm font-normal">{fileName ? fileName : aditionalFile === true ? "Additional files" : "Select File"}</span>
         <span className="text-gray-400">
           <FileIcon />
         </span>

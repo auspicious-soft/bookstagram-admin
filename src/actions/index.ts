@@ -212,7 +212,42 @@ export const generateSignedUrlBookFiles = async (fileName: string, fileType: str
     ContentType: fileType,
     acl: "public-read",
   };
+  console.log('uploadParams: ', uploadParams);
   try {
+    const command = new PutObjectCommand(uploadParams);
+    const signedUrl = await getSignedUrl(await createS3Client(), command);
+    return { signedUrl, key: uploadParams.Key };
+  } catch (error) {
+    console.error("Error generating signed URL:", error);
+    throw error;
+  }
+};
+export const generateSignedUrlCoursesFiles = async (fileName: string, fileType: string, name: string, language: string) => {
+  const uploadParams = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: `courses/${name}/files/${language}/${fileName}`,
+    ContentType: fileType,
+    acl: "public-read",
+  };
+  console.log('uploadParams: ', uploadParams);
+  try {
+    const command = new PutObjectCommand(uploadParams);
+    const signedUrl = await getSignedUrl(await createS3Client(), command);
+    return { signedUrl, key: uploadParams.Key };
+  } catch (error) {
+    console.error("Error generating signed URL:", error);
+    throw error;
+  }
+};
+export const generateSignedUrlCourseAdditionalFiles = async (fileName: string, fileType: string, name: string, language: string) => {
+  const uploadParams = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: `courses/${name}/additional-files/${language}/${fileName}`,
+    ContentType: fileType,
+    acl: "public-read",
+  };
+  try {
+    console.log('uploadParams: ', uploadParams);
     const command = new PutObjectCommand(uploadParams);
     const signedUrl = await getSignedUrl(await createS3Client(), command);
     return { signedUrl, key: uploadParams.Key };

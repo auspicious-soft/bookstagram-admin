@@ -91,7 +91,7 @@ const BookForm = () => {
     //     file: yup.mixed()
     //   })
     // ),
-    fileTranslations: bookType !== 'audiobook' 
+    fileTranslations: (bookType !== 'audiobook' && bookType !== 'course')
       ? yup.array().of(
           yup.object().shape({
             file: yup.mixed().required("File is required"),
@@ -162,241 +162,7 @@ const BookForm = () => {
     setValue(name as any, Array.isArray(value) ? value.map(v => v.value) : value.value);
   };
 
-  // const onSubmit = async (data: any) => { 
-  //   const userName = data.translations[0].name.split(" ").join("-").toLowerCase();
-  //   startTransition(async () => {
-  //     try {
-  //       let imageUrl = null;
-  //       if (imageFile) {
-  //         const { signedUrl, key } = await generateSignedUrlBooks(imageFile.name, imageFile.type, userName);
-  //         await fetch(signedUrl, {
-  //           method: 'PUT',
-  //           body: imageFile,
-  //           headers: {
-  //             'Content-Type': imageFile.type,
-  //           },
-  //         });
-  //         imageUrl = key;
-  //       }
-
-  //       const filePromises = data.fileTranslations
-  //       .filter(trans => trans.file) // Only process translations with files
-  //       .map(async trans => {
-  //         const file = trans.file as File;
-  //       const { signedUrl, key } = await generateSignedUrlBookFiles(file.name, file.type, userName, trans.language);
-
-  //         await fetch(signedUrl, {
-  //           method: 'PUT',
-  //           body: file,
-  //           headers: {
-  //             'Content-Type': file.type,
-  //           },
-  //         });
-
-  //         return {
-  //           language: trans.language,
-  //           fileUrl: key
-  //         };
-  //       });
-
-  //       const uploadedFiles = await Promise.all(filePromises);
-
-  //       const fileTransforms = uploadedFiles.reduce((acc, curr) => ({
-  //         ...acc,
-  //         [curr.language]: curr.fileUrl
-  //       }), {});
   
-  //       const nameTransforms = data.translations.reduce((acc, curr) => ({
-  //         ...acc,
-  //         [curr.language]: curr.name
-  //       }), {});
-  
-  //       const descriptionTransforms = data.descriptionTranslations.reduce((acc, curr) => ({
-  //         ...acc,
-  //         [curr.language]: curr.content
-  //       }), {});
-
-  //       const payload = {
-  //         name: nameTransforms,
-  //         description: descriptionTransforms,
-  //         file: fileTransforms,
-  //         price: data.price,
-  //         authorId: data.authorId,
-  //         publisherId: data.publisherId,
-  //         categoryId: data.categoryId,
-  //         subCategoryId: data.subCategoryId,
-  //         genre: data.genre,
-  //         type: data.type,
-  //         image: imageUrl
-  //       };
-  //       if (bookType === 'audiobook') {
-  //         // Navigate to the audioBook timestamp page, passing all data
-  //         router.push({
-  //           pathname: '/add-new/audioBook-timestamp',
-  //           state: { data: JSON.stringify(payload) }
-  //         });
-  //       } else {
-  //         // Proceed with the normal book submission
-  //         const response = await addNewBook("/admin/books", payload);
-  //         if (response?.status === 201) {
-  //           toast.success("Book added successfully");
-  //           window.location.href = "/admin/book-hub";
-  //         } else {
-  //           toast.error("Failed to add Book");
-  //         }
-  //       }
-        
-  //      const response = await addNewBook("/admin/books", payload);
-  //       if (response?.status === 201) {
-  //         toast.success("Book added successfully");
-  //         window.location.href = "/admin/book-hub";
-  //       } else {
-  //         toast.error("Failed to add Book");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error", error);
-  //       toast.error("An error occurred while adding the Book");
-  //     }
-  //   });
-  // };
- 
-  // const onSubmit = async (data: any) => { 
-  //   const userName = data.translations[0].name.split(" ").join("-").toLowerCase();
-  //   startTransition(async () => {
-  //     try {
-  //       const nameTransforms = data.translations.reduce((acc, curr) => ({
-  //         ...acc,
-  //         [curr.language]: curr.name
-  //       }), {});
-  
-  //       const descriptionTransforms = data.descriptionTranslations.reduce((acc, curr) => ({
-  //         ...acc,
-  //         [curr.language]: curr.content
-  //       }), {});
-     
-  //       const payload = {
-  //         name: nameTransforms,
-  //         description: descriptionTransforms,
-  //         price: data.price,
-  //         authorId: data.authorId,
-  //         publisherId: data.publisherId,
-  //         categoryId: data.categoryId,
-  //         subCategoryId: data.subCategoryId,
-  //         genre: data.genre,
-  //         type: data.type,
-  //         // file: fileTransforms? fileTransforms : null,
-  //       };
-  
-  //       if (bookType === 'audiobook') {
-  //         // Navigate to the audioBook-timestamp page with data, without submitting yet
-  //         const queryParams = new URLSearchParams(payload as Record<string, string>).toString();
-
-  //         // Use router.push to pass the query params to the next page
-  //         sessionStorage.setItem('audioBookData', JSON.stringify(payload));
-
-  //         // Navigate to the next page
-  //         router.push('/admin/add-new/audioBook-timestamp');
-        
-  //       } else {
-  //         // Handle normal submission for book
-  //         const response = await addNewBook("/admin/books", payload);
-  //         if (response?.status === 201) {
-  //           toast.success("Book added successfully");
-  //           window.location.href = "/admin/book-hub";
-  //         } else {
-  //           toast.error("Failed to add Book");
-  //         }
-  //       }
-  
-  //     } catch (error) {
-  //       console.error("Error", error);
-  //       toast.error("An error occurred while adding the Book");
-  //     }
-  //   });
-  // };
-  
-  // const onSubmit = async (data: any) => { 
-  //   const userName = data.translations[0].name.split(" ").join("-").toLowerCase();
-  //   startTransition(async () => {
-  //     try {
-  //       let imageUrl = null;
-  //       if (imageFile) {
-  //         const { signedUrl, key } = await generateSignedUrlBooks(imageFile.name, imageFile.type, userName);
-  //         await fetch(signedUrl, {
-  //           method: 'PUT',
-  //           body: imageFile,
-  //           headers: {
-  //             'Content-Type': imageFile.type,
-  //           },
-  //         });
-  //         imageUrl = key;
-  //       }
-
-  //       const filePromises = data.fileTranslations
-  //       .filter(trans => trans.file) // Only process translations with files
-  //       .map(async trans => {
-  //         const file = trans.file as File;
-  //       const { signedUrl, key } = await generateSignedUrlBookFiles(file.name, file.type, userName, trans.language);
-
-  //         await fetch(signedUrl, {
-  //           method: 'PUT',
-  //           body: file,
-  //           headers: {
-  //             'Content-Type': file.type,
-  //           },
-  //         });
-
-  //         return {
-  //           language: trans.language,
-  //           fileUrl: key
-  //         };
-  //       });
-
-  //       const uploadedFiles = await Promise.all(filePromises);
-
-  //       const fileTransforms = uploadedFiles.reduce((acc, curr) => ({
-  //         ...acc,
-  //         [curr.language]: curr.fileUrl
-  //       }), {});
-  
-  //       const nameTransforms = data.translations.reduce((acc, curr) => ({
-  //         ...acc,
-  //         [curr.language]: curr.name
-  //       }), {});
-  
-  //       const descriptionTransforms = data.descriptionTranslations.reduce((acc, curr) => ({
-  //         ...acc,
-  //         [curr.language]: curr.content
-  //       }), {});
-
-  //       const payload = {
-  //         name: nameTransforms,
-  //         description: descriptionTransforms,
-  //         file: fileTransforms,
-  //         price: data.price,
-  //         authorId: data.authorId,
-  //         publisherId: data.publisherId,
-  //         categoryId: data.categoryId,
-  //         subCategoryId: data.subCategoryId,
-  //         genre: data.genre,
-  //         type: data.type,
-  //         image: imageUrl
-  //       };
-
-  //      const response = await addNewBook("/admin/books", payload);
-  //       if (response?.status === 201) {
-  //         toast.success("Book added successfully");
-  //         window.location.href = "/admin/book-hub";
-  //       } else {
-  //         toast.error("Failed to add Book");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error", error);
-  //       toast.error("An error occurred while adding the Book");
-  //     }
-  //   });
-  // };
-
   const onSubmit = async (data: any) => { 
     const userName = data.translations[0].name.split(" ").join("-").toLowerCase();
   
@@ -468,14 +234,13 @@ const BookForm = () => {
   
           (payload as any).file = fileTransforms;
   
-          // Submit the final payload for non-audiobooks
           const response = await addNewBook("/admin/books", payload);
-          // if (response?.status === 201) {
-          //   toast.success("Book added successfully");
-          //   window.location.href = "/admin/book-hub";
-          // } else {
-          //   toast.error("Failed to add Book");
-          // }
+          if (response?.status === 201) {
+            toast.success("Book added successfully");
+            window.location.href = "/admin/book-hub";
+          } else {
+            toast.error("Failed to add Book");
+          }
         }
       } catch (error) {
         console.error("Error", error);
@@ -527,7 +292,7 @@ const BookForm = () => {
               </div>
             </div>
 
-            {bookType !== 'audiobook' && (
+            {bookType !== 'audiobook' && bookType!== "course" && (
             <div className=" mt-5">
               {fileFields.map((field, index) => (
                 <div key={field.id} className="mb-4">

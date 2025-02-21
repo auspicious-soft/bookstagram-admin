@@ -7,7 +7,6 @@ interface Props {
   data: any;
   onYearChange: (year: number) => void;
 }
-// Custom YAxis tick formatter to format large numbers as "k" and skip 10000
 const yAxisTickFormatter = (value: number) => {
   if (value === 10000) return "";
   if (value < 1000) return value.toString();
@@ -23,9 +22,8 @@ const SalesChart = ({selectedYear, data, onYearChange}: Props) => {
   const [userGrowth, setUserGrowth] = useState<{ name: string; value: number }[]>([]);
 
   useEffect(() => {
-    // Convert incoming data into the required format
     const formattedData = monthlyCounts.map((item: any) => ({
-      name: item.month.split("/")[0], // Extract the month (e.g., "01" from "01/2025")
+      name: item.month.split("/")[0], 
       value: item.count,
     }));
 

@@ -41,7 +41,6 @@ const AudiobookForm = () => {
   const userName = formData?.name ? Object.values(formData.name).find(name => name && (name as string).trim() !== "").toString() : "Audiobook Name";  
 
   const onSubmit = async (data: any) => {
-    console.log("Form Data:", data);
 
     startTransition(async () => {
       try {
