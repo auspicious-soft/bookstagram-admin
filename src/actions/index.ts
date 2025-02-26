@@ -212,7 +212,6 @@ export const generateSignedUrlBookFiles = async (fileName: string, fileType: str
     ContentType: fileType,
     acl: "public-read",
   };
-  console.log('uploadParams: ', uploadParams);
   try {
     const command = new PutObjectCommand(uploadParams);
     const signedUrl = await getSignedUrl(await createS3Client(), command);
@@ -229,7 +228,6 @@ export const generateSignedUrlCoursesFiles = async (fileName: string, fileType: 
     ContentType: fileType,
     acl: "public-read",
   };
-  console.log('uploadParams: ', uploadParams);
   try {
     const command = new PutObjectCommand(uploadParams);
     const signedUrl = await getSignedUrl(await createS3Client(), command);
@@ -247,7 +245,6 @@ export const generateSignedUrlCourseAdditionalFiles = async (fileName: string, f
     acl: "public-read",
   };
   try {
-    console.log('uploadParams: ', uploadParams);
     const command = new PutObjectCommand(uploadParams);
     const signedUrl = await getSignedUrl(await createS3Client(), command);
     return { signedUrl, key: uploadParams.Key };

@@ -19,6 +19,7 @@ import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import { Dice1 } from 'lucide-react';
 import { DashboardIcon1, DashboardIcon2 } from '@/utils/svgicons';
 import DashboardCard from '../../components/DashboardCard';
+import { useRouter } from 'next/navigation';
 
 type Language = "eng" | "kaz" | "rus";
 
@@ -34,31 +35,6 @@ const genresOptions: OptionType[] = [
   { value: "anti", label: "Anti" },
 ];  
 
-const validationSchema = yup.object({
-  translations: yup.array().of(
-    yup.object({
-      language: yup.string(),
-      name: yup.string()
-    })
-  ),
-  descriptionTranslations: yup.array().of(
-    yup.object({
-      language: yup.string().required('Language is required'),
-      content: yup.string().required('Description is required')
-    })
-  ),
-  fileTranslations: yup.array().of(
-    yup.object({
-      language: yup.string().required('Language is required'),
-      file: yup.mixed()
-    })
-  ),
-  price: yup.number().required('Price is required'),
-  authorId: yup.array().min(1, 'At least one author is required'),
-  publisherId: yup.string().min(1, 'Publisher is required'),
-  categoryId: yup.array().min(1, 'Category is required'),
-  genre: yup.array().required('Genre is required')
-});
 
 interface FormValues {
   translations: {
@@ -88,7 +64,9 @@ interface FormValues {
 
 const BookForm = () => {
   const {id} = useParams();
+  const router = useRouter();
   const {data, isLoading} = useSWR(`/admin/books/${id}`, getSingleBook)
+  console.log('data: ', data);
   const [isPending, startTransition] = useTransition();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -98,10 +76,44 @@ const BookForm = () => {
   const isFormPopulated = useRef(false);
   const isImageChanged = useRef(false);
   const bookData = data?.data?.data?.books?.[0];
-  console.log('bookData:', bookData);
   const upperData = data?.data?.data
   const searchParams = useSearchParams();
-  const bookType = searchParams.get('type') || 'e-book';
+  const bookType = data?.data?.data?.books?.[0].type;
+  console.log('bookType: ', bookType);
+  const validationSchema = yup.object({
+    translations: yup.array().of(
+      yup.object({
+        language: yup.string(),
+        name: yup.string()
+      })
+    ),
+    descriptionTranslations: yup.array().of(
+      yup.object({
+        language: yup.string().required('Language is required'),
+        content: yup.string().required('Description is required')
+      })
+    ),
+    // fileTranslations: yup.array().of(
+    //   yup.object({
+    //     language: yup.string().required('Language is required'),
+    //     file: yup.mixed()
+    //   })
+    // ),
+    fileTranslations: (bookType !== 'audiobook' && bookType !== 'course')
+    ? yup.array().of(
+        yup.object().shape({
+          file: yup.mixed().required("File is required"),
+          language: yup.string().required("Language is required"),
+        })
+      ) 
+    : yup.array().notRequired(),
+    price: yup.number().required('Price is required'),
+    authorId: yup.array().min(1, 'At least one author is required'),
+    publisherId: yup.string().min(1, 'Publisher is required'),
+    categoryId: yup.array().min(1, 'Category is required'),
+    genre: yup.array().required('Genre is required')
+  });
+  
   const OverviewData = [
   { id: "1", title: "No of Book Sold", value: upperData?.totalBookSold, icon: <DashboardIcon2/>,},
   { id: "2", title: "Revenue By This Book", value: `$${upperData?.totalRevenue}`, icon: <DashboardIcon1/>,},
@@ -177,10 +189,10 @@ const BookForm = () => {
         descriptionTranslations: descTranslations,
         fileTranslations: fileTranslations,
         price: bookData.price,
-        authorId: bookData.authorId.map((author: any) => author._id),
-        publisherId: bookData.publisherId._id,
-        categoryId: bookData.categoryId.map((cat: any) => cat._id),
-        subCategoryId: bookData.subCategoryId?.map((subCat: any) => subCat._id) || [],
+        authorId: bookData.authorId.map((author: any) => author?._id),
+        publisherId: bookData.publisherId?._id,
+        categoryId: bookData.categoryId.map((cat: any) => cat?._id),
+        subCategoryId: bookData.subCategoryId?.map((subCat: any) => subCat?._id) || [],
         genre: bookData.genre?.map((g: any) => g),
         type: bookData.type,
         image: null
@@ -225,6 +237,7 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
 
   const onSubmit = async (data: any) => {
+
     const userName = data.translations[0].name.split(" ").join("-").toLowerCase();
     startTransition(async () => {
       try {
@@ -291,7 +304,14 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           type: data.type,
           ...(imageUrl && { image: imageUrl })
         };
-
+        if (data.type === "audiobook") {
+          sessionStorage.setItem("audioBookData", JSON.stringify(payload));
+          router.push(`/admin/add-new/${id}/audioBook-timestamp`);
+        }else if (data.type === "course") {
+          sessionStorage.setItem("courseData", JSON.stringify(payload));
+          router.push(`/admin/books/${id}/lessons`);
+        } 
+        else {
         let response;
         if (id) {
           response = await updateSingleBook(`/admin/books/${id}`, payload);
@@ -313,7 +333,7 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
           toast.success("Book updated successfully");
           // window.location.href = "/admin/book-hub";
         }
-      } catch (error) {
+      } }catch (error) {
         console.error("Error", error);
         toast.error(`An error occurred while ${id ? 'updating' : 'adding'} the Book`);
       }
@@ -539,7 +559,7 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 <CustomSelect
                   name="Select Author"
                   value={authors.filter(option => 
-                    watch('authorId').includes(option.value))}
+                    watch('authorId')?.includes(option.value))}
                   options={authors}
                   onChange={(value) => handleSelectChange('authorId', value)}
                   placeholder="Select Author"
@@ -549,7 +569,7 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 <CustomSelect
                   name="Select Publisher"
                   value={publishers.find(option => 
-                    watch('publisherId').includes(option.value))}
+                    watch('publisherId')?.includes(option.value))}
                   options={publishers}
                   onChange={(value) => handleSelectChange('publisherId', value)}
                   placeholder="Select Publisher" 
@@ -568,7 +588,7 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 <CustomSelect
                   name="Select Category"
                   value={category.filter(option => 
-                    watch('categoryId').includes(option.value))}
+                    watch('categoryId')?.includes(option.value))}
                   options={category}
                   onChange={(value) => handleSelectChange('categoryId', value)}
                   placeholder="Select Category"
@@ -578,7 +598,7 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 <CustomSelect
                   name="Select Sub-Category (If Any)"
                   value={subCategory.filter(option => 
-                    watch('subCategoryId').includes(option.value))}
+                    watch('subCategoryId')?.includes(option.value))}
                   options={subCategory}
                   onChange={(value) => handleSelectChange('subCategoryId', value)}
                   placeholder="Select Sub-Category"

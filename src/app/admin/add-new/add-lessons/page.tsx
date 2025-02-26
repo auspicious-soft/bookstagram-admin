@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -89,6 +89,7 @@ const CourseForm = () => {
 
   const [selectedLanguages, setSelectedLanguages] = useState([]);
   const [formData, setFormData] = useState(null);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     const data = sessionStorage.getItem("courseData");
@@ -96,68 +97,128 @@ const CourseForm = () => {
       setFormData(JSON.parse(data));
     }
   }, []);
+
 const onSubmit = async (data) => {
-  console.log('data: ', data);
-  try {
-    // Loop over languages, lessons, and subLessons to process file uploads
+  startTransition(async () => {
+    try {
+    // Transform the languages array into the desired lessons format
+    let transformedLessons = [];
+    
+    // Process each language
     for (const language of data.languages) {
-      for (const lesson of language.lessons) {
-        for (const subLesson of lesson.subLessons) {
-          if (subLesson.file) {
+      // Transform lessons for current language
+      const languageLessons = language.lessons.map((lesson, lessonIndex) => ({
+        name: lesson.name,
+        lang: language.language,
+        srNo: lessonIndex + 1,
+        subLessons: lesson?.subLessons?.map((subLesson, subIndex) => {
+          // Build the base subLesson object
+          const transformedSubLesson = {
+            name: subLesson.name,
+            description: subLesson.description,
+            srNo: subIndex + 1,
+            file: null, // Will be updated after file upload
+            additionalFiles: subLesson.additionalFiles
+              .filter(af => af.file || af.name) // Filter out empty entries
+              .map(af => ({
+                file: null, // Will be updated after file upload
+                name: af.name
+              })),
+            links: subLesson.links
+              .filter(link => link.url || link.name) // Filter out empty entries
+              .map(link => ({
+                url: link.url,
+                name: link.name
+              }))
+          };
 
+          return transformedSubLesson;
+        })
+      }));
 
-            console.log('subLesson: ', subLesson);
-            const file = subLesson.file[0]; 
-            const { signedUrl, key } = await generateSignedUrlCoursesFiles(
-              file?.name,
-              file?.type,
-              subLesson.name,
-              language.language
-            );
-            await fetch(signedUrl, {
-              method: "PUT",
-              body: file,
-              headers: { "Content-Type": file.type },
-            });
-            subLesson.file = key;
-          }
-          if (subLesson.additionalFiles && subLesson.additionalFiles.length > 0) {
-            for (const additionalFileObj of subLesson.additionalFiles) {
-              if (additionalFileObj.file) {
-                const file = additionalFileObj.file[0];
-                console.log('additionalFileObj.file: ', file);
-                const { signedUrl, key } = await generateSignedUrlCourseAdditionalFiles(
-                  file.name,
-                  file.type,
-                  subLesson.name,
-                  language.language
-                );
-                await fetch(signedUrl, {
-                  method: "PUT",
-                  body: file,
-                  headers: { "Content-Type": file.type },
-                });
-                additionalFileObj.file = key;
+      transformedLessons = [...transformedLessons, ...languageLessons];
+    }
+
+    // Process file uploads
+    for (const lesson of transformedLessons) {
+      const languageData = data.languages.find(lang => lang.language === lesson.lang);
+      if (!languageData) continue;
+
+      for (const subLesson of lesson.subLessons) {
+        // Find corresponding original data
+        const originalLesson = languageData.lessons.find(l => l.name === lesson.name);
+        const originalSubLesson = originalLesson?.subLessons.find(
+          sl => sl.name === subLesson.name
+        );
+
+        if (!originalSubLesson) continue;
+
+        // Process main file
+        if (originalSubLesson.file?.[0]) {
+          const file = originalSubLesson.file[0];
+          const { signedUrl, key } = await generateSignedUrlCoursesFiles(
+            file.name,
+            file.type,
+            subLesson.name,
+            lesson.lang
+          );
+          await fetch(signedUrl, {
+            method: "PUT",
+            body: file,
+            headers: { "Content-Type": file.type },
+          });
+          subLesson.file = key;
+        }
+
+        // Process additional files
+        if (originalSubLesson.additionalFiles?.length > 0) {
+          for (let i = 0; i < originalSubLesson.additionalFiles.length; i++) {
+            const additionalFileObj = originalSubLesson.additionalFiles[i];
+            if (additionalFileObj.file?.[0]) {
+              const file = additionalFileObj.file[0];
+              const { signedUrl, key } = await generateSignedUrlCourseAdditionalFiles(
+                file.name,
+                file.type,
+                subLesson.name,
+                lesson.lang
+              );
+              await fetch(signedUrl, {
+                method: "PUT",
+                body: file,
+                headers: { "Content-Type": file.type },
+              });
+              // Update the corresponding transformed additional file
+              if (subLesson.additionalFiles[i]) {
+                subLesson.additionalFiles[i].file = key;
               }
             }
           }
         }
       }
     }
+
+    // Prepare final payload
+    const finalPayload = {
+      bookDetails: formData,
+      lessons: transformedLessons
+    };
     
-    const response = await addNewCourse("/admin/course-lessons", {bookDetails:formData, lessons:data});
-    console.log('response: ', response);
+    // Submit the data
+    const response = await addNewCourse("/admin/course-lessons", finalPayload);
+    
     if (response?.status === 201) {
       toast.success("Book added successfully");
+      sessionStorage.setItem("courseData", "");
       window.location.href = "/admin/book-hub";
     } else {
       toast.error("Failed to add Book");
     }
   } catch (error) {
-    console.error("Error uploading files: ", error);
-    toast.error("An error occurred while uploading files");
+    console.error("Error submitting form: ", error);
+    toast.error("An error occurred while submitting the form");
   }
-};
+})
+}
 
   const handleLanguageSelect = (language) => {
     setSelectedLanguages((prev) => [...prev, language]);
@@ -226,12 +287,13 @@ const onSubmit = async (data) => {
         ))}
 
         <div className="flex justify-end gap-4 mt-6">
-          <button type="button" className="px-6 py-2 border rounded-full">
+          <button type="button" className="px-6 py-2 border rounded-full" onClick={() => { window.location.href = "/admin/book-hub" }}>
             Cancel
           </button>
-          <button type="submit" className="bg-orange text-white px-5 py-2 rounded-[28px]">
-            Save Lesson
+          <button type="submit"  disabled={isPending} className="bg-orange text-white px-5 py-2 rounded-[28px]">
+             {isPending ? 'Saving...' : 'Save Lesson'}
           </button>
+         
         </div>
       </div>
     </form>
