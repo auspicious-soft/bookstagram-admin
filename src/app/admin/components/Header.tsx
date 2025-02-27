@@ -50,6 +50,7 @@ const Header: React.FC = () => {
     "/admin/stories/add-new-story": "Add New Story",
     "/admin/promotions/add-new-banner": "Add New Banner",
     "/admin/add-new": "Add New Book",
+    
   };
   const getPageName = (path: string): string => {
     if (path.startsWith("/admin/categories/") && path.endsWith("/sub-category")) {
@@ -57,6 +58,12 @@ const Header: React.FC = () => {
     }
     if (path.startsWith("/admin/book-hub/profile/")) {
       return "Single Book";
+    }
+    if (path.startsWith("/admin/add-new/add-lessons")) {
+      return "Add Lessons";
+    }
+    if (path.startsWith(`/admin/books/`)&& path.endsWith("/lessons")) {
+      return "Update Lessons";
     }
     if (path.startsWith("/admin/stories/single-story/")) {
       return "Single Story";

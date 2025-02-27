@@ -66,7 +66,6 @@ const BookForm = () => {
   const {id} = useParams();
   const router = useRouter();
   const {data, isLoading} = useSWR(`/admin/books/${id}`, getSingleBook)
-  console.log('data: ', data);
   const [isPending, startTransition] = useTransition();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -79,7 +78,6 @@ const BookForm = () => {
   const upperData = data?.data?.data
   const searchParams = useSearchParams();
   const bookType = data?.data?.data?.books?.[0].type;
-  console.log('bookType: ', bookType);
   const validationSchema = yup.object({
     translations: yup.array().of(
       yup.object({
@@ -608,7 +606,7 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
               </div>
               <button type="submit" disabled={isPending}
               className="w-full bg-orange text-white py-2 px-4 rounded-[28px] hover:bg-opacity-90 disabled:bg-opacity-50">
-              {isPending ? 'Updating...' : 'Update Details'}
+              {bookType ? isPending ? 'Loading' : 'Next' : isPending ? 'Updating...' : 'Update Details'}
               </button>
             </div>
           </div>

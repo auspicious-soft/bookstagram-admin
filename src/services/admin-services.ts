@@ -145,6 +145,18 @@ export const getSingleCourse = async (route: string) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.get(route)
 }
+export const deleteSingleCourseLesson = async (route: string) => {  //-----Book school tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.delete(route)
+}
+export const deleteSingleCourseSubLesson = async (route: string,) => {  //-----Book school tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.delete(route)
+}
+export const deleteSingleCourselanguage = async (route: string,) => {  //-----Book school tab
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.delete(route)
+}
 export const updateSingleBook = async (route: string, payload: any) => {
     const axiosInstance = await getAxiosInstance()
     return axiosInstance.put(route, payload)
