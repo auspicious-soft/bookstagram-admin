@@ -56,7 +56,6 @@ const CourseForm = () => {
   const [isPending, startTransition] = useTransition();
   const [selectedLanguages, setSelectedLanguages] = useState([]);
   const [formData, setFormData] = useState(null);
-  console.log('formData: ', formData?.name?.eng);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const { data, isLoading } = useSWR(id ? `/admin/course-lessons/${id}` : null, getSingleCourse);
   const {

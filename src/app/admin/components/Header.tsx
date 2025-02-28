@@ -65,6 +65,9 @@ const Header: React.FC = () => {
     if (path.startsWith(`/admin/books/`)&& path.endsWith("/lessons")) {
       return "Update Lessons";
     }
+    if (path.startsWith(`/admin/books/`)&& path.endsWith("/timestamps")) {
+      return "Update Audiobook Chapters";
+    }
     if (path.startsWith("/admin/stories/single-story/")) {
       return "Single Story";
     }
@@ -79,6 +82,9 @@ const Header: React.FC = () => {
     }
     if (path.startsWith("/admin/categories/sub-category/")) {
       return categoryName;
+    }
+    if (path.startsWith("/admin/add-new/timestamps")) {
+      return "Add Audiobook Chapters";
     }
     if (path.startsWith("/admin/books/")) {
       return bookName;

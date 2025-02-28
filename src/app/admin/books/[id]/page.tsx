@@ -304,7 +304,7 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         };
         if (data.type === "audiobook") {
           sessionStorage.setItem("audioBookData", JSON.stringify(payload));
-          router.push(`/admin/add-new/${id}/audioBook-timestamp`);
+          router.push(`/admin/books/${id}/timestamps`);
         }else if (data.type === "course") {
           sessionStorage.setItem("courseData", JSON.stringify(payload));
           router.push(`/admin/books/${id}/lessons`);
@@ -375,9 +375,9 @@ const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
               >{imagePreview ? 'Edit Image' : 'Upload Image'}</button>
             </div>
           </div>
-
+{/* {bookType !=="audioBook" &&( */}
           <div className=" mt-5">
-           {fileFields.map((field, index) => (
+           {bookType !=="audiobook" && fileFields.map((field, index) => (
              <div key={field.id} className="mb-4">
                <div className="w-full">
                <div className='bg-white p-5 rounded-[20px]'>

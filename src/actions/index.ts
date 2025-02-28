@@ -5,8 +5,9 @@ import { loginService } from "@/services/admin-services";
 import { cookies } from "next/headers";
 import { createS3Client } from "@/config/s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, ObjectCannedACL, PutObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, ObjectCannedACL, PutObjectCommand, CopyObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getImageClientS3URL } from "@/config/axios";
+import { MetadataDirective } from '@aws-sdk/client-s3';
 
 export const loginAction = async (payload: any) => {
   try {
@@ -182,19 +183,47 @@ export const generateSignedUrlBooks = async (fileName: string, fileType: string,
   }
 };
 
-export const generateSignedUrlAudioBookFile = async (fileName: string, fileType: string, name: any, language: string, metadata: any) => {
+// export const generateSignedUrlAudioBookFile = async (fileName: string, fileType: string, name: any, language: string, metadata: any) => {
+//   const fileKey = `books/${name}/files/${language}/${fileName}`;
+//   const uploadParams = {
+//     Bucket: process.env.AWS_BUCKET_NAME!,
+//     Key: fileKey,
+//     ContentType: fileType,
+//     // ACL: ObjectCannedACL.public_read,
+//     Metadata: {
+//       // timestamps: (JSON.stringify(metadata.timestamps)),
+//       timestamps: Buffer.from(JSON.stringify(metadata.timestamps)).toString("base64"),
+
+//     },
+//   };
+//   try {
+//     const command = new PutObjectCommand(uploadParams);
+//     const signedUrl = await getSignedUrl(await createS3Client(), command, { expiresIn: 60 });
+//     return { signedUrl, key: fileKey };
+//   } catch (error) {
+//     console.error("❌ Error generating signed URL:", error);
+//     throw error;
+//   }
+// };
+
+export const generateSignedUrlAudioBookFile = async (
+  fileName: string,
+  fileType: string,
+  name: any,
+  language: string,
+  metadata: { timestamps: string }
+) => {
+  console.log('metadata: ', metadata);
   const fileKey = `books/${name}/files/${language}/${fileName}`;
   const uploadParams = {
     Bucket: process.env.AWS_BUCKET_NAME!,
     Key: fileKey,
     ContentType: fileType,
-    // ACL: ObjectCannedACL.public_read,
     Metadata: {
-      // timestamps: (JSON.stringify(metadata.timestamps)),
-      timestamps: Buffer.from(JSON.stringify(metadata.timestamps)).toString("base64"),
-
+      timestamps: metadata.timestamps,
     },
   };
+
   try {
     const command = new PutObjectCommand(uploadParams);
     const signedUrl = await getSignedUrl(await createS3Client(), command, { expiresIn: 60 });
@@ -204,6 +233,67 @@ export const generateSignedUrlAudioBookFile = async (fileName: string, fileType:
     throw error;
   }
 };
+const { AWS_ACCESS_KEY_ID, AWS_REGION, AWS_SECRET_ACCESS_KEY } = process.env
+
+
+export const updateS3ObjectMetadata = async (
+  fileKey: string,
+  metadata: { timestamps: string }
+) => {
+  try {
+
+    const updateParams = {
+      Bucket: process.env.AWS_BUCKET_NAME!, 
+      Key: fileKey,
+      CopySource: `/${process.env.AWS_BUCKET_NAME}/${fileKey}`, 
+      Metadata: {
+        timestamps: metadata.timestamps,
+      },
+      MetadataDirective: "REPLACE" as const, // TypeScript-friendly way
+    };
+
+    const command = new CopyObjectCommand(updateParams);
+    const s3Client = new S3Client({ region: AWS_REGION });
+    const response = await s3Client.send(command);
+
+    console.log('Metadata updated successfully:', response);
+    return response;
+  } catch (error) {
+    console.error('Error updating metadata:', error);
+    throw error;
+  }
+};
+
+// export const updateS3ObjectMetadata = async (
+//   fileKey: string,
+//   metadata: { timestamps: string }
+// ) => {
+//   try {
+//     console.log('Updating metadata for:', fileKey);
+//     console.log('New metadata:', metadata);
+
+//     const updateParams = {
+//       Bucket: process.env.AWS_BUCKET_NAME!, // Ensure this env variable is set
+//       Key: fileKey,                        // e.g., books/Herrod Little/files/eng/Rectangle 588.png
+//       CopySource: `/${process.env.AWS_BUCKET_NAME}/${fileKey}`, // Source is the same as destination
+//       Metadata: {
+//         timestamps: metadata.timestamps,   // New metadata to apply
+//       },
+//       MetadataDirective: MetadataDirective.REPLACE,        // Replace existing metadata
+//     };
+
+//     const command = new CopyObjectCommand(updateParams);
+//     const s3Client = new S3Client({ region: AWS_REGION });
+// const response = await s3Client.send(command);
+//     // const response = await createS3Client().send(command);
+
+//     console.log('Metadata updated successfully:', response);
+//     return response;
+//   } catch (error) {
+//     console.error('Error updating metadata:', error);
+//     throw error;
+//   }
+// };
 
 export const generateSignedUrlBookFiles = async (fileName: string, fileType: string, name: string, language: string) => {
   const uploadParams = {
@@ -353,6 +443,7 @@ export const deleteFileFromS3 = async (imageKey: string) => {
 };
 
 export const getFileWithMetadata = async (fileKey: string) => {
+  console.log('fileKey: ', fileKey);
   if (!fileKey) {
     throw new Error("fileKey is required");
   }
@@ -369,8 +460,8 @@ export const getFileWithMetadata = async (fileKey: string) => {
     if (metadata.timestamps) {
       try {
         const firstDecode = Buffer.from(metadata.timestamps, "base64").toString("utf-8");
-        const secondDecode = Buffer.from(firstDecode, "base64").toString("utf-8");
-        metadata.timestamps = JSON.parse(secondDecode);
+        // const secondDecode = Buffer.from(firstDecode, "base64").toString("utf-8");
+        metadata.timestamps = JSON.parse(firstDecode);
       } catch (error) {
         console.error("Error decoding metadata timestamps:", error);
       }

@@ -205,7 +205,7 @@ const BookForm = () => {
   
         if (data.type === "audiobook") {
           sessionStorage.setItem("audioBookData", JSON.stringify(payload));
-          router.push("/admin/add-new/audioBook-timestamp");
+          router.push("/admin/add-new/timestamps");
         }else if (data.type === "course") {
           sessionStorage.setItem("courseData", JSON.stringify(payload));
           router.push("/admin/add-new/add-lessons");

@@ -40,6 +40,10 @@ const AudiobookForm = () => {
   }, []);
   const userName = formData?.name ? Object.values(formData.name).find(name => name && (name as string).trim() !== "").toString() : "Audiobook Name";  
 
+  const handleCancel = () => {
+    sessionStorage.removeItem("audioBookData");
+       window.location.href = "/admin/book-hub";
+   }
   const onSubmit = async (data: any) => {
 
     startTransition(async () => {
@@ -102,8 +106,8 @@ const AudiobookForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="bg-[#FFF] p-8 rounded-[20px] shadow-md">
-      <div className="flex justify-between mb-4">
-        <h2 className="text-2xl font-semibold">{userName}</h2>
+      <div className="flex justify-between mb-4 h-10">
+        <h2 className=" text-[#060606] text-2xl font-normal tracking-tight">{userName}</h2>
         <button
           type="button"
           onClick={() => {
@@ -147,19 +151,20 @@ const AudiobookForm = () => {
               </button>
             )}
           </div>
-
+<div className="p-5 bg-white rounded-[10px] ">
           {/* File Upload */}
           <CustomFileUpload register={register} langIndex={langIndex} />
 
           {/* Timestamps */}
           <TimestampsFieldArray control={control} langIndex={langIndex} register={register} />
+          </div>
         </div>
       ))}
 
       {/* Footer Buttons */}
-      <div className="flex justify-end gap-[10px] mt-6">
-        <button type="button" className="border border-orange text-orange px-5 py-2 rounded-[28px]">Cancel</button>
-        <button type="submit" className="bg-orange text-white px-5 py-2 rounded-[28px]">Save Audiobook</button>
+      <div className="flex justify-end gap-[10px] mt-6 h-10">
+        <button type="button" onClick={()=>handleCancel()} className="border border-orange text-orange px-5 py-2 rounded-[28px]">Cancel</button>
+        <button type="submit" className="bg-[#f96815] text-white px-5 py-2 rounded-[28px]">Save Audiobook</button>
       </div>
     </form>
   );
@@ -176,14 +181,14 @@ const CustomFileUpload = ({ register, langIndex }) => {
         <input
           type="file"
           {...register(`languages.${langIndex}.file`)}
-          className="absolute inset-0 opacity-0 cursor-pointer"
+          className="absolute inset-0 opacity-0 cursor-pointer  text-[#6e6e6e] text-sm font-normal "
           onChange={(e) => {
             const selectedFile = e.target.files?.[0]?.name || "Select File";
             setFileName(selectedFile);
           }}
         />
-        <span className="text-gray-500 flex-1">{fileName || "Select File"}</span>
-        <span className="text-gray-400">
+        <span className=" flex-1 text-[#6e6e6e] text-sm font-normal">{fileName || "Select File"}</span>
+        <span className="text-[#060606]">
           <FileIcon />
         </span>
       </div>
@@ -200,20 +205,59 @@ const TimestampsFieldArray = ({ control, langIndex, register }) => {
 
   return (
     <>
-      {fields.map((field, index) => (
+      {/* {fields.map((field, index) => (
         <div key={field.id} className="flex gap-4 items-center mb-4 flex-wrap">
-          <input type="text" {...register(`languages.${langIndex}.timestamps.${index}.chapterName`)} placeholder="Name of chapter" className="flex-1 p-3 border rounded-lg"  />
+          <input type="text" {...register(`languages.${langIndex}.timestamps.${index}.chapterName`)} placeholder="Name of chapter" className=" flex-1 p-3 border rounded-lg text-[#6e6e6e] text-sm font-normal"  />
           <div className="space-x-4  ">
 
-          <input type="time" step="1" {...register(`languages.${langIndex}.timestamps.${index}.startTime`)} className="p-3 border rounded-lg" />
+          <input type="time" step="1" {...register(`languages.${langIndex}.timestamps.${index}.startTime`)} className="p-3 border rounded-lg " />
           <input type="time" step="1" {...register(`languages.${langIndex}.timestamps.${index}.endTime`)} className="p-3 border rounded-lg" />
           <button type="button" onClick={() => remove(index)} className="border-[#989898] border-[1px] text-white px-2 py-2 rounded-[28px]">
             <CrossIcon />
           </button>
           </div>
         </div>
+      ))} */}
+{/*  */}
+{fields.map((field, index) => (
+  <div key={field.id} className="flex flex-col gap-2 mb-4 w-full">
+    <div className="flex flex-wrap items-center gap-2 justify-between md:flex-nowrap">
+      {['Name of Chapter', 'Start Time', 'End Time'].map((label, i) => (
+        <div key={i} className="flex-1 min-w-[120px] max-w-[33%] md:max-w-[30%]">
+          <label className=" mb-1 block text-[#060606] text-sm font-normal ">{label}</label>
+          {i === 0 ? (
+            <input 
+              type="text" 
+              {...register(`languages.${langIndex}.timestamps.${index}.chapterName`)} 
+              placeholder="Name of chapter" 
+              className="w-full p-2 border border-gray-300 rounded-lg text-[#060606] text-sm font-normal "
+            />
+          ) : i === 1 ? (
+            <input 
+              type="time" 
+              step="1" 
+              {...register(`languages.${langIndex}.timestamps.${index}.startTime`)} 
+              className="w-full p-2 border border-gray-300 rounded-lg text-[#060606] text-sm font-normal  focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          ) : (
+            <input 
+              type="time" 
+              step="1" 
+              {...register(`languages.${langIndex}.timestamps.${index}.endTime`)} 
+              className="w-full p-2 border border-gray-300 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          )}
+        </div>
       ))}
-      <button type="button" onClick={() => append({ id: Date.now().toString(), chapterName: "", startTime: "00:00:00", endTime: "00:00:00" })} className="bg-blue-600 text-white px-5 py-2 rounded-lg">
+      <div className="w-[40px] min-w-[40px]">
+      <button type="button" onClick={() => remove(index)} className="border-[#989898] border-[1px] items-center text-white px-2 py-2 rounded-[28px]">
+       <CrossIcon />
+      </button>
+      </div>
+    </div>
+  </div>
+))}
+      <button type="button" onClick={() => append({ id: Date.now().toString(), chapterName: "", startTime: "00:00:00", endTime: "00:00:00" })} className=" px-5 py-3 bg-[#157ff9] rounded-[28px] text-white text-sm font-normal  ">
         Add New Timestamp
       </button>
     </>
