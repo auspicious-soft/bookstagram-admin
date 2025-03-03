@@ -252,7 +252,7 @@ const CourseForm = () => {
                   required
                   {...register(`languages.${languageIndex}.language`)}
                   onChange={(e) => handleLanguageSelect(e.target.value, languageIndex)}
-                  className="w-full p-3 border rounded-lg"
+                  className="w-full p-3 border rounded-lg text-[#6e6e6e] text-sm font-normal "
                 >
                   <option value="" disabled>
                     Select Language
@@ -331,7 +331,7 @@ const LessonFieldArray = ({ nestIndex, control, register, watch, setValue, error
               <input
                 {...register(`languages.${nestIndex}.lessons.${index}.srNo`)}
                 placeholder="Sr.No"
-                className="w-[100px] px-[14px] py-[15px] rounded-[10px] bg-[#f5f5f5] text-[#6e6e6e] border-none"
+                className="w-[100px] px-[14px] py-[15px] rounded-[10px] bg-[#f5f5f5] text-[#6e6e6e] text-sm font-normal border-none"
                 value={index + 1}
                 disabled
               />
@@ -341,7 +341,7 @@ const LessonFieldArray = ({ nestIndex, control, register, watch, setValue, error
               <input
                 {...register(`languages.${nestIndex}.lessons.${index}.name`)}
                 placeholder="Enter Name of the course"
-                className="w-full px-[14px] py-[15px] rounded-[10px] bg-[#f5f5f5] border-none"
+                className="w-full px-[14px] py-[15px] rounded-[10px] bg-[#f5f5f5] border-none text-[#6e6e6e] text-sm font-normal"
                 required
               />
               {errors.languages?.[nestIndex]?.lessons?.[index]?.name && (

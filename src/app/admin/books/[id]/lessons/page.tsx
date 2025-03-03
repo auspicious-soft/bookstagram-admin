@@ -440,7 +440,7 @@ const CourseForm = () => {
                   required
                   {...register(`languages.${languageIndex}.language`)}
                   onChange={(e) => handleLanguageSelect(e.target.value, languageIndex)}
-                  className="w-full p-3 border rounded-lg"
+                  className="w-full p-3 border rounded-lg text-[#6e6e6e] text-sm font-normal "
                 >
                   <option value="" disabled>
                     Select Language
@@ -548,7 +548,7 @@ const LessonFieldArray = ({ nestIndex, control, register, watch, setValue, error
                 <input
                   {...register(`languages.${nestIndex}.lessons.${index}.srNo`)}
                   placeholder="Sr.No"
-                  className="w-[100px] px-[14px] py-[15px] rounded-[10px] bg-[#f5f5f5] text-[#6e6e6e] border-none"
+                  className="w-[100px] px-[14px] py-[15px] rounded-[10px] bg-[#f5f5f5] text-[#6e6e6e] text-sm font-normal border-none"
                   value={index + 1}
                   disabled
                 />
@@ -559,7 +559,7 @@ const LessonFieldArray = ({ nestIndex, control, register, watch, setValue, error
                 <input
                   {...register(`languages.${nestIndex}.lessons.${index}.name`)}
                   placeholder="Enter Name of the course"
-                  className="w-full px-[14px] py-[15px] rounded-[10px] bg-[#f5f5f5] border-none"
+                  className="w-full px-[14px] py-[15px] rounded-[10px] bg-[#f5f5f5] border-none text-[#6e6e6e] text-sm font-normal"
                   required
                 />
                 {errors.languages?.[nestIndex]?.lessons?.[index]?.name && (
@@ -679,7 +679,7 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
                 <input
                   {...register(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.name`)}
                   placeholder="Sub-lesson name"
-                  className="text-[#6e6e6e] w-full h-[46px] px-[15px] py-[14px] text-sm font-normal rounded-[10px] border border-[#eaeaea]"
+                  className="text-[#6e6e6e] text-sm font-normal w-full h-[46px] px-[15px] py-[14px]  rounded-[10px] border border-[#eaeaea]"
                   required
                 />
               </div>
@@ -796,16 +796,16 @@ const CustomFileUpload = ({ register, langIndex, aditionalFile, width, isRequire
           type="file"
           {...register(`${langIndex}`)}
           required={isRequired === "true" && !existingFile}
-          className="absolute inset-0 opacity-0 cursor-pointer h-11 text-[#6e6e6e]"
+          className="absolute inset-0 opacity-0 cursor-pointer h-11  text-[#6e6e6e] text-sm font-normal"
           onChange={(e) => {
             const selectedFile = e.target.files?.[0]?.name || (existingFile ? existingFile.split("/").pop() : "Select File");
             setFileName(selectedFile);
           }}
         />
-        <span className="flex-1 text-[#6e6e6e] opacity-0.5 text-sm font-normal">
+        <span className="flex-1 text-[#6e6e6e] opacity-0.5  text-sm font-normal">
           {fileName || (aditionalFile ? "Additional files" : "Select File")}
         </span>
-        <span className="text-gray-400">
+        <span className="text-[#060606]">
           <FileIcon />
         </span>
       </div>
