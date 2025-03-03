@@ -795,7 +795,6 @@ const CustomFileUpload = ({ register, langIndex, aditionalFile, width, isRequire
         <input
           type="file"
           {...register(`${langIndex}`)}
-          required={isRequired === "true" && !existingFile}
           className="absolute inset-0 opacity-0 cursor-pointer h-11  text-[#6e6e6e] text-sm font-normal"
           onChange={(e) => {
             const selectedFile = e.target.files?.[0]?.name || (existingFile ? existingFile.split("/").pop() : "Select File");
