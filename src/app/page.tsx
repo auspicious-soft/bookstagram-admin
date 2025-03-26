@@ -61,7 +61,7 @@ export default function Page() {
             window.location.href = '/admin/dashboard';
           }
         } else {
-          toast.error( 'An error occurred during login.');
+          toast.error( 'Invalid username or password.');
         }
       });
     } catch (error) {

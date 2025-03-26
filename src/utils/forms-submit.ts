@@ -1,6 +1,6 @@
 "use client";
 import { generateSignedUrlForBlog, generateSignedUrlToUploadOn } from "@/actions";
-import { addBookEventFormData,addBlogFormData } from "@/services/admin-services";
+import { addBlogFormData, addBookEventFormData } from "@/services/admin-services";
 import { toast } from "sonner";
 
 export const submitForm = async (

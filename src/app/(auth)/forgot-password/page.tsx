@@ -31,7 +31,7 @@ export default function Page() {
         }
       }
     catch (err: any) {
-        if (err.status == 404) toast.error('Username not found')
+        if (err.status == 404) toast.error('Email not found')
         else toast.error("Something went wrong")
       }
     })
@@ -64,7 +64,7 @@ export default function Page() {
                   />
    
                   <button disabled={isPending} onClick={handleSubmit} className="login-button  w-full">
-                  Confirm
+                  {isPending? "Loading...": "Confirm"}
                   </button>
                 </form>
               </div>

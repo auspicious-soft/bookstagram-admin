@@ -1,12 +1,10 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import avatar from '@/assets/images/avatar.png';
 import { usePathname, useSearchParams } from "next/navigation";
 import { DropIcon } from "@/utils/svgicons";
 import { signOut, useSession } from "next-auth/react";
-
-
 
 const Header: React.FC = () => {
   const [showData, setShowData] = useState(false);
@@ -18,7 +16,10 @@ const Header: React.FC = () => {
   const [bookName, setBookName] = useState("");
   const [summary, setSummary] = useState("");
   const {data} = useSession();  
-  const name = (data as any)?.user?.fullName; 
+  const name = (data as any)?.user?.fullName;
+  // Add ref to track the dropdown element
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       setCategoryName(localStorage.getItem("subCategoryName") || "");
@@ -27,8 +28,25 @@ const Header: React.FC = () => {
       setSummary(localStorage.getItem("summaryName") || "");
     }
   }, [pathname]);
-  
 
+  // Add useEffect to handle clicks outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowData(false);
+      }
+    };
+
+    // Add event listener when dropdown is open
+    if (showData) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    // Cleanup event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showData]);
 
   const pageNames: { [key: string]: string } = {
     "/admin/dashboard": "dashboard",
@@ -39,7 +57,6 @@ const Header: React.FC = () => {
     "/admin/discounts": "Discounts",
     "/admin/book-life": "Book Life",
     "/admin/book-events":  "Book Events",
-    // "/admin/book-events/add":  "Add New Event",
     "/admin/authors": "Authors",
     "/admin/publishers": "Publishers",
     "/admin/stories": "Stories",
@@ -50,8 +67,8 @@ const Header: React.FC = () => {
     "/admin/stories/add-new-story": "Add New Story",
     "/admin/promotions/add-new-banner": "Add New Banner",
     "/admin/add-new": "Add New Book",
-    
   };
+
   const getPageName = (path: string): string => {
     if (path.startsWith("/admin/categories/") && path.endsWith("/sub-category")) {
       return "Sub-Categories";
@@ -103,18 +120,19 @@ const Header: React.FC = () => {
     }
     return pageNames[path] || "Bookstagram";
   };
+
   const currentPageName = nameParam || getPageName(pathname);
-  // const currentPageName = pageNames[pathname] || t("projects");
 
   return (
     <header className="flex justify-between items-center p-[15px] lg:px-[30px] lg:py-[23px] border-b border-[#D9CEC6] ">
-     
       <div className="flex items-center justify-between w-full">
         <h1 className="text-[32px] text-darkBlack font-aeonikRegular tracking-[0.16px] capitalize">{currentPageName}</h1>  
-        <div className="hidden lg:block relative">
-          <div onClick={() => setShowData(!showData)}
-          className="flex gap-2.5 items-center bg-white p-[5px] pr-5 rounded-[24px] cursor-pointer ">
-          <Image
+        <div className="hidden lg:block relative" ref={dropdownRef}>
+          <div 
+            onClick={() => setShowData(!showData)}
+            className="flex gap-2.5 items-center bg-white p-[5px] pr-5 rounded-[24px] cursor-pointer "
+          >
+            <Image
               src={avatar}
               alt="User Profile"
               width={38}
@@ -128,9 +146,14 @@ const Header: React.FC = () => {
             <DropIcon/>
           </div>
           {showData && (
-           <div className=" absolute z-[2] top-[55px] right-0 w-full h-auto bg-white p-5 rounded-lg shadow-[0_4px_4px_0_rgba(0,0,0,0.08)]">
-            <button onClick={() => signOut({ redirectTo: '/' })} className="text-darkBlack w-full hover:underline text-left ">Log Out</button>
-          </div>
+            <div className="absolute z-[2] top-[55px] right-0 w-full h-auto bg-white p-5 rounded-lg shadow-[0_4px_4px_0_rgba(0,0,0,0.08)]">
+              <button 
+                onClick={() => signOut({ redirectTo: '/' })} 
+                className="text-darkBlack w-full hover:underline text-left"
+              >
+                Log Out
+              </button>
+            </div>
           )}
         </div>
       </div>
