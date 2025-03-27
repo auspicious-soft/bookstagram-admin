@@ -41,7 +41,7 @@ const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSele
       aria-labelledby="child-modal-title"
       className="grid place-items-center"
     >
-      <div className="modal bg-white py-[30px] px-5 max-w-[950px] mx-auto rounded-[20px] w-full h-full relative">
+      <div className="modal bg-white pt-[30px] px-5 max-w-[950px] mx-auto rounded-[20px] w-full h-full relative">
         <div className="max-h-[80vh] flex flex-col">
           <h2 className="text-[32px] text-darkBlack mb-5">{title}</h2>
           <div className="main-form">
@@ -49,7 +49,7 @@ const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSele
               <input type="search" name="" value={searchParams} onChange={handleInputChange} placeholder="Enter Name of the course" />
             </label>
           </div>
-          <div className="flex-1 mt-5 pt-5 grid grid-cols-4 gap-5 border-t border-dashed border-[#D0D0D0] overflow-auto overflo-custom">
+          <div className="flex-1 mt-5 pt-5 grid grid-cols-4 gap-5 border-t  border-[#D0D0D0] overflow-auto overflo-custom">
             {allBooks?.map((data: any) => (
               <CourseCard
                 key={data?._id}
