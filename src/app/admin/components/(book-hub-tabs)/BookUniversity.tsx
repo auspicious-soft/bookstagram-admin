@@ -41,7 +41,7 @@ const BookUniversity = () => {
       startTransition(async()=>{
       const response = await deleteBookUniversity(`/admin/book-universities/${id}`);
       if (response.status === 200) {
-        toast.success("deleted successfully");
+        toast.success("Deleted successfully");
         mutate()
       } else {
       toast.error("Failed To Delete");

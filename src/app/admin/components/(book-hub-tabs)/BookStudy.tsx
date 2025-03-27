@@ -41,7 +41,7 @@ const BookStudy = () => {
         startTransition(async()=>{
         const response = await deleteBookStudy(`/admin/book-studies/${id}`);
         if (response.status === 200) {
-          toast.success("deleted successfully");
+          toast.success("Deleted successfully");
           mutate()
         } else {
         toast.error("Failed To Delete");

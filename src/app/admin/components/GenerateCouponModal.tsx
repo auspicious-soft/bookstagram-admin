@@ -151,13 +151,13 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
 
               <div className="grid grid-cols-[2fr_1fr] gap-5 mb-5">
                 {nameFields.map((field, index) => (
-                  <div key={field.id}>
-                    <p className="mb-1 text-sm text-darkBlack">Name of School</p>
-                    <div className="flex items-center gap-[5px] w-full">
-                      <label className="flex bg-[#F5F5F5] rounded-[10px] w-full">
+                  <div key={field.id} className="mb-4">
+                    <p className="mb-2 text-sm font-medium text-gray-700">Name of School</p>
+                    <div className="flex items-center gap-2 w-full">
+                      <div className="flex bg-gray-100 rounded-md overflow-hidden w-full shadow-sm">
                         <select
                           {...register(`translations.${index}.language`)}
-                          className="max-w-[80px] bg-[#D9D9D9]"
+                          className="px-3 py-2 bg-gray-200 text-gray-700 focus:outline-none"
                         >
                           <option value="eng">Eng</option>
                           <option value="kaz">Kaz</option>
@@ -167,9 +167,9 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
                           type="text"
                           {...register(`translations.${index}.name`)}
                           placeholder="Enter name"
-                          className="flex-1"
+                          className="flex-1 px-4 py-2 focus:outline-none text-gray-700"
                         />
-                      </label>
+                      </div>
                       {index === 0 ? (
                         <button
                           type="button"
@@ -186,7 +186,7 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
                             }
                           }}
                           disabled={usedLanguages.size >= 3}
-                          className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm"
+                          className="bg-[#ef6a00] hover:bg-[#faa259] text-white px-4 py-2 rounded-md text-sm focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                         >
                           Add
                         </button>
@@ -202,7 +202,7 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
                               return updated;
                             });
                           }}
-                          className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm"
+                          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm focus:outline-none shadow-md"
                         >
                           Remove
                         </button>
@@ -217,12 +217,12 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
                 ))}
 
                 <label className="block">
-                  Number of activations allowed
+                  <span className="block mb-2 text-sm font-medium text-gray-700">Number of activations allowed</span>
                   <input
                     type="number"
                     {...register('allowedActivation')}
                     placeholder="100"
-                    className="w-full mt-1"
+                    className="w-full mt-1 px-4 py-2 rounded-md border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 shadow-sm"
                   />
                   {errors.allowedActivation && (
                     <p className="text-red-500 text-sm mt-1">
@@ -233,7 +233,7 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
               </div>
 
               <h2 className="text-3xl text-darkBlack mb-5">Select Publishers</h2>
-              <label className="w-full block">
+              <label className="w-full block mb-5">
                 Search
                 <input
                   type="search"

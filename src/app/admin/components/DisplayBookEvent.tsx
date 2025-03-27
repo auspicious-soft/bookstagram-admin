@@ -36,7 +36,7 @@ const handleDelete = async () => {
   try {
     const response = await DeleteBookEvent(route); 
     if (response.status === 200) {
-      toast.success("Book Event deleted successfully");
+      toast.success("Book Event Deleted successfully");
       router.push('/admin/book-events');
 
     } else {
@@ -54,7 +54,7 @@ const handleUpload = async () => {
     const image = imagePreview;
     const response = await updateBookEvent(route,image); 
     if (response.status === 200) {
-      toast.success("Book Event deleted successfully");
+      toast.success("Book Event Deleted successfully");
       router.push('/admin/book-events');
 
     } else {

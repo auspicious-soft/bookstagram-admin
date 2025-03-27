@@ -40,21 +40,25 @@ const BookSchool = () => {
     setCoupon(code);
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      startTransition(async () => {
-        const response = await deleteBookSchool(`/admin/book-schools/${id}`);
-        if (response.status === 200) {
-          toast.success("deleted successfully");
-          mutate()
-        } else {
-          toast.error("Failed To Delete");
+    const handleDelete = async (id: string) => {
+      const confirmDelete = window.confirm("Are you sure you want to delete this school?");
+      if (confirmDelete) {
+        try {
+          startTransition(async () => {
+            const response = await deleteBookSchool(`/admin/book-schools/${id}`);
+            if (response.status === 200) {
+              toast.success("Deleted successfully");
+              mutate()
+            } else {
+              toast.error("Failed To Delete");
+            }
+          });
+        } catch (error) {
+          toast.error("an Error Occurred While Deleting");
         }
-      });
-    } catch (error) {
-      toast.error("an Error Occurred While Deleting");
+      }
     }
-  }
+
 
   return (
     <div>
