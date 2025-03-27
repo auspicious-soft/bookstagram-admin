@@ -40,24 +40,24 @@ const BookSchool = () => {
     setCoupon(code);
   };
 
-    const handleDelete = async (id: string) => {
-      const confirmDelete = window.confirm("Are you sure you want to delete this school?");
-      if (confirmDelete) {
-        try {
-          startTransition(async () => {
-            const response = await deleteBookSchool(`/admin/book-schools/${id}`);
-            if (response.status === 200) {
-              toast.success("Deleted successfully");
-              mutate()
-            } else {
-              toast.error("Failed To Delete");
-            }
-          });
-        } catch (error) {
-          toast.error("an Error Occurred While Deleting");
-        }
+  const handleDelete = async (id: string) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this school?");
+    if (confirmDelete) {
+      try {
+        startTransition(async () => {
+          const response = await deleteBookSchool(`/admin/book-schools/${id}`);
+          if (response.status === 200) {
+            toast.success("Deleted successfully");
+            mutate()
+          } else {
+            toast.error("Failed To Delete");
+          }
+        });
+      } catch (error) {
+        toast.error("an Error Occurred While Deleting");
       }
     }
+  }
 
 
   return (
@@ -78,6 +78,7 @@ const BookSchool = () => {
               <th>Coupon Code</th>
               <th>Created On</th>
               <th>No of Activations</th>
+              <th>Total Allowed Activations</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -91,20 +92,25 @@ const BookSchool = () => {
                 <td colSpan={6} className="text-center text-red-500 ">Error loading data.</td>
               </tr>
             ) : schoolData?.length > 0 ? (
-              schoolData?.map((row: any) => (
-                <tr key={row?._id}>
-                  <td>{row?.name?.eng}</td>
-                  <td>{row?.couponCode}</td>
-                  <td>{row?.createdAt}</td>
-                  <td>{row?.codeActivated}</td>
-                  <td>
-                    <div>
-                      <button onClick={() => openCouponModal(row?.couponCode)} className='p-2.5'><ViewIcon /></button>
-                      <button onClick={() => handleDelete(row?._id)} className='p-2.5'><DeleteIcon /> </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+              schoolData?.map((row: any) => {
+                console.log('row: ', row);
+                return (
+                  <tr key={row?._id}>
+                    <td>{row?.name?.eng}</td>
+                    <td>{row?.couponCode}</td>
+                    <td>{row?.createdAt}</td>
+                    <td>{row?.codeActivated}</td>
+                    <td>{row?.allowedActivation}</td>
+                    <td>
+                      <div>
+                        <button onClick={() => openCouponModal(row?.couponCode)} className='p-2.5'><ViewIcon /></button>
+                        <button onClick={() => handleDelete(row?._id)} className='p-2.5'><DeleteIcon /> </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              }
+              )
             ) : (
               <tr>
                 <td colSpan={6}>{isLoading ? (<ReactLoading type={"spin"} color={"#26395e"} height={"20px"} width={"20px"} />
