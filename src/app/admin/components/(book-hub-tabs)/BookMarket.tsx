@@ -14,7 +14,7 @@ const BookMarket = () => {
   const [activeTab, setActiveTab] = useState('All');
   const [showData, setShowData] = useState(false);
   const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 12;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchTerm, setSearchTerm] = useState(""); // Renamed to searchTerm for clarity
   const dropdownRef = useRef<HTMLDivElement>(null);
