@@ -7,6 +7,7 @@ import { DeleteIcon, CrossIcon, FileIcon, DustbinIcon, AddIcon } from "@/utils/s
 import { generateSignedUrlCoursesFiles, generateSignedUrlCourseAdditionalFiles } from "@/actions";
 import { toast } from "sonner";
 import { addNewCourse } from "@/services/admin-services";
+import { useRouter } from "next/navigation";
 
 // Yup validation schema
 const schema = yup.object().shape({
@@ -44,6 +45,23 @@ const schema = yup.object().shape({
 });
 
 const CourseForm = () => {
+  const [submit, setSubmit] = useState(false)
+  // prevent reload and back functionality and warn leaveing
+  useEffect(() => {
+    if (!submit) {
+
+      window.onbeforeunload = function () {
+        return "Are you sure you want to leave?";
+      };
+      // window.history.pushState(null, "", window.location.href);
+      window.addEventListener("popstate", function () {
+        window.history.pushState(null, "", window.location.href);
+      });
+      return () => {
+        window.onbeforeunload = null;
+      };
+    }
+  }, []);
   const {
     register,
     control,
@@ -90,7 +108,7 @@ const CourseForm = () => {
   const [selectedLanguages, setSelectedLanguages] = useState([]);
   const [formData, setFormData] = useState(null);
   const [isPending, startTransition] = useTransition();
-
+  const router = useRouter()
   useEffect(() => {
     const data = sessionStorage.getItem("courseData");
     if (data) {
@@ -99,6 +117,7 @@ const CourseForm = () => {
   }, []);
 
   const onSubmit = async (data) => {
+    setSubmit(true)
     startTransition(async () => {
       try {
         let transformedLessons = [];
@@ -185,7 +204,7 @@ const CourseForm = () => {
         if (response?.status === 201) {
           toast.success("Book added successfully");
           sessionStorage.setItem("courseData", "");
-          window.location.href = "/admin/book-hub";
+          router.push("/admin/book-hub");
         } else {
           toast.error("Failed to add Book");
         }
@@ -260,7 +279,7 @@ const CourseForm = () => {
                   {["eng", "kaz", "rus"]
                     .filter((lang) => !otherSelectedLanguages.includes(lang) || lang === currentLanguage)
                     .map((lang) => (
-                      <option key={lang} value={lang}>
+                      <option key={lang} value={lang} defaultValue={'eng'}>
                         {lang.toUpperCase()}
                       </option>
                     ))}
@@ -454,7 +473,7 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
                     <CustomFileUpload
                       register={register}
                       langIndex={`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.additionalFiles.${fileIndex}.file`}
-                      aditionalFile={true}   
+                      aditionalFile={true}
                       width="50%"
                     />
                     <input
