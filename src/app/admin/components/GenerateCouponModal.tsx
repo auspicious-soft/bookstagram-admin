@@ -16,6 +16,7 @@ type Language = "eng" | "kaz" | "rus";
 interface ModalProp {
   open: boolean;
   onClose: () => void;
+  mutateCoupons: () => void;
 }
 
 interface TranslationField {
@@ -56,17 +57,18 @@ const generateCouponCode = () => {
   return result;
 };
 
-const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose }) => {
+const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons }) => {
   const [isPending, startTransition] = useTransition();
   const [couponModal, setCouponModal] = useState(false);
   const [searchParams, setSearchParams] = useState("");
   const [couponCode, setCouponCode] = useState('');
   const [usedLanguages, setUsedLanguages] = useState<Set<Language>>(new Set(["eng"]));
-
-  const { data, error, isLoading, mutate } = useSWR(`/admin/publishers?description=${searchParams}`, getAllPublishers);
+  const url = `/admin/publishers${searchParams ? `?description=${searchParams}` : ""}`;
+  const { data } = useSWR(url, getAllPublishers, {
+    revalidateOnFocus: false
+  });
 
   const allPublishers = data?.data?.data;
-
   const methods = useForm<FormData>({
     resolver: yupResolver(schema) as any,
     defaultValues: {
@@ -108,7 +110,7 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose }) => {
     const generatedCode = generateCouponCode();
     setCouponCode(generatedCode);
     try {
-      const payload = { 
+      const payload = {
         couponCode: generatedCode,
         name: data.translations.reduce((acc, curr) => ({
           ...acc,
@@ -120,10 +122,10 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose }) => {
 
       startTransition(async () => {
         const response = await addToBookSchool('/admin/book-schools', payload);
-        if (response.status===201 ) {
+        if (response.status === 201) {
           setCouponModal(true)
-          mutate();
-          toast.success("Books added to discount successfully");
+          mutateCoupons();
+          toast.success("Books added to discount successfully")
         } else {
           toast.error("Failed To add books to discount");
         }
@@ -146,7 +148,7 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose }) => {
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
               <h2 className="text-3xl text-darkBlack mb-5">Generate A Coupon Code</h2>
-              
+
               <div className="grid grid-cols-[2fr_1fr] gap-5 mb-5">
                 {nameFields.map((field, index) => (
                   <div key={field.id}>
@@ -276,12 +278,12 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose }) => {
             </form>
           </FormProvider>
         </div>
-        <CouponCode 
-          couponCode={couponCode} 
-          open={couponModal} 
+        <CouponCode
+          couponCode={couponCode}
+          open={couponModal}
           onClose={() => setCouponModal(false)}
           close={onClose}
-        /> 
+        />
         {/* <CouponCode open={couponModal} onClose={() => setCouponModal(false)} /> */}
       </div>
     </Modal>
