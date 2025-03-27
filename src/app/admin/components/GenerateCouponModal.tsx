@@ -95,7 +95,10 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
   const selectedPublishers = watch('publisherId');
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchParams(event.target.value);
+    const { value } = event.target;
+    const trimmedStartValue = value.replace(/^\s+/, '');
+    setSearchParams(trimmedStartValue);
+
   };
 
   const handleSelect = (id: string) => {
@@ -143,8 +146,8 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
       aria-labelledby="child-modal-title"
       className="grid place-items-center"
     >
-      <div className="modal bg-white py-8 px-5 max-w-[950px] mx-auto rounded-[20px] w-full h-full">
-        <div className="max-h-[80vh] overflow-auto overflow-custom">
+      <div className="modal bg-white pt-8 px-5 max-w-[950px] mx-auto rounded-[20px] w-full h-full">
+        <div className="max-h-[80vh] overflow-auto overflow-custom relative">
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)}>
               <h2 className="text-3xl text-darkBlack mb-5">Generate A Coupon Code</h2>
@@ -164,6 +167,7 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
                           <option value="rus">Rus</option>
                         </select>
                         <input
+                          required
                           type="text"
                           {...register(`translations.${index}.name`)}
                           placeholder="Enter name"
@@ -260,7 +264,7 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
                 <p className="text-red-500 text-sm mt-1">{errors.publisherId.message}</p>
               )}
 
-              <div className="mt-8 flex gap-2.5 justify-end">
+              <div className="mt-8 flex gap-2.5 justify-end sticky bottom-0 bg-white pt-4 px-5 border-t border-gray-200">
                 <button
                   type="submit"
                   className="flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px]"

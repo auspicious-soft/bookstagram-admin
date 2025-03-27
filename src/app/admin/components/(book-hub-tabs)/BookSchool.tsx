@@ -93,12 +93,11 @@ const BookSchool = () => {
               </tr>
             ) : schoolData?.length > 0 ? (
               schoolData?.map((row: any) => {
-                console.log('row: ', row);
                 return (
                   <tr key={row?._id}>
                     <td>{row?.name?.eng}</td>
                     <td>{row?.couponCode}</td>
-                    <td>{row?.createdAt}</td>
+                    <td>{new Date(row?.createdAt).toLocaleDateString()}</td>
                     <td>{row?.codeActivated}</td>
                     <td>{row?.allowedActivation}</td>
                     <td>
