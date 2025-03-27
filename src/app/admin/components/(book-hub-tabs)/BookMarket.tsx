@@ -95,11 +95,14 @@ const BookMarket = () => {
         <div className='flex justify-end items-center gap-2.5'>
           <SearchBar query={searchTerm} setQuery={setSearchTerm} />
           <div className='relative' ref={dropdownRef}>
-            <button 
-              onClick={() => setShowData(!showData)}
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowData(!showData);
+              }}
               className='flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px]'
             >
-              <PlusIcon/> Add <span>|</span> <DropWhite/>
+              <PlusIcon /> Add <span>|</span> <DropWhite />
             </button>
             {showData && (
               <div className="space-y-2 absolute z-[2] top-[45px] right-0 w-full h-auto bg-white p-2 rounded-lg shadow-lg">
