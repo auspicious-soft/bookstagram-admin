@@ -52,6 +52,10 @@ const BookMasters = () => {
   }
 
   const addBookToBookMaster = async() => {
+    if (selectedBooks.length === 0) {
+      toast.error("Please select at least one book.");
+      return;
+    }
     try {
       const payload = {
         productsId: selectedBooks
