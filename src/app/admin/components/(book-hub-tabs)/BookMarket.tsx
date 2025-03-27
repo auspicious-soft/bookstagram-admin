@@ -57,6 +57,7 @@ const BookMarket = () => {
   };
 
   const handleTabClick = (tab) => {
+    setQuery(`page=${1}&limit=${itemsPerPage}`);
     setActiveTab(tab);
     setPage(1);
   };
@@ -97,7 +98,7 @@ const BookMarket = () => {
           <div className='relative' ref={dropdownRef}>
             <button
               onClick={(e) => {
-                e.stopPropagation()
+                e.stopPropagation(); // Stop event propagation
                 setShowData(!showData);
               }}
               className='flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px]'
