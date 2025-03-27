@@ -353,6 +353,17 @@ export const SideBarIcon = () => (
     />
   </svg>
 );
+export const SideBarIconMirrored = () => (
+  <svg width={30} height={30} viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width={30} height={30} rx={15} fill="white" />
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12.6037 10.6904C12.8025 10.4971 13.1248 10.4971 13.3236 10.6904L17.3963 14.65C17.4918 14.7429 17.5455 14.8687 17.5455 15C17.5455 15.1313 17.4918 15.2572 17.3963 15.35L13.3236 19.3096C13.1248 19.5029 12.8025 19.5029 12.6037 19.3096C12.4048 19.1163 12.4048 18.8029 12.6037 18.6096L16.3164 15L12.6037 11.3904C12.4048 11.1971 12.4048 10.8837 12.6037 10.6904Z"
+      fill="#060606"
+    />
+  </svg>
+);
 export const HamburgerIcon = () => (
   <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g id="hamburg-icon">
