@@ -16,7 +16,6 @@ import CustomSelect from '@/app/components/CustomSelect';
 import { addNewBook, getSingleBook, updateSingleBook } from '@/services/admin-services';
 import useSWR from 'swr';
 import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
-import { Dice1 } from 'lucide-react';
 import { DashboardIcon1, DashboardIcon2 } from '@/utils/svgicons';
 import DashboardCard from '../../components/DashboardCard';
 import { useRouter } from 'next/navigation';
@@ -105,7 +104,7 @@ const BookForm = () => {
           language: yup.string().required("Language is required"),
         })
       )
-      : yup.array().notRequired(),
+      : yup.array().notRequired().optional(),
     price: yup.number().required('Price is required'),
     authorId: yup.array().min(1, 'At least one author is required'),
     publisherId: yup.string().min(1, 'Publisher is required'),
@@ -174,7 +173,7 @@ const BookForm = () => {
       const fileTranslations = Object.entries(bookData.file || {}).map(([lang, file], index) => ({
         id: String(index + 1),
         language: lang as Language,
-        file: null
+        file: file ? file as File : null
       }));
 
       // Update used languages sets
@@ -327,11 +326,6 @@ const BookForm = () => {
               toast.error("Failed to add Book");
             }
           }
-
-          if (response?.status === 200) {
-            toast.success("Book updated successfully");
-            // window.location.href = "/admin/book-hub";
-          }
         }
       } catch (error) {
         console.error("Error", error);
@@ -381,66 +375,85 @@ const BookForm = () => {
                 </div>
               </div>
               {/* {bookType !=="audioBook" &&( */}
-              <div className=" mt-5">
-                {bookType !== "audiobook" && fileFields.map((field, index) => (
-                  <div key={field.id} className="mb-4">
-                    <div className="w-full">
-                      <div className='bg-white p-5 rounded-[20px]'>
-                        <input
-                          type="file"
-                          className="border border-[#BDBDBD] py-5 rounded-[10px] px-5 bg-[#F5F5F5] flex-1 w-full"
-                          onChange={(e) => {
-                            if (e.target.files?.[0]) {
-                              setValue(`fileTranslations.${index}.file`, e.target.files[0]);
-                            }
-                          }}
-                        />
-                        <select {...register(`fileTranslations.${index}.language`)}
-                          className="w-full bg-[#f5f5f5] py-4 px-4 rounded-[10px] p-2 mt-4">
-                          <option value="" disabled>Select Language</option>
-                          <option value="eng">Eng</option>
-                          <option value="kaz">Kaz</option>
-                          <option value="rus">Rus</option>
-                        </select>
-                      </div>
-                      {index === 0 ? (
-                        <button type="button"
-                          onClick={() => {
-                            const unusedLanguage = ["eng", "kaz", "rus"].find(
-                              (lang) => !usedFileLanguages.has(lang as Language)
-                            );
-                            if (unusedLanguage) {
-                              appendFile({
-                                id: String(fileFields.length + 1),
-                                language: unusedLanguage as Language,
-                                file: null,
+              <div className="mt-5">
+                {bookType !== "audiobook" &&
+                  fileFields.map((field, index) => (
+                    <div key={field.id} className="mb-4">
+                      <div className="w-full">
+                        <div className="bg-white p-5 rounded-[20px]">
+                          <input
+                            type="file"
+                            className="border border-[#BDBDBD] py-5 rounded-[10px] px-5 bg-[#F5F5F5] flex-1 w-full"
+                            onChange={(e) => {
+                              if (e.target.files?.[0]) {
+                                setValue(`fileTranslations.${index}.file`, e.target.files[0]);
+                              }
+                            }}
+                          />
+                          {/* Show file name if already uploaded */}
+                          {field.file && (
+                            <p className="text-sm mt-2 text-gray-600">
+                              {(field as any).file.substring((field as any).file.lastIndexOf('/') + 1)}
+                            </p>
+                          )}
+                          <select
+                            {...register(`fileTranslations.${index}.language`)}
+                            className="w-full bg-[#f5f5f5] py-4 px-4 rounded-[10px] p-2 mt-4"
+                          >
+                            <option value="" disabled>
+                              Select Language
+                            </option>
+                            <option value="eng">Eng</option>
+                            <option value="kaz">Kaz</option>
+                            <option value="rus">Rus</option>
+                          </select>
+                        </div>
+                        {index !== 0 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const languageToRemove = field.language;
+                              removeFile(index);
+                              setUsedFileLanguages((prev) => {
+                                const updated = new Set(prev);
+                                updated.delete(languageToRemove);
+                                return updated;
                               });
-                              setUsedFileLanguages(new Set([...usedFileLanguages, unusedLanguage as Language]));
-                            }
-                          }}
-                          disabled={usedFileLanguages.size >= 3}
-                          className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] w-full mt-5"
-                        >
-                          Add New
-                        </button>
-                      ) : (
-                        <button type="button"
-                          onClick={() => {
-                            const languageToRemove = field.language;
-                            removeFile(index);
-                            setUsedFileLanguages(prev => {
-                              const updated = new Set(prev);
-                              updated.delete(languageToRemove);
-                              return updated;
-                            });
-                          }}
-                          className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm mt-5"
-                        >Remove</button>
-                      )}
+                            }}
+                            className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm mt-5"
+                          >
+                            Remove
+                          </button>
+                        )}
+                        {index == fileFields?.length - 1 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const unusedLanguage = ["eng", "kaz", "rus"].find(
+                                (lang) => !usedFileLanguages.has(lang as Language)
+                              );
+                              if (unusedLanguage) {
+                                appendFile({
+                                  id: String(fileFields.length + 1),
+                                  language: unusedLanguage as Language,
+                                  file: null,
+                                });
+                                setUsedFileLanguages(
+                                  new Set([...usedFileLanguages, unusedLanguage as Language])
+                                );
+                              }
+                            }}
+                            disabled={usedFileLanguages.size >= 3}
+                            className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] w-full mt-5"
+                          >
+                            Add New
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
+
             </div>
 
             <div className="main-form bg-white p-[30px] rounded-[20px]">
