@@ -2,7 +2,9 @@ import { getAllAuthors } from '@/services/admin-services';
 import useSWR from 'swr'; 
 
 const UseAuthors = () => {
-    const { data, error, isLoading } = useSWR(`/admin/authors`, getAllAuthors);
+    const { data, error, isLoading } = useSWR(`/admin/authors`, getAllAuthors, {
+        revalidateOnFocus: false,
+      });
 
     const authors = data?.data?.data?.map((row: any) => ({
         label: `${row?.name.eng}`,

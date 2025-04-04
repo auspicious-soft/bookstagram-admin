@@ -2,7 +2,9 @@ import { getAllCategories } from '@/services/admin-services';
 import useSWR from 'swr'; 
 
 const UseCategory = () => {
-    const { data, error, isLoading } = useSWR(`/admin/categories`, getAllCategories);
+    const { data, error, isLoading } = useSWR(`/admin/categories`, getAllCategories, {
+        revalidateOnFocus: false,
+      });
 
     const category = data?.data?.data?.map((row: any) => ({
         label: `${row?.name.eng}`,

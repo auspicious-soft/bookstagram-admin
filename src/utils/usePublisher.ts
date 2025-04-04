@@ -3,7 +3,9 @@ import useSWR from "swr";
 
 
 const UsePublisher = () => {
-  const { data, error, isLoading } = useSWR(`/admin/publishers`, getAllPublishers);
+  const { data, error, isLoading } = useSWR(`/admin/publishers`, getAllPublishers, {
+    revalidateOnFocus: false,
+  });
  
   const publishers = data?.data?.data?.map((row: any) => ({
       label: `${row?.publisher?.name?.eng}`,
