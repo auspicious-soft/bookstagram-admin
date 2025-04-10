@@ -17,7 +17,7 @@ import UseCategory from "@/utils/useCategory";
 const AllPublishersTable = () => {
   const router = useRouter();
   const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 12;
   const session = useSession()
   const role= (session as any)?.data?.user?.role
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);

@@ -306,7 +306,7 @@ const CourseForm = () => {
           <button type="button" className="px-6 py-2 border rounded-full" onClick={() => { window.location.href = "/admin/book-hub"; }}>
             Cancel
           </button>
-          <button type="submit" disabled={isPending} className="bg-orange text-white px-5 py-2 rounded-[28px]">
+          <button type="submit" disabled={isPending} className="bg-orange text-white px-5 py-2 rounded-[28px] hover:bg-opacity-90 disabled:bg-opacity-50">
             {isPending ? "Saving..." : "Save Lesson"}
           </button>
         </div>

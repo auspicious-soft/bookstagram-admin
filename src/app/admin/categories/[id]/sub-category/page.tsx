@@ -32,7 +32,7 @@ const Page = () => {
   const [isPending, startTransition] = useTransition();
   const { id } = useParams();
   const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 12;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchParams, setSearchParams] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);

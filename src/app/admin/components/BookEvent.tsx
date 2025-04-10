@@ -12,7 +12,7 @@ import Image from "next/image";
 
 const BooksEvents = () => {
   const router = useRouter();
-  const itemsPerPage = 10;
+  const itemsPerPage = 12;
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchQuery, setSearchQuery] = useState(``);

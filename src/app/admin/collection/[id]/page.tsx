@@ -15,7 +15,7 @@ const Page = () => {
   const router = useRouter();
   const {id} = useParams();
   const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 12;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchParams, setsearchParams] = useState("");
   const { data, error, isLoading, mutate } = useSWR(`/admin/collections/${id}?description=${searchParams}&${query}`, getSingleCollection);

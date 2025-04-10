@@ -15,7 +15,7 @@ import profile from '@/assets/images/preview.png';
 const AllUsersTable = () => {
   const router = useRouter();
   const [page, setPage] = useState(1); 
-  const itemsPerPage = 10;
+  const itemsPerPage = 12;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchParams, setsearchParams] = useState('');
   const {data, error, isLoading, mutate} = useSWR(searchParams!=="" ? `/admin/users?description=${searchParams}`: `/admin/users?${query}`, getAllUsers)

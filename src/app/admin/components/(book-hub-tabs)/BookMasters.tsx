@@ -20,7 +20,7 @@ const BookMasters = () => {
   const [openModal, setOpenModal] = useState(false)
   const [selectedBooks, setSelectedBooks] = useState<string[]>([]);
   const [page, setPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 12;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchParams, setsearchParams] = useState("");
   const { data, error, isLoading, mutate } = useSWR(searchParams !== ""? `/admin/book-masters?description=${searchParams}`

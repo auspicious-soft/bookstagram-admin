@@ -2,11 +2,12 @@
 import { generateSignedUrlAudioBookFile } from "@/actions";
 import { addNewBook } from "@/services/admin-services";
 import { DeleteIcon, CrossIcon, FileIcon } from "@/utils/svgicons";
-import React, { useState, useEffect, startTransition } from "react";
+import React, { useState, useEffect,  useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const AudiobookForm = () => {
+  const [isPending, startTransition] = useTransition();
   const { register, control, handleSubmit, watch } = useForm({
     defaultValues: {
       courseName: "",
@@ -187,8 +188,8 @@ const AudiobookForm = () => {
         <button type="button" onClick={() => handleCancel()} className="border border-orange text-orange px-5 py-2 rounded-[28px]">
           Cancel
         </button>
-        <button type="submit" className="bg-[#f96815] text-white px-5 py-2 rounded-[28px]">
-          Save Audiobook
+        <button disabled={isPending} type="submit" className="bg-[#f96815] text-white px-5 py-2 rounded-[28px] hover:bg-opacity-90 disabled:bg-opacity-50">
+          {isPending ? "Saving..." :"Save Audiobook"}
         </button>
       </div>
     </form>

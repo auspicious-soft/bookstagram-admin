@@ -19,7 +19,7 @@ interface Props {
 }
 const AllVouchers = ({vouchers, isLoading, error, mutate, total, page, itemsPerPage, handlePageChange}: Props) => {
   // const [page, setPage] = useState(1); 
-  // const itemsPerPage = 10;
+  // const itemsPerPage = 12;
   // const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   // const {data, error, isLoading, mutate} = useSWR(`/admin/vouchers`, getAllVouchers)
   // const vouchers = data?.data?.data;
