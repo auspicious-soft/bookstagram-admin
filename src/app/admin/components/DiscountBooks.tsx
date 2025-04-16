@@ -15,6 +15,7 @@ const DiscountBooks = ({data}: Props) => {
   }
   return (
     <div>
+        { (data === undefined || data.length === 0) &&  <p className="text-center text-gray-500">No data found.</p>}
        <div className='grid grid-cols-4 gap-6'>
             {data?.map((row: any) => (
             <BookCard 

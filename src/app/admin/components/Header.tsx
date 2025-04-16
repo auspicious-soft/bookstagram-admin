@@ -122,6 +122,7 @@ const Header: React.FC = () => {
   };
 
   const currentPageName = nameParam || getPageName(pathname);
+  console.log('currentPageName: ', currentPageName);
 
   return (
     <header className="flex justify-between items-center p-[15px] lg:px-[30px] lg:py-[23px] border-b border-[#D9CEC6] ">

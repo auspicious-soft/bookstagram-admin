@@ -21,7 +21,7 @@ const Page = () => {
   const [page, setPage] = useState(1); 
   const itemsPerPage = 12;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
-  const {data: discountData, isLoading: bookIsLoading, mutate: discMutate}= useSWR(bookSearch?`/admin/discounted-books?description=${bookSearch}$${query}&isDiscounted=true`:`/admin/discounted-books?${query}&isDiscounted=true`, getAllDiscountBooks)
+  const {data: discountData, isLoading: bookIsLoading, mutate: discMutate}= useSWR(bookSearch?`/admin/discounted-books?description=${bookSearch}&${query}&isDiscounted=true`:`/admin/discounted-books?${query}&isDiscounted=true`, getAllDiscountBooks)
   const bookData= discountData?.data?.data; 
   const {data, error, isLoading, mutate} = useSWR(voucherSearch? `/admin/vouchers?description=${voucherSearch}&${query}` : `/admin/vouchers?${query}`, getAllVouchers)
   const vouchersData = data?.data?.data;

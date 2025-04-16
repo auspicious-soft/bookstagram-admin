@@ -107,13 +107,13 @@ const AllSummary = () => {
           summary?.map((row: any) => (
             <CategoryCard
               key={row?._id}
-              name={row?.name.eng}
+              name={row?.name?.eng || row?.name?.kaz || row?.name?.rus }
               image={getImageClientS3URL(row?.image)}
-              onClick={() => handleSummary(row?._id, row?.name.eng)}
+              onClick={() => handleSummary(row?._id, row?.name?.eng || row?.name?.kaz || row?.name?.rus )}
             />
           ))
         ) : (
-          <p>No data found.</p>
+          <p className="text-center text-gray-500">No data found.</p>
         )}
       </div>
       <div className="mt-10 flex justify-end">

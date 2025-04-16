@@ -129,7 +129,7 @@ const Page = () => {
             />
           ))
         ) : (
-          <p>No data found.</p>
+          <p className="text-center text-gray-500">No data found.</p>
         )}
       </div>
       <div className="mt-10 flex justify-end">

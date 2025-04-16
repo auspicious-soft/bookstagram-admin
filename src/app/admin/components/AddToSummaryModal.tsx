@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useTransition } from "react";
 import Modal from "@mui/material/Modal";
 import Image from "next/image";
-import { toast } from "sonner"; 
+import { toast } from "sonner";
 import { PlusIcon, SelectSvg } from "@/utils/svgicons";
 import useSWR from "swr";
 import { addBookToSummary, getAllBooks } from "@/services/admin-services";
-import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL"; 
+import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 
 interface ModalProp {
   open: boolean;
@@ -16,25 +16,25 @@ interface ModalProp {
 
 const AddToSummaryModal: React.FC<ModalProp> = ({ open, onClose, mutate, id }) => {
   const [searchParams, setsearchParams] = useState("");
-  const [inputValue, setInputValue] = useState('');
-  const [percentage, setPercentage] = useState('');
+  const [inputValue, setInputValue] = useState("");
+  const [percentage, setPercentage] = useState("");
   const [selectedCourses, setSelectedCourses] = useState<number[]>([]);
   const [isPending, startTransition] = useTransition();
-  const {data, error, isLoading}= useSWR(`/admin/books?description=${searchParams}`, getAllBooks)
+  const { data, error, isLoading } = useSWR(`/admin/books?description=${searchParams}`, getAllBooks);
   const allBooks = data?.data?.data;
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setsearchParams(`${inputValue ? 'description=' :''}${inputValue.trim()}`);
+      setsearchParams(`${inputValue ? "description=" : ""}${inputValue.trim()}`);
     }, 500);
-  
+
     return () => {
       clearTimeout(handler);
     };
-  }, [inputValue, setsearchParams]);
+  }, [inputValue]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setsearchParams(event.target.value);
+    setInputValue(event.target.value); // Update inputValue for debouncing
   };
 
   const handleSelect = (id: number) => {
@@ -45,27 +45,26 @@ const AddToSummaryModal: React.FC<ModalProp> = ({ open, onClose, mutate, id }) =
 
   const addToSummaries = async () => {
     try {
-
       const payload = {
-        booksId: selectedCourses
+        booksId: selectedCourses,
       };
 
-     startTransition(async () => {
+      startTransition(async () => {
         const response = await addBookToSummary(`/admin/summaries/${id}/books`, payload);
 
-        if (response.status===200 ) {
+        if (response.status === 200) {
           toast.success("Books added to summary successfully");
           mutate();
           onClose();
           // Reset form
-          setPercentage('');
+          setPercentage("");
           setSelectedCourses([]);
         } else {
-          toast.error("Failed To add books to summary");
+          toast.error("Failed to add books to summary");
         }
       });
     } catch (error) {
-      console.error('Error adding books to summary:', error);
+      console.error("Error adding books to summary:", error);
       toast.error("An error occurred while adding books to summary");
     }
   };
@@ -81,8 +80,15 @@ const AddToSummaryModal: React.FC<ModalProp> = ({ open, onClose, mutate, id }) =
         <div className="max-h-[80vh] overflow-auto overflo-custom">
           <h2 className="text-[32px] text-darkBlack mb-5">Add To Summary</h2>
           <div className="main-form pb-5 border-dashed border-b border-[#d0d0d0] mb-5">
-            <label className="w-full">Search
-              <input type="search" name="" value={searchParams} onChange={handleInputChange} placeholder="Enter Name of the course" />
+            <label className="w-full">
+              Search
+              <input
+                type="search"
+                name=""
+                value={inputValue} // Bind to inputValue
+                onChange={handleInputChange}
+                placeholder="Enter Name of the course"
+              />
             </label>
           </div>
           <div className="grid grid-cols-4 gap-x-[15px] gap-y-5">
@@ -122,17 +128,25 @@ const AddToSummaryModal: React.FC<ModalProp> = ({ open, onClose, mutate, id }) =
             )}
           </div>
           <div className="mt-[30px] flex gap-2.5 justify-end">
-            <button onClick={addToSummaries}
-              className="flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px]"
-              disabled={isPending}><PlusIcon />Add To Summary</button>
+            <button
+              onClick={addToSummaries}
+              className="flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px] disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isPending || selectedCourses.length === 0} // Disable if no courses selected or pending
+            >
+              <PlusIcon />
+              Add To Summary
+            </button>
             <button
               onClick={onClose}
               className="rounded-[28px] border border-darkBlack py-2 px-5 text-sm"
-            >Cancel</button>
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>
     </Modal>
   );
 };
+
 export default AddToSummaryModal;

@@ -130,13 +130,16 @@ const AllCollections = () => {
         <SearchBar setQuery={setsearchParams} query={searchParams} />
          <div><Button text="Add A New collection" onClick={addCollection} /></div>
       </div>
+        {collections?.length===0  &&         <p className="text-center text-gray-500">No data found.</p>
+ }
        <div className='grid grid-cols-4 gap-6'>
           {collections?.map((row: any) => (
+
             <div key={row?._id} className='bg-white rounded-[20px] relative'>
-            <div onClick={()=>handleSubCollection(row?._id, row?.name.eng )} 
+            <div onClick={()=>handleSubCollection(row?._id, row?.name?.eng || row?.name?.kaz || row?.name?.rus  )} 
               className='text-center px-5 pt-[30px] pb-5 cursor-pointer '>
                 <Image unoptimized src={getImageClientS3URL(row?.image)} alt='dgv' width={122} height={122}  className='w-[122px] h-[122px] object-cover rounded-full mx-auto ' />
-                <p className='text-darkBlack text-[15px] leading-5 tracking-[-0.24px] mt-[23px] '>{row?.name.eng}</p>
+                <p className='text-darkBlack text-[15px] leading-5 tracking-[-0.24px] mt-[23px] '>{row?.name?.eng || row?.name?.kaz || row?.name?.rus }</p>
               </div>
                 <p onClick={() => updateCollection(row?._id)} className="flex gap-2.5 justify-center pt-1 pb-[30px] px-5 items-center text-sm">
                   <SelectSvg color={row?.displayOnMobile===true ? 'var(--tw-bg-orange)' : '#C1C1C1'} /> 

@@ -129,95 +129,102 @@ const Page = () => {
       }
   }
 
-  return (
-    <div className="h-full">
-      {subCategory?.length > 0 ? (
-        <>
-          <div className="flex gap-2.5 justify-end mb-5">
-            <SearchBar setQuery={setSearchParams} query={searchParams} />
-            <Button text="Add A Sub-Category" onClick={() => setIsAddModalOpen(true)} />
-          </div>
-          <div className="grid grid-cols-4 gap-6">
-            {subCategory?.map((row: any) => (
-              <CategoryCard
-                key={row?._id}
-                name={row?.name.eng}
-                image={getImageClientS3URL(row?.image)}
-                onClick={() => handleSubCategory(row?._id, row?.name?.eng)}
-              />
-            ))}
-          </div>
-          <div className="mt-10 flex justify-end">
-            <TablePagination
-              setPage={handlePageChange}
-              page={page}
-              totalData={subCategory.length}
-              itemsPerPage={itemsPerPage}
+return (
+  <div className="h-full">
+       <div className="flex gap-2.5 justify-end mb-5">
+           <SearchBar setQuery={setSearchParams} query={searchParams} />
+           {subCategory?.length > 0 && <Button text="Add A Sub-Category" onClick={() => setIsAddModalOpen(true)} />}
+           {booksData?.length > 0 && <Button text="Add A Book" onClick={() => setBookModal(true)} />}
+
+       </div>
+
+    {isLoading ? (
+      <p className="text-center text-gray-500">Loading...</p>
+    ) : subCategory?.length > 0 ? (
+      <>
+        {/* <div className="flex gap-2.5 justify-end mb-5">
+          <Button text="Add A Sub-Category" onClick={() => setIsAddModalOpen(true)} />
+        </div> */}
+        <div className="grid grid-cols-4 gap-6">
+          {subCategory?.map((row) => (
+            <CategoryCard
+              key={row?._id}
+              name={row?.name.eng}
+              image={getImageClientS3URL(row?.image)}
+              onClick={() => handleSubCategory(row?._id, row?.name?.eng)}
             />
-          </div>
-        </>
-      ) : booksData?.length > 0 ? (
-        <>
-          <div className="flex gap-2.5 justify-end mb-5">
-            <SearchBar setQuery={setSearchParams} query={searchParams} />
-            <Button text="Add A Book" onClick={() => setBookModal(true)} />
-          </div>
-          <div className="grid grid-cols-4 gap-6">
-            {booksData?.map((row: any) => (
-              <BookCard 
-              handleClick={()=>openBookProfile(row?._id, row?.name.eng)}
-               key={row?._id}
-               author={row?.authorId?.[0]?.name?.eng}
-               title={row?.name?.eng}
-               price={`$${row?.price}`}
-               imgSrc={getImageClientS3URL(row?.image)}
-             />
-            ))}
-          </div>
-          <div className="mt-10 flex justify-end">
-            <TablePagination
-              setPage={handlePageChange}
-              page={page}
-              totalData={booksData.length}
-              itemsPerPage={itemsPerPage}
+          ))}
+        </div>
+        <div className="mt-10 flex justify-end">
+          <TablePagination
+            setPage={handlePageChange}
+            page={page}
+            totalData={subCategory.length}
+            itemsPerPage={itemsPerPage}
+          />
+        </div>
+      </>
+    ) : booksData?.length > 0 ? (
+      <>
+        {/* <div className="flex gap-2.5 justify-end mb-5">
+          <Button text="Add A Book" onClick={() => setBookModal(true)} />
+        </div> */}
+        <div className="grid grid-cols-4 gap-6">
+          {booksData?.map((row) => (
+            <BookCard
+              handleClick={() => openBookProfile(row?._id, row?.name.eng)}
+              key={row?._id}
+              author={row?.authorId?.[0]?.name?.eng}
+              title={row?.name?.eng}
+              price={`$${row?.price}`}
+              imgSrc={getImageClientS3URL(row?.image)}
             />
-          </div>
-        </>
-      ) : (
-        <div className="h-full grid place-items-center">
-          <div className="text-center">
-            <Image src={cartoon} alt="cartoon" width={154} height={181} className="mx-auto" />
-            <h2 className="text-[32px] text-darkBlack mt-5 mb-2.5">No Books Found Here!</h2>
-            <p className="text-sm text-darkBlack mb-5">Add a book or a sub category.</p>
-            <div className='flex justify-center gap-[9px] '>
+          ))}
+        </div>
+        <div className="mt-10 flex justify-end">
+          <TablePagination
+            setPage={handlePageChange}
+            page={page}
+            totalData={booksData.length}
+            itemsPerPage={itemsPerPage}
+          />
+        </div>
+      </>
+    ) : (
+      <div className="h-full grid place-items-center">
+        <div className="text-center">
+          <Image src={cartoon} alt="cartoon" width={154} height={181} className="mx-auto" />
+          <h2 className="text-[32px] text-darkBlack mt-5 mb-2.5">No Books Found Here!</h2>
+          <p className="text-sm text-darkBlack mb-5">Add a book or a sub category.</p>
+          <div className="flex justify-center gap-[9px]">
             <Button text="Add a Sub-Category" onClick={() => setIsAddModalOpen(true)} />
             <Button text="Add A Book" onClick={() => setBookModal(true)} />
-            </div>
           </div>
         </div>
-      )}
+      </div>
+    )}
 
-      <AddCommonModal
-        open={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSubmit={handleAddSubmit}
-        buttonText="Create a Sub-Category"
-        image={subCatImg}
-        title="Add a Sub-Category"
-        labelname="Name of Sub-Category"
-      />
+    <AddCommonModal
+      open={isAddModalOpen}
+      onClose={() => setIsAddModalOpen(false)}
+      onSubmit={handleAddSubmit}
+      buttonText="Create a Sub-Category"
+      image={subCatImg}
+      title="Add a Sub-Category"
+      labelname="Name of Sub-Category"
+    />
 
     <AddToBookCommon
-        open={bookModal}
-        onClose={() => setBookModal(false)}
-        title="Add book to Category"
-        selectedBooks={selectedBooks}
-        onSelectBooks={setSelectedBooks}
-        handleSubmit={handleAddBookToCategory} 
-        isPending={isPending}    
-      />      
-    </div>
-  );
+      open={bookModal}
+      onClose={() => setBookModal(false)}
+      title="Add book to Category"
+      selectedBooks={selectedBooks}
+      onSelectBooks={setSelectedBooks}
+      handleSubmit={handleAddBookToCategory}
+      isPending={isPending}
+    />
+  </div>
+);
 };
 
 export default Page;

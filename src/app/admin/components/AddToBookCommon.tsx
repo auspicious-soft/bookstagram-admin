@@ -12,13 +12,13 @@ interface Props {
   title?: string;
   handleSubmit: () => void;
   isPending: any;
-  selectedBooks: string[];  // Changed to string[] to match _id type
+  selectedBooks: string[];
   onSelectBooks: (books: string[]) => void;
 }
 
 const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSelectBooks, selectedBooks }: Props) => {
   const [searchParams, setSearchParams] = useState("");
-  const { data, error, isLoading } = useSWR(`/admin/books?description=${searchParams}`, getAllBooks)
+  const { data, error, isLoading } = useSWR(`/admin/books?description=${searchParams}`, getAllBooks);
   const allBooks = data?.data?.data;
 
   const handleSelect = (id: string) => {
@@ -33,7 +33,6 @@ const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSele
     setSearchParams(event.target.value);
   };
 
-
   return (
     <Modal
       open={open}
@@ -45,11 +44,18 @@ const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSele
         <div className="max-h-[80vh] flex flex-col">
           <h2 className="text-[32px] text-darkBlack mb-5">{title}</h2>
           <div className="main-form">
-            <label className="w-full">Search
-              <input type="search" name="" value={searchParams} onChange={handleInputChange} placeholder="Enter Name of the course" />
+            <label className="w-full">
+              Search
+              <input
+                type="search"
+                name=""
+                value={searchParams}
+                onChange={handleInputChange}
+                placeholder="Enter Name of the course"
+              />
             </label>
           </div>
-          <div className="flex-1 mt-5 pt-5 grid grid-cols-4 gap-5 border-t  border-[#D0D0D0] overflow-auto overflo-custom">
+          <div className="flex-1 mt-5 pt-5 grid grid-cols-4 gap-5 border-t border-[#D0D0D0] overflow-auto overflo-custom">
             {allBooks?.map((data: any) => (
               <CourseCard
                 key={data?._id}
@@ -63,11 +69,12 @@ const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSele
           <div className="mt-5 flex gap-2.5 justify-end border-t border-[#D0D0D0] pt-5">
             <button
               onClick={handleSubmit}
-              type='submit'
+              type="submit"
               className="flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px] hover:bg-opacity-90 transition-all disabled:opacity-50"
-              disabled={isPending}
+              disabled={isPending || selectedBooks.length === 0}
             >
-              <PlusIcon />{title}
+              <PlusIcon />
+              {title}
             </button>
             <button
               onClick={onClose}
@@ -80,6 +87,6 @@ const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSele
       </div>
     </Modal>
   );
-}
+};
 
 export default AddToBookCommon;

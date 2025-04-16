@@ -131,7 +131,7 @@ const BookMarket = () => {
           ) : error ? (
             <p className="text-red-500">Error loading data.</p>
           ) : booksdata?.length === 0 ? (
-            <p>No data found.</p>
+            <p className="text-center text-gray-500">No data found.</p>
           ) : (
             <div className="grid grid-cols-4 gap-6">
               {booksdata?.map((book: any) => (
