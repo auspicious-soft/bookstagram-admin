@@ -8,7 +8,7 @@ interface ButtonProps {
 const Button:React.FC<ButtonProps> = ({text, onClick}) => {
     return (
        <button onClick={onClick}
-        className="flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px] ">
+        className="flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px] disabled:opacity-50 ">
         <PlusIcon /> {text}
         </button>
     );

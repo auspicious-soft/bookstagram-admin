@@ -212,6 +212,7 @@ return (
       image={subCatImg}
       title="Add a Sub-Category"
       labelname="Name of Sub-Category"
+      disabled={isPending}
     />
 
     <AddToBookCommon

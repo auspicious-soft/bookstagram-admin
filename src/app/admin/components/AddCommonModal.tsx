@@ -32,6 +32,7 @@ interface ModalProps {
   title: string;
   image: string | StaticImageData;
   labelname: string;
+  disabled?: boolean;
 }
 
 const AddCommonModal: React.FC<ModalProps> = ({
@@ -42,6 +43,7 @@ const AddCommonModal: React.FC<ModalProps> = ({
   title,
   image,
   labelname,
+  disabled
 }) => {
   const [previewImage, setPreviewImage] = useState<string>();
   const [usedDescLanguages, setUsedDescLanguages] = useState<Set<Language>>(new Set());
@@ -95,7 +97,7 @@ const AddCommonModal: React.FC<ModalProps> = ({
   };
 
   // Determine if the submit button should be disabled
-  const isSubmitDisabled = !isValid || !imageValue;
+  const isSubmitDisabled = !isValid || !imageValue || disabled;
 
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="child-modal-title" className="grid place-items-center">

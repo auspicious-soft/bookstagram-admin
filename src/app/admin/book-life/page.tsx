@@ -43,7 +43,9 @@ const Page = () => {
     setIsAddModalOpen(true);
   };
 
-  const openBookLife = (id: string) => {
+  const openBookLife = (id: string, name:string) => {
+    localStorage.setItem("bookLife", name);
+
     router.push(`/admin/book-life/${id}`) 
   };
 
@@ -115,16 +117,16 @@ const Page = () => {
     <div>
       <div className="flex gap-2.5 justify-end mb-5 ">
         <SearchBar setQuery={setsearchParams} query={searchParams} />
-        <div><Button text="Add A New Category" onClick={addNewSummary} /></div>
+        <div><Button text="Add A New Category"  onClick={addNewSummary} /></div>
       </div>
       <div className='grid grid-cols-4 gap-6'>
         {bookLife?.length > 0 ? (
           bookLife?.map((row: any) => (
             <CategoryCard
               key={row?._id}
-              name={row?.name.eng}
+              name={row.name.eng || row.name.kaz || row.name.rus}
               image={getImageClientS3URL(row?.image)}
-              onClick={() => openBookLife(row?._id)}
+              onClick={() => openBookLife(row?._id,row.name.eng || row.name.kaz || row.name.rus )}
               handleDelete={()=>deleteBookLives(row?._id)}
             />
           ))
@@ -148,6 +150,7 @@ const Page = () => {
         image={sumImg}
         title="Add a Book Life"
         labelname="Name of Book Life"
+        disabled={isPending}
       />
     </div>
   );

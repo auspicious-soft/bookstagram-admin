@@ -164,6 +164,7 @@ const AllCollections = () => {
         image={bookImg}
         title="Add a Collection"
         labelname="Name of Collection"
+        disabled={isPending}
       />
     </div>
   );

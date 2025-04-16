@@ -15,6 +15,7 @@ const Header: React.FC = () => {
   const [collections, setCollections] = useState("") 
   const [bookName, setBookName] = useState("");
   const [summary, setSummary] = useState("");
+  const [bookLife, setBookLife] = useState("");
   const {data} = useSession();  
   const name = (data as any)?.user?.fullName;
   // Add ref to track the dropdown element
@@ -26,6 +27,7 @@ const Header: React.FC = () => {
       setCollections(localStorage.getItem("collectionName") || "");
       setBookName(localStorage.getItem("getbookName") || "");
       setSummary(localStorage.getItem("summaryName") || "");
+      setBookLife(localStorage.getItem("bookLife") || "");
     }
   }, [pathname]);
 
@@ -68,7 +70,6 @@ const Header: React.FC = () => {
     "/admin/promotions/add-new-banner": "Add New Banner",
     "/admin/add-new": "Add New Book",
   };
-
   const getPageName = (path: string): string => {
     if (path.startsWith("/admin/categories/") && path.endsWith("/sub-category")) {
       return "Sub-Categories";
@@ -117,6 +118,13 @@ const Header: React.FC = () => {
     }
     if (path.startsWith("/admin/book-events/")) {
       return `Single Event`;
+    }
+   
+    if (/^\/admin\/book-life\/[a-zA-Z0-9]+$/.test(path)) {
+      return bookLife;
+    }
+    if (path === "/admin/book-life") {
+      return `Book Life`;
     }
     return pageNames[path] || "Bookstagram";
   };

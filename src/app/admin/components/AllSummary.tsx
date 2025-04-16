@@ -132,6 +132,7 @@ const AllSummary = () => {
         image={sumImg}
         title="Add a Summary"
         labelname="Name of Summary"
+        disabled={isPending}
       />
     </div>
   );
