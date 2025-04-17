@@ -14,7 +14,6 @@ const Dashboard = () => {
 const [overview, setOverview] = useState<string>("7");
 const [user, setUser] = useState<string>("7");
 const {data, error, mutate, isLoading} = useSWR(`/admin/dashboard?overviewDuration=${overview}&usersDuration=${user}`, getDashboardStats)
-console.log('data: ', data);
 const overviewData= data?.data?.data  
 const router = useRouter();
 

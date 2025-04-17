@@ -68,8 +68,6 @@ const AudiobookForm = () => {
               { timestamps: timestampsEncoded }
             );
 
-            console.log(`Signed URL for ${lang.language}:`, signedUrl);
-
             await fetch(signedUrl, {
               method: "PUT",
               body: file,
@@ -94,8 +92,6 @@ const AudiobookForm = () => {
           file: fileTransforms,
         };
 
-        console.log("Mapped Files to Languages (fileTransforms):", fileTransforms);
-        console.log("Final Payload:", finalPayload);
 
         const response = await addNewBook("/admin/books", finalPayload);
         if (response?.status === 201 || response?.status === 200) {

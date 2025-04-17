@@ -102,7 +102,6 @@ const AudiobookForm = () => {
           ? metadatas[lang]
           : [{ id: Date.now().toString(), chapterName: "", startTime: "00:00:00", endTime: "00:00:00" }],
       }));
-      console.log("Initializing form with languages:", languages); // Debug log
       reset({ languages });
       setIsFormInitialized(true);
     }
@@ -151,7 +150,6 @@ const AudiobookForm = () => {
 
         const uploadedFiles = await Promise.all(filePromises);
         const fileTransforms = uploadedFiles.reduce((acc, curr) => ({ ...acc, [curr.language]: curr.fileUrl }), {});
-        console.log('fileTransforms: ', fileTransforms);
 
         const finalPayload = { ...formData, file: fileTransforms };
         const response = await updateSingleBook(`/admin/books/${id}`, finalPayload);

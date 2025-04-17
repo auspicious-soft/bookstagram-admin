@@ -40,8 +40,6 @@ const AddBookEvent = () => {
       };
       try {
         await submitForm(formData, router);
-        // Optionally redirect or show success message after successful submission
-        console.log("Form submitted successfully");
       } catch (error) {
         console.error("Form submission failed:", error);
         // Handle error (e.g., show error message to user)

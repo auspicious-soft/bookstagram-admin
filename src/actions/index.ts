@@ -207,7 +207,6 @@ export const generateSignedUrlBooks = async (fileName: string, fileType: string,
 // };
 
 export const generateSignedUrlAudioBookFile = async (fileName: string, fileType: string, name: any, language: string, metadata: { timestamps: string }) => {
-	console.log("metadata: ", metadata);
 	const fileKey = `books/${name}/files/${language}/${fileName}`;
 	const uploadParams = {
 		Bucket: process.env.AWS_BUCKET_NAME!,
@@ -245,44 +244,12 @@ export const updateS3ObjectMetadata = async (fileKey: string, metadata: { timest
 		const s3Client = new S3Client({ region: AWS_REGION });
 		const response = await s3Client.send(command);
 
-		console.log("Metadata updated successfully:", response);
 		return response;
 	} catch (error) {
 		console.error("Error updating metadata:", error);
 		throw error;
 	}
 };
-
-// export const updateS3ObjectMetadata = async (
-//   fileKey: string,
-//   metadata: { timestamps: string }
-// ) => {
-//   try {
-//     console.log('Updating metadata for:', fileKey);
-//     console.log('New metadata:', metadata);
-
-//     const updateParams = {
-//       Bucket: process.env.AWS_BUCKET_NAME!, // Ensure this env variable is set
-//       Key: fileKey,                        // e.g., books/Herrod Little/files/eng/Rectangle 588.png
-//       CopySource: `/${process.env.AWS_BUCKET_NAME}/${fileKey}`, // Source is the same as destination
-//       Metadata: {
-//         timestamps: metadata.timestamps,   // New metadata to apply
-//       },
-//       MetadataDirective: MetadataDirective.REPLACE,        // Replace existing metadata
-//     };
-
-//     const command = new CopyObjectCommand(updateParams);
-//     const s3Client = new S3Client({ region: AWS_REGION });
-// const response = await s3Client.send(command);
-//     // const response = await createS3Client().send(command);
-
-//     console.log('Metadata updated successfully:', response);
-//     return response;
-//   } catch (error) {
-//     console.error('Error updating metadata:', error);
-//     throw error;
-//   }
-// };
 
 export const generateSignedUrlBookFiles = async (fileName: string, fileType: string, name: string, language: string) => {
 	const uploadParams = {
@@ -432,7 +399,6 @@ export const deleteFileFromS3 = async (imageKey: string) => {
 };
 
 export const getFileWithMetadata = async (fileKey: string) => {
-	console.log("fileKey: ", fileKey);
 	if (!fileKey) {
 		throw new Error("fileKey is required");
 	}

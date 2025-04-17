@@ -358,7 +358,6 @@ const CourseForm = () => {
     if (hasMappedLessons && languageToRemove && productId) {
       try {
         const response = await deleteSingleCourselanguage(`admin/course-lessons/${productId}/language?lang=${languageToRemove}`);
-        console.log('response: ', response);
         if (response?.status === 200) {
           toast.success(`Lessons for language ${languageToRemove.toUpperCase()} removed successfully`);
         } else {
@@ -499,7 +498,6 @@ const LessonFieldArray = ({ nestIndex, control, register, watch, setValue, error
   const handleDeleteLesson = async (id) => {
     if (id !== "") {
       const response = await deleteSingleCourseLesson(`admin/course-lessons/${id}`);
-      console.log("response: ", response);
     }
   };
 
@@ -608,7 +606,6 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
 
   const handleDeleteSubLesson = async ({ lessonId, subLessonId }) => {
     const response = await deleteSingleCourseSubLesson(`admin/course-lessons/${lessonId}/sub-lesson/${subLessonId}`);
-    console.log("response: ", response);
   };
 
   const handleAddSubLesson = () => {

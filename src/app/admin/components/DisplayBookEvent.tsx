@@ -33,7 +33,6 @@ const DisplayBookEvent = () => {
     startTransition(async () => {
       try {
         const response = await DeleteBookEvent(route);
-        console.log('response: ', response);
         if (response.status === 200) {
           toast.success("Book Event Deleted successfully");
           router.push("/admin/book-events");
