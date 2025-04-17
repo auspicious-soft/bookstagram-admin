@@ -1,73 +1,55 @@
 "use client";
 
-import React, { useState, useCallback,useEffect } from "react";
+import React, { useState, useCallback, useEffect, useTransition } from "react";
 import { toast } from "sonner";
-// import { DeleteIcon } from "@/utils/svgicons";
+import { DeleteIcon } from "@/utils/svgicons";
 import useSWR from "swr";
-import { getBookEvents,DeleteBookEvent,updateBookEvent } from "@/services/admin-services";
-import { useParams } from 'next/navigation'
+import { getBookEvents, DeleteBookEvent, updateBookEvent } from "@/services/admin-services";
+import { useParams } from "next/navigation";
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { DeleteIcon } from "@/utils/svgicons";
 
 const DisplayBookEvent = () => {
-  const Params = useParams()
-  const router = useRouter()
-  const eventId = Params.id;
+  const params = useParams();
+  const router = useRouter();
+  const eventId = params.id;
   const route = `/admin/events/${eventId}`;
 
-  const { data , error, isLoading, mutate } = useSWR(route, getBookEvents);
+  const { data, error, isLoading, mutate } = useSWR(route, getBookEvents);
   const eventImage = data?.data?.image;
   const eventName = data?.data?.name;
-  const description= data?.data?.description
+  const description = data?.data?.description;
 
   const [imagePreview, setImagePreview] = useState<string | null>("");
+  const [isPending, startTransition] = useTransition();
+
   const preprocessHTMLContent = (html: string) => {
-    const updatedHTML = html?.replace(
-      /stroke-([a-z])/g,
-      (match, p1) => `stroke${p1.toUpperCase()}`
-    );
+    const updatedHTML = html?.replace(/stroke-([a-z])/g, (match, p1) => `stroke${p1.toUpperCase()}`);
     return updatedHTML;
   };
 
+  const handleDelete = () => {
+    startTransition(async () => {
+      try {
+        const response = await DeleteBookEvent(route);
+        console.log('response: ', response);
+        if (response.status === 200) {
+          toast.success("Book Event Deleted successfully");
+          router.push("/admin/book-events");
+        } else {
+          toast.error("Failed to delete Book Event");
+        }
+      } catch (error) {
+        console.error("Error deleting Book Event:", error);
+        toast.error("An error occurred while deleting the Book Event");
+      }
+      // Revalidate data after deletion (though router.push might suffice)
+      mutate();
+    });
+  };
 
-const handleDelete = async () => {
-  try {
-    const response = await DeleteBookEvent(route); 
-    if (response.status === 200) {
-      toast.success("Book Event Deleted successfully");
-      router.push('/admin/book-events');
-
-    } else {
-      toast.error("Failed to delete Book Event");
-    }
-  } catch (error) {
-    console.error("Error deleting Book Event:", error);
-    toast.error("An error occurred while deleting the Book Event");
-  }
  
-  mutate()
-};
-const handleUpload = async () => {
-  try {
-    const image = imagePreview;
-    const response = await updateBookEvent(route,image); 
-    if (response.status === 200) {
-      toast.success("Book Event Deleted successfully");
-      router.push('/admin/book-events');
-
-    } else {
-      toast.error("Failed to delete Book Event");
-    }
-  } catch (error) {
-    console.error("Error deleting Book Event:", error);
-    toast.error("An error occurred while deleting the Book Event");
-  }
- 
-  mutate()
-};
-  const safeHTML = preprocessHTMLContent(description);
   const handleImageUpload = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
@@ -82,33 +64,37 @@ const handleUpload = async () => {
     []
   );
 
+  const safeHTML = preprocessHTMLContent(description);
+
   return (
     <div>
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-6">
         <div className="w-full md:w-80">
           <div className="bg-white rounded-[20px] p-4 shadow-sm">
-            <div className="aspect-square bg-gray-100 rounded-[20px]  flex items-center justify-center">
-              {  imagePreview ==="" && eventImage && (
-                <Image unoptimized
-                  src={getImageClientS3URL(eventImage)  }
+            <div className="aspect-square bg-gray-100 rounded-[20px] flex items-center justify-center">
+              {imagePreview === "" && eventImage && (
+                <Image
+                  unoptimized
+                  src={getImageClientS3URL(eventImage)}
                   alt={eventName}
-                  className="w-full h-full object-cover round-[10px]"
-                  style={{borderRadius:"20px"}}
+                  className="w-full h-full object-cover rounded-[10px]"
+                  style={{ borderRadius: "20px" }}
                   width={340}
                   height={340}
                 />
-              ) }
-               { imagePreview !=="" && (
-                <Image unoptimized
-                  src={ imagePreview }
+              )}
+              {imagePreview !== "" && (
+                <Image
+                  unoptimized
+                  src={imagePreview}
                   alt={"Preview"}
-                  className="w-full h-full object-cover round-[10px]"
-                  style={{borderRadius:"20px"}}
+                  className="w-full h-full object-cover rounded-[10px]"
+                  style={{ borderRadius: "20px" }}
                   width={340}
                   height={340}
                 />
-              )} 
-              {!eventImage && imagePreview ==="" &&(
+              )}
+              {!eventImage && imagePreview === "" && (
                 <div className="text-gray-400">
                   <svg
                     className="w-12 h-12"
@@ -126,42 +112,41 @@ const handleUpload = async () => {
                 </div>
               )}
             </div>
-            {/* <label className="w-full">
+            <label className="w-full mt-4">
               <input
                 type="file"
                 className="hidden"
                 accept="image/*"
                 onChange={handleImageUpload}
-              />
-              <div className="bg-[#F96915] text-[14px] text-white text-center py-3 rounded-[28px] cursor-pointer hover:bg-[#F96915] transition-colors flex items-center justify-center gap-2">
-                Upload Image
-              </div>
-            </label> */}
+              />        
+            </label>
           </div>
         </div>
 
         {/* Right Column - Content */}
         <div className="flex-1">
-          <div className="w-full text-[14px] text-white text-center flex items-center justify-end gap-2 mb-[10px] ">
+          <div className="w-full text-[14px] text-white text-center flex items-center justify-end gap-2 mb-[10px]">
             <div className="bg-[#FF0004] rounded-[28px] w-[211px] flex items-center justify-center cursor-pointer">
-              <button className="flex items-center justify-end gap-2  py-[16px] " onClick={()=> handleDelete()}>
-                <DeleteIcon stroke="#fff"/>
-                <h6 className="text-[14px] font-medium">Delete Event</h6>
+              <button
+                className="flex items-center justify-end gap-2 py-[16px]"
+                onClick={handleDelete}
+                disabled={isPending}
+              >
+                <DeleteIcon stroke="#fff" />
+                <h6 className="text-[14px] font-medium">
+                  {isPending ? "Deleting..." : "Delete Event"}
+                </h6>
               </button>
             </div>
           </div>
           <div className="bg-white rounded-[20px] p-6 shadow-sm">
             {/* Event Name */}
             <div className="mb-6">
-              <h1 className="text-2xl font-semibold text-gray-900">
-                {data?.data?.name}
-              </h1>
+              <h1 className="text-2xl font-semibold text-gray-900">{eventName}</h1>
             </div>
 
-            {/* Lorem Ipsum Sections */}
-            {/* {Array.from({ length: 5 }).map((_, index) => ( */}
+            {/* Description */}
             <div dangerouslySetInnerHTML={{ __html: safeHTML }} />
-            {/* ))} */}
           </div>
         </div>
       </div>

@@ -75,7 +75,7 @@ const AllAuthorsTable = () => {
                   <TableRowImage image={row?.image ? getImageClientS3URL(row?.image) : profile}/> {row?.name.eng} 
                     </div></td>
                   <td className="capitalize"> {row?.profession.join(", ")}</td>
-                  <td>{row?.dob}</td>
+                  <td>{new Date(row?.dob).toLocaleDateString()}</td>
                   <td>{row?.country}</td>
                   <td className="space-x-2">
                     {row?.genres.map((item, index) => (

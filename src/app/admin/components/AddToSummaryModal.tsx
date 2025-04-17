@@ -124,7 +124,7 @@ const AddToSummaryModal: React.FC<ModalProp> = ({ open, onClose, mutate, id }) =
                 </div>
               ))
             ) : (
-              <p>No data found</p>
+              <p className="text-center text-gray-500">No data found.</p>
             )}
           </div>
           <div className="mt-[30px] flex gap-2.5 justify-end">

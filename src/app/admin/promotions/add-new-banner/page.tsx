@@ -42,23 +42,21 @@ const Page = () => {
       link: "",
     },
   });
-  
+
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
     setValue,
     getValues,
     watch,
-  } = useForm<FormValues>({
-    resolver: yupResolver(validationSchema) as any,
-    defaultValues: {
-      translations: [{ language: "eng", name: "" }],
-      link: "",
-    },
-  });
+  } = methods;
 
   const translations = watch("translations");
+  const link = watch("link");
+
+  // Check if all required fields are filled (image is not required)
+  const isFormComplete = isValid && translations.every(t => t.name.trim() !== "") && link.trim() !== "";
 
   const triggerFileInputClick = () => {
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -98,10 +96,10 @@ const Page = () => {
   const removeTranslation = (index: number) => {
     const currentTranslations = getValues("translations");
     const languageToRemove = currentTranslations[index].language;
-    
+
     const newTranslations = currentTranslations.filter((_, i) => i !== index);
     setValue("translations", newTranslations);
-    
+
     setUsedLanguages((prev) => {
       const updated = new Set(prev);
       updated.delete(languageToRemove);
@@ -115,10 +113,8 @@ const Page = () => {
         let imageKey = null;
         const timestamp = Date.now();
         if (imageFile) {
-
           const { signedUrl, key } = await generateSignedUrlForBanners(
             `${timestamp}-${imageFile.name}`,
-            // imageFile.name,
             imageFile.type
           );
 
@@ -146,14 +142,14 @@ const Page = () => {
         const payload = {
           name: nameObject,
           image: imageKey,
-          link: data.link
+          link: data.link,
         };
 
         const response = await addNewBaner("/admin/banners", payload);
 
         if (response?.status === 201) {
           toast.success("Banner added successfully");
-          window.location.href = "/admin/promotions"
+          window.location.href = "/admin/promotions";
         } else {
           toast.error("Failed to add banner");
         }
@@ -167,136 +163,144 @@ const Page = () => {
     });
   };
 
-  return ( 
-      <div className="bg-white p-5 rounded-[20px]">
-        <div className="main-form bg-white p-[30px] rounded-[20px]">
+  return (
+    <div className="bg-white p-5 rounded-[20px]">
+      <div className="main-form bg-white p-[30px] rounded-[20px]">
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)} className="form-box">
             <div className="">
               {translations.map((_, index) => (
                 <div key={index} className="mb-3">
                   <p className="mb-1 text-sm text-darkBlack">Name/Title of the banner</p>
-                    <div className="flex items-center gap-[5px] w-full">
-                      <label className="!flex bg-[#F5F5F5] rounded-[10px] w-full">
-                        <select
-                            {...register(`translations.${index}.language`)}
-                            className="!mt-0 max-w-[80px] !bg-[#D9D9D9]"
-                          >
-                            <option value="eng">Eng</option>
-                            <option value="kaz">Kaz</option>
-                            <option value="rus">Rus</option>
-                          </select>
-                          <input
-                            type="text"
-                            {...register(`translations.${index}.name`)}
-                            placeholder="Enter name"
-                            className="!mt-0 flex-1"
-                          />
-                        </label>
-                        {index === 0 ? (
-                          <button
-                            type="button"
-                            onClick={addTranslation}
-                            disabled={usedLanguages.size >= 3}
-                            className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm"
-                          >
-                            Add
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => removeTranslation(index)}
-                            className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm"
-                          >
-                            Remove
-                          </button>
-                        )}
-                      </div>
-                      {errors.translations?.[index]?.name && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {errors.translations[index]?.name?.message}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-            <div className="mt-10 max-w-[536px] ">
-            <div className="custom relative mb-5">
-                {imagePreview ? (
-                  <div className="relative">
-                    <Image
-                      unoptimized
-                      src={imagePreview}
-                      alt="Preview"
-                      width={340}
-                      height={340}
-                      className="rounded-[10px] w-full h-full object-cover"
-                    />
+                  <div className="flex items-center gap-[5px] w-full">
+                    <label className="!flex bg-[#F5F5F5] rounded-[10px] w-full">
+                      <select
+                        {...register(`translations.${index}.language`)}
+                        className="!mt-0 max-w-[80px] !bg-[#D9D9D9]"
+                      >
+                        <option value="eng">Eng</option>
+                        <option value="kaz">Kaz</option>
+                        <option value="rus">Rus</option>
+                      </select>
+                      <input
+                        type="text"
+                        {...register(`translations.${index}.name`)}
+                        placeholder="Enter name"
+                        className="!mt-0 flex-1"
+                      />
+                    </label>
+                    {index === 0 ? (
+                      <button
+                        type="button"
+                        onClick={addTranslation}
+                        disabled={usedLanguages.size >= 3}
+                        className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm"
+                      >
+                        Add
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => removeTranslation(index)}
+                        className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm"
+                      >
+                        Remove
+                      </button>
+                    )}
                   </div>
-                ) : (
-                  <div className="grid place-items-center">
-                    <Image
-                      unoptimized
-                      src={preview}
-                      alt="upload"
-                      width={340}
-                      height={340}
-                      className="rounded-[10px] w-full"
-                    />
-                  </div>
-                )}
-                <div className="relative mt-5">
-                  <input
-                    className="absolute top-0 left-0 h-full w-full opacity-0 p-0 cursor-pointer"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                  />
-                  {imagePreview ? (
-                    <button
-                      type="button"
-                      onClick={triggerFileInputClick}
-                      className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] w-full"
-                    >
-                      Edit
-                    </button>
-                  ) : (
-                    <p
-                      className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] cursor-pointer"
-                      onClick={triggerFileInputClick}
-                    >
-                      Upload Image
+                  {errors.translations?.[index]?.name && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.translations[index]?.name?.message}
                     </p>
                   )}
                 </div>
-              </div>
-                  <label>
-                    Link
+              ))}
+              <div className="mt-10 max-w-[536px]">
+                <div className="custom relative mb-5">
+                  {imagePreview ? (
+                    <div className="relative">
+                      <Image
+                        unoptimized
+                        src={imagePreview}
+                        alt="Preview"
+                        width={340}
+                        height={340}
+                        className="rounded-[10px] w-full h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="grid place-items-center">
+                      <Image
+                        unoptimized
+                        src={preview}
+                        alt="upload"
+                        width={340}
+                        height={340}
+                        className="rounded-[10px] w-full"
+                      />
+                    </div>
+                  )}
+                  <div className="relative mt-5">
                     <input
-                      type="text"
-                      {...register("link")}
-                      placeholder="https://example.com"
-                      className="w-full"
+                      className="absolute top-0 left-0 h-full w-full opacity-0 p-0 cursor-pointer"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
                     />
-                    {errors.link && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.link.message}
+                    {imagePreview ? (
+                      <button
+                        type="button"
+                        onClick={triggerFileInputClick}
+                        className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] w-full"
+                      >
+                        Edit
+                      </button>
+                    ) : (
+                      <p
+                        className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] cursor-pointer"
+                        onClick={triggerFileInputClick}
+                      >
+                        Upload Image
                       </p>
                     )}
-                  </label>
-
-                  <div>
-                    <button
-                      type="submit"
-                      disabled={isPending}
-                      className="bg-orange text-white text-sm px-4 mt-10 py-[14px] text-center rounded-[28px] w-full"
-                    >Add New Banner</button>
-                    </div>
                   </div>
                 </div>
-            </form>
-        </FormProvider>
+                <label>
+                  Link
+                  <input
+                    type="text"
+                    {...register("link")}
+                    placeholder="https://example.com"
+                    className="w-full"
+                  />
+                  {errors.link && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.link.message}
+                    </p>
+                  )}
+                </label>
+
+                <div>
+                  <button
+                    type="submit"
+                    disabled={isPending || !isFormComplete}
+                    className={`bg-orange text-white text-sm px-4 mt-10 py-[14px] text-center rounded-[28px] w-full flex items-center justify-center gap-2 ${
+                      isPending || !isFormComplete ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                  >
+                    {isPending ? (                     
+                        "Adding..."
+                    ) : (
+                      "Add New Banner"
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
-          </div> 
+          </form>
+        </FormProvider>
+      </div>
+    </div>
   );
 };
 

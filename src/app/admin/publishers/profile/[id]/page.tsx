@@ -80,6 +80,7 @@ const Page = () => {
     new Set(["eng"])
   );
   const [isFormInitialized, setIsFormInitialized] = useState(false);
+  const [isPasswordModified, setIsPasswordModified] = useState(false);
 
   const methods = useForm<FormValues>({
     resolver: yupResolver(validationSchema) as any,
@@ -180,10 +181,10 @@ const Page = () => {
     setValue("categoryId", selectedOptions || [], { shouldValidate: true });
   };
 
-  const openBookProfile =(id: string, name: string) => {
+  const openBookProfile = (id: string, name: string) => {
     localStorage.setItem("getbookName", name);
-    router.push(`/admin/books/${id}`)
-  }
+    router.push(`/admin/books/${id}`);
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -260,6 +261,7 @@ const Page = () => {
         if (response?.status === 200) {
           toast.success("Publisher details updated successfully");
           mutate();
+          setIsPasswordModified(false); // Reset password modification state
         } else {
           toast.error("Failed to update publisher");
         }
@@ -268,6 +270,15 @@ const Page = () => {
         toast.error("An error occurred while updating the publisher");
       }
     });
+  };
+
+  // Watch the password field to detect changes
+  const passwordValue = watch("password");
+
+  // Handle password input change
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsPasswordModified(true);
+    setValue("password", e.target.value, { shouldValidate: true });
   };
 
   return (
@@ -407,8 +418,9 @@ const Page = () => {
                       Password
                       <input
                         type="text"
-                        {...register("password")}
-                        placeholder="***"
+                        value={isPasswordModified ? passwordValue : "******"}
+                        onChange={handlePasswordChange}
+                        placeholder="******"
                       />
                       {errors.password && (
                         <span className="text-red-500 text-sm">
@@ -453,7 +465,7 @@ const Page = () => {
                       {errors.country.message}
                     </span>
                   )}
-                </label>
+                </label>                     
                 {descriptionFields.map((field, index) => (
                   <div key={field.id}>
                     <div className="flex items-start gap-[5px] w-full">
@@ -545,7 +557,7 @@ const Page = () => {
             bookData?.map((data: any) => (
               <BookCard
                 key={data?._id}
-                handleClick={()=>openBookProfile(data?._id, data?.name.eng)}
+                handleClick={() => openBookProfile(data?._id, data?.name.eng)}
                 title={data?.name?.eng}
                 price={`$${data?.price}`}
                 imgSrc={getImageClientS3URL(data?.image)}
