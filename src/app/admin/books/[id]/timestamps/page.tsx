@@ -310,7 +310,7 @@ const TimestampsFieldArray = ({ control, langIndex, register }) => {
   return (
     <>
       {fields.map((field, index) => (
-        <div key={field.id} className="w-full flex flex-col gap-1 mb-4 w-full">
+        <div key={field.id} className="w-full flex flex-col gap-1 mb-4">
           <div className="flex flex-wrap items-center justify-between md:flex-nowrap">
             {["Name of Chapter", "Start Time", "End Time"].map((label, i) => (
               <div key={i} className="flex-1 min-w-[120px] max-w-[33%] md:max-w-[30%]">

@@ -45,7 +45,6 @@ const validationSchema = yup.object({
       content: yup.string().required('Description is required')
     })
   ),
-  // fullName: yup.object().required(),
   profession: yup.array().min(1, 'At least one profession is required'),
   country: yup.string().required('Country is required'),
   dob: yup.string().required('Date of birth is required'),
@@ -163,16 +162,26 @@ const Page = () => {
           imageUrl = key;
         }
 
-        // Transform translations arrays to objects
-        const nameTransforms = data.translations.reduce((acc, curr) => ({
-          ...acc,
-          [curr.language]: curr.name
-        }), {});
+        // Define all languages and set undefined ones to null
+        const allLanguages: Language[] = ["eng", "kaz", "rus"];
+        
+        // Transform translations arrays to objects, including all languages
+        const nameTransforms = allLanguages.reduce((acc, lang) => {
+          const translation = data.translations.find(t => t.language === lang);
+          return {
+            ...acc,
+            [lang]: translation ? translation.name : null
+          };
+        }, {});
 
-        const descriptionTransforms = data.descriptionTranslations.reduce((acc, curr) => ({
-          ...acc,
-          [curr.language]: curr.content
-        }), {});
+        // Transform description translations arrays to objects, including all languages
+        const descriptionTransforms = allLanguages.reduce((acc, lang) => {
+          const descTranslation = data.descriptionTranslations.find(t => t.language === lang);
+          return {
+            ...acc,
+            [lang]: descTranslation ? descTranslation.content : null
+          };
+        }, {});
 
         const { translations, descriptionTranslations, ...filteredData } = data;
         const payload = {
@@ -181,7 +190,6 @@ const Page = () => {
           description: descriptionTransforms,
           image: imageUrl,
         };
-        
         
         const response = await addNewAuthor("/admin/authors", payload);
         

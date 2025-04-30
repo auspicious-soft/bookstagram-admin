@@ -113,12 +113,15 @@ const EditStoryModal = ({open, onClose, data}: Props) => {
   useEffect(() => {
     if (data && open && !isInitialized.current) {
       try {
-        // Initialize translations
-        const initialTranslations = Object.entries(data.name).map(([lang, value]) => ({
-          language: lang as Language,
-          name: value as string,
-        }));
-        
+        // Initialize translations with only languages that have non-null values, setting missing ones to empty string
+        const allLanguages: Language[] = ["eng", "kaz", "rus"];
+        const initialTranslations = allLanguages
+          .filter(lang => data.name[lang] !== null)
+          .map(lang => ({
+            language: lang,
+            name: data.name[lang] || ""
+          }));
+
         // Initialize file sections
         const initialFileSections = Object.entries(data.file).map(([key, value]) => ({
           imageFile: null,
@@ -254,19 +257,6 @@ const EditStoryModal = ({open, onClose, data}: Props) => {
     });
   };
 
-  // const addFileSection = () => {
-  //   const currentSections = getValues("fileSections");
-  //   setValue("fileSections", [
-  //     ...currentSections, 
-  //     { 
-  //       imageFile: null, 
-  //       imagePreview: null, 
-  //       link: "",
-  //       isNewImage: false
-  //     }
-  //   ]);
-  // };
-
   const removeFileSection = (index: number) => {
     const currentSections = getValues("fileSections");
     const newSections = currentSections.filter((_, i) => i !== index);
@@ -311,10 +301,13 @@ const EditStoryModal = ({open, onClose, data}: Props) => {
           }
         }
 
-        const nameObject = formData.translations.reduce((acc, { language, name }) => {
-          acc[language] = name.trim();
+        // Include all languages, set missing ones to null
+        const allLanguages: Language[] = ["eng", "kaz", "rus"];
+        const nameObject = allLanguages.reduce((acc, lang) => {
+          const translation = formData.translations.find(t => t.language === lang);
+          acc[lang] = translation?.name?.trim() || null;
           return acc;
-        }, {} as Record<Language, string>);
+        }, {} as Record<Language, string | null>);
 
         const payload = {
           name: nameObject,

@@ -144,9 +144,18 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
           profilePicKey = key;
         }
 
+        // Include all languages, set missing or empty ones to null
+        const allLanguages: Language[] = ["eng", "kaz", "rus"];
+        const fullNameObject = allLanguages.reduce((acc, lang) => {
+          const translation = data.translations.find(t => t.language === lang);
+          acc[lang] = translation?.name?.trim() || null;
+          return acc;
+        }, {} as Record<Language, string | null>);
+
         const { confirmPassword, translations, ...otherFields } = data;
         const payload = {
           ...otherFields,
+          fullName: fullNameObject,
           profilePic: profilePicKey,
         };
 
@@ -168,6 +177,7 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
       }
     });
   };
+
   useEffect(() => {
     if (open) {
       reset({
@@ -181,6 +191,7 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
       });
     }
   }, [open, reset]);
+
   return (
     <>
       {open && (

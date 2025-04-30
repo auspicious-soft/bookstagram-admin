@@ -17,13 +17,13 @@ const validationSchema = yup.object({
   translations: yup.array().of(
     yup.object({
       language: yup.string().required('Language is required'),
-      name: yup.string().required('Name is required')
+      name: yup.string().nullable().transform((value) => value || null),
     })
   ),
   descriptionTranslations: yup.array().of(
     yup.object({
       language: yup.string().required('Language is required'),
-      content: yup.string().required('Description is required')
+      content: yup.string().nullable().transform((value) => value || null),
     })
   ),
   categoryId: yup.array().min(1, 'At least one category is required'),
@@ -36,12 +36,12 @@ interface FormValues {
   translations: {
     id: string;
     language: Language;
-    name: string;
+    name: string | null;
   }[];
   descriptionTranslations: {
     id: string;
     language: Language;
-    content: string;
+    content: string | null;
   }[];
   categoryId: string[];
   country: string;
@@ -142,16 +142,26 @@ const Page = () => {
           profilePicKey = key;
         }
 
-        // Transform translations arrays to objects
-        const nameTransforms = data.translations.reduce((acc, curr) => ({
-          ...acc,
-          [curr.language]: curr.name
-        }), {});
+        // Ensure all languages are included in translations and descriptionTranslations
+        const allLanguages: Language[] = ["eng", "kaz", "rus"];
 
-        const descriptionTransforms = data.descriptionTranslations.reduce((acc, curr) => ({
-          ...acc,
-          [curr.language]: curr.content
-        }), {});
+        // Transform translations to include all languages with null for empty content
+        const nameTransforms = allLanguages.reduce((acc, lang) => {
+          const translation = data.translations.find(t => t.language === lang);
+          return {
+            ...acc,
+            [lang]: translation?.name?.trim() || null
+          };
+        }, {});
+
+        // Transform descriptionTranslations to include all languages with null for empty content
+        const descriptionTransforms = allLanguages.reduce((acc, lang) => {
+          const description = data.descriptionTranslations.find(d => d.language === lang);
+          return {
+            ...acc,
+            [lang]: description?.content?.trim() || null
+          };
+        }, {});
 
         const { translations, descriptionTranslations, ...filteredData } = data;
         const payload = {
@@ -161,6 +171,7 @@ const Page = () => {
           image: profilePicKey,
         };
 
+        console.log('payload: ', payload);
         const response = await addNewPublisher("/admin/publishers", payload);
         
         if (response?.status === 201) {

@@ -97,18 +97,21 @@ const UserProfile = ({ id }: Props) => {
 
   useEffect(() => {
     if (profileData) {
-           // Convert existing fullName object into translations array
-           const existingTranslations = Object.entries(profileData.fullName).map(([lang, name], index) => ({
-            id: String(index + 1),
-            language: lang as Language,
-            name: name as string
-          }));
-    
-          // Update used languages set
-          setUsedLanguages(new Set(Object.keys(profileData.fullName) as Language[]));
+      // Convert existing fullName object into translations array, excluding languages with null values
+      const existingTranslations = Object.entries(profileData.fullName)
+        .filter(([_, name]) => name !== null)
+        .map(([lang, name], index) => ({
+          id: String(index + 1),
+          language: lang as Language,
+          name: name as string
+        }));
+
+      // Update used languages set
+      setUsedLanguages(new Set(existingTranslations.map(t => t.language)));
+
       reset({
         translations: existingTranslations.length > 0 ? existingTranslations : [{ id: "1", language: "eng", name: "" }],
-       fullName: profileData.fullName || { eng: "" },
+        fullName: profileData.fullName || { eng: "" },
         email: profileData.email,
         phoneNumber: profileData.phoneNumber,
         countryCode: profileData.countryCode,
@@ -167,7 +170,6 @@ const UserProfile = ({ id }: Props) => {
     }
   };
 
-  // Update the handleLanguageRemove function
   const handleLanguageRemove = (index: number, language: Language) => {
     const currentFullName = getValues("fullName");
     
@@ -219,9 +221,18 @@ const UserProfile = ({ id }: Props) => {
           profilePicKey = key;
         }
 
+        // Include all languages, set missing or empty ones to null
+        const allLanguages: Language[] = ["eng", "kaz", "rus"];
+        const fullNameObject = allLanguages.reduce((acc, lang) => {
+          const translation = data.translations.find(t => t.language === lang);
+          acc[lang] = translation?.name?.trim() || null;
+          return acc;
+        }, {} as Record<Language, string | null>);
+
         const { translations, ...otherFields } = data;
         const payload = {
           ...otherFields,
+          fullName: fullNameObject,
           profilePic: profilePicKey,
         };
 
@@ -240,7 +251,6 @@ const UserProfile = ({ id }: Props) => {
     });
   };
 
-  
   return (
     <div>
       <div className="grid grid-cols-[1fr_2fr] gap-5">
@@ -299,57 +309,57 @@ const UserProfile = ({ id }: Props) => {
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)} className="form-box">
               <div className="space-y-5">
-              {fields.map((field, index) => (
-      <div key={field.id}>
-        <p className="mb-1 text-sm text-darkBlack">Name</p>
-        <div className="flex items-center gap-[5px] w-full">
-          <label className="!flex bg-[#F5F5F5] rounded-[10px] w-full">
-            <select
-              {...register(`translations.${index}.language`)}
-              className="!mt-0 max-w-[80px] !bg-[#D9D9D9]"
-              disabled={index === 0 && fields.length === 1} // Disable if it's the only field
-            >
-              <option value="eng">Eng</option>
-              <option value="kaz">Kaz</option>
-              <option value="rus">Rus</option>
-            </select>
-            <input
-              type="text"
-              {...register(`translations.${index}.name`)}
-              onChange={(e) => {
-                register(`translations.${index}.name`).onChange(e);
-                setValue(`fullName.${field.language}`, e.target.value);
-              }}
-              placeholder="Enter name"
-              className="!mt-0 flex-1"
-            />
-          </label>
-          {index === 0 ? (
-            <button
-              type="button"
-              onClick={handleLanguageAdd}
-              disabled={usedLanguages.size >= 3}
-              className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm disabled:opacity-50"
-            >
-              Add
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => handleLanguageRemove(index, field.language)}
-              className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm"
-            >
-              Remove
-            </button>
-          )}
-        </div>
-        {errors.translations?.[index]?.name && (
-          <p className="text-red-500 text-sm mt-1">
-            {errors.translations[index]?.name?.message}
-          </p>
-        )}
-      </div>
-    ))}
+                {fields.map((field, index) => (
+                  <div key={field.id}>
+                    <p className="mb-1 text-sm text-darkBlack">Name</p>
+                    <div className="flex items-center gap-[5px] w-full">
+                      <label className="!flex bg-[#F5F5F5] rounded-[10px] w-full">
+                        <select
+                          {...register(`translations.${index}.language`)}
+                          className="!mt-0 max-w-[80px] !bg-[#D9D9D9]"
+                          disabled={index === 0 && fields.length === 1}
+                        >
+                          <option value="eng">Eng</option>
+                          <option value="kaz">Kaz</option>
+                          <option value="rus">Rus</option>
+                        </select>
+                        <input
+                          type="text"
+                          {...register(`translations.${index}.name`)}
+                          onChange={(e) => {
+                            register(`translations.${index}.name`).onChange(e);
+                            setValue(`fullName.${field.language}`, e.target.value);
+                          }}
+                          placeholder="Enter name"
+                          className="!mt-0 flex-1"
+                        />
+                      </label>
+                      {index === 0 ? (
+                        <button
+                          type="button"
+                          onClick={handleLanguageAdd}
+                          disabled={usedLanguages.size >= 3}
+                          className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm disabled:opacity-50"
+                        >
+                          Add
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => handleLanguageRemove(index, field.language)}
+                          className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                    {errors.translations?.[index]?.name && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.translations[index]?.name?.message}
+                      </p>
+                    )}
+                  </div>
+                ))}
 
                 <label>
                   Email Address

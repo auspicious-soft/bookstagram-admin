@@ -64,7 +64,7 @@ const userProfile = (id: string) => {
             ) : userData?.length > 0 ? (
             userData?.map((row: any) => (
               <tr key={row?._id}>
-                <td>{row?._id}</td>
+                <td>#{row?.identifier}</td>
                 <td><div className="flex items-center gap-[5px] capitalize"><TableRowImage image={row?.profilePic ? getImageClientS3URL(row?.profilePic) : profile}/>
                  {row?.fullName?.eng}  </div>
                   </td>

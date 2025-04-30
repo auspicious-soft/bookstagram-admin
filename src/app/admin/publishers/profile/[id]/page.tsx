@@ -25,13 +25,13 @@ const validationSchema = yup.object({
   translations: yup.array().of(
     yup.object({
       language: yup.string().required("Language is required"),
-      name: yup.string().required("Name is required"),
+      name: yup.string().nullable().transform((value) => value || null),
     })
   ),
   descriptionTranslations: yup.array().of(
     yup.object({
       language: yup.string().required("Language is required"),
-      content: yup.string().required("Description is required"),
+      content: yup.string().nullable().transform((value) => value || null),
     })
   ),
   categoryId: yup.array().min(1, "At least one category is required"),
@@ -44,12 +44,12 @@ interface FormValues {
   translations: {
     id: string;
     language: Language;
-    name: string;
+    name: string | null;
   }[];
   descriptionTranslations: {
     id: string;
     language: Language;
-    content: string;
+    content: string | null;
   }[];
   categoryId: any[];
   country: string;
@@ -134,26 +134,29 @@ const Page = () => {
             })
           : [];
 
-        const nameTranslations = Object.entries(publishersData.name || {}).map(
-          ([lang, name], index) => ({
+        const allLanguages: Language[] = ["eng", "kaz", "rus"];
+        const nameTranslations = allLanguages.map((lang, index) => {
+          const name = publishersData.name?.[lang] || null;
+          return {
             id: String(index + 1),
-            language: lang as Language,
-            name: name as string,
-          })
-        );
+            language: lang,
+            name: (name as string)?.trim() || null,
+          };
+        }).filter(t => t.name != null && (t.name as string).trim() !== "");
 
-        const descriptionTranslations = Object.entries(
-          publishersData.description || {}
-        ).map(([lang, content], index) => ({
-          id: String(index + 1),
-          language: lang as Language,
-          content: content as string,
-        }));
+        const descriptionTranslations = allLanguages.map((lang, index) => {
+          const content = publishersData.description?.[lang] || null;
+          return {
+            id: String(index + 1),
+            language: lang,
+            content: (content as string)?.trim() || null,
+          };
+        }).filter(t => t.content != null && (t.content as string).trim() !== "");
 
         // Reset form with all values at once
         reset({
-          translations: nameTranslations,
-          descriptionTranslations: descriptionTranslations,
+          translations: nameTranslations.length > 0 ? nameTranslations : [{ id: "1", language: "eng", name: "" }],
+          descriptionTranslations: descriptionTranslations.length > 0 ? descriptionTranslations : [{ id: "1", language: "eng", content: "" }],
           email: publishersData.email || "",
           password: publishersData.password || "",
           categoryId: selectedCategories,
@@ -228,21 +231,19 @@ const Page = () => {
           profilePicKey = key;
         }
 
-        const nameTransforms = data.translations.reduce(
-          (acc, curr) => ({
-            ...acc,
-            [curr.language]: curr.name,
-          }),
-          {}
-        );
+        // Include all languages, set empty or removed values to null
+        const allLanguages: Language[] = ["eng", "kaz", "rus"];
+        const nameTransforms = allLanguages.reduce((acc, lang) => {
+          const translation = data.translations.find(t => t.language === lang);
+          acc[lang] = translation?.name?.trim() || null;
+          return acc;
+        }, {} as Record<Language, string | null>);
 
-        const descriptionTransforms = data.descriptionTranslations.reduce(
-          (acc, curr) => ({
-            ...acc,
-            [curr.language]: curr.content,
-          }),
-          {}
-        );
+        const descriptionTransforms = allLanguages.reduce((acc, lang) => {
+          const description = data.descriptionTranslations.find(d => d.language === lang);
+          acc[lang] = description?.content?.trim() || null;
+          return acc;
+        }, {} as Record<Language, string | null>);
 
         const { translations, descriptionTranslations, ...filteredData } = data;
         const payload = {

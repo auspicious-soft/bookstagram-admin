@@ -121,49 +121,102 @@ const Page = () => {
   });
 
   // Prepopulate form when author data is available
+  // useEffect(() => {
+  //   if (authorData && !isFormPopulated.current) {
+  //     // Transform name translations
+  //     const nameTranslations = Object.entries(authorData.name || {}).map(([lang, name], index) => ({
+  //       id: String(index + 1),
+  //       language: lang as Language,
+  //       name: name as string
+  //     }));
+
+  //     // Transform description translations
+  //     const descTranslations = Object.entries(authorData.description || {}).map(([lang, content], index) => ({
+  //       id: String(index + 1),
+  //       language: lang as Language,
+  //       content: content as string
+  //     }));
+
+  //     // Update used languages sets
+  //     setUsedLanguages(new Set(nameTranslations.map(t => t.language)));
+  //     setUsedDescLanguages(new Set(descTranslations.map(t => t.language)));
+
+  //     // Transform professions and genres
+  //     const professionOptions = authorData.profession.map((prof: string) => prof);
+  //     const genreOptions = authorData.genres.map((genre: string) => genre);
+
+  //     // Format date
+  //     const formattedDate = authorData.dob ? new Date(authorData.dob).toISOString().split('T')[0] : '';
+
+  //     // Reset form with all values
+  //     reset({
+  //       translations: nameTranslations,
+  //       descriptionTranslations: descTranslations,
+  //       profession: professionOptions,
+  //       country: authorData.country,
+  //       dob: formattedDate,
+  //       genres: genreOptions,
+  //     });
+
+  //     // Set image preview if exists
+  //     if (authorData?.image && !isImageChanged.current) {
+  //       const imageUrl = getImageClientS3URL(authorData?.image) ?? '';
+  //       setImagePreview(imageUrl);
+  //     }
+
+  //     isFormPopulated.current = true;
+  //   }
+  // }, [authorData, reset]);
+
   useEffect(() => {
     if (authorData && !isFormPopulated.current) {
-      // Transform name translations
-      const nameTranslations = Object.entries(authorData.name || {}).map(([lang, name], index) => ({
-        id: String(index + 1),
-        language: lang as Language,
-        name: name as string
-      }));
-
-      // Transform description translations
-      const descTranslations = Object.entries(authorData.description || {}).map(([lang, content], index) => ({
-        id: String(index + 1),
-        language: lang as Language,
-        content: content as string
-      }));
-
+      // Transform name translations, excluding null values
+      const nameTranslations = Object.entries(authorData.name || {})
+        .filter(([_, name]) => name !== null) // Exclude null values
+        .map(([lang, name], index) => ({
+          id: String(index + 1),
+          language: lang as Language,
+          name: name as string,
+        }));
+  
+      // Transform description translations, excluding null values
+      const descTranslations = Object.entries(authorData.description || {})
+        .filter(([_, content]) => content !== null) // Exclude null values
+        .map(([lang, content], index) => ({
+          id: String(index + 1),
+          language: lang as Language,
+          content: content as string,
+        }));
+  
       // Update used languages sets
-      setUsedLanguages(new Set(nameTranslations.map(t => t.language)));
-      setUsedDescLanguages(new Set(descTranslations.map(t => t.language)));
-
+      setUsedLanguages(new Set(nameTranslations.map((t) => t.language)));
+      setUsedDescLanguages(new Set(descTranslations.map((t) => t.language)));
+  
       // Transform professions and genres
       const professionOptions = authorData.profession.map((prof: string) => prof);
       const genreOptions = authorData.genres.map((genre: string) => genre);
-
+  
       // Format date
-      const formattedDate = authorData.dob ? new Date(authorData.dob).toISOString().split('T')[0] : '';
-
+      const formattedDate = authorData.dob
+        ? new Date(authorData.dob).toISOString().split("T")[0]
+        : "";
+  
       // Reset form with all values
       reset({
-        translations: nameTranslations,
-        descriptionTranslations: descTranslations,
+        translations: nameTranslations.length > 0 ? nameTranslations : [{ id: "1", language: "eng" as Language, name: "" }],
+        descriptionTranslations: descTranslations.length > 0 ? descTranslations : [{ id: "1", language: "eng" as Language, content: "" }],
         profession: professionOptions,
         country: authorData.country,
         dob: formattedDate,
         genres: genreOptions,
       });
-
+  
       // Set image preview if exists
       if (authorData?.image && !isImageChanged.current) {
-        const imageUrl = getImageClientS3URL(authorData?.image) ?? '';
+        const imageUrl = getImageClientS3URL(authorData?.image) ?? "";
         setImagePreview(imageUrl);
       }
-
+  
       isFormPopulated.current = true;
     }
   }, [authorData, reset]);

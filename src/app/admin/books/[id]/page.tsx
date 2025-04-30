@@ -34,17 +34,16 @@ const genresOptions: OptionType[] = [
   { value: "anti", label: "Anti" },
 ];
 
-
 interface FormValues {
   translations: {
     id: string;
     language: Language;
-    name: string;
+    name: string | null;
   }[];
   descriptionTranslations: {
     id: string;
     language: Language;
-    content: string;
+    content: string | null;
   }[];
   fileTranslations: {
     id: string;
@@ -64,7 +63,7 @@ interface FormValues {
 const BookForm = () => {
   const { id } = useParams();
   const router = useRouter();
-  const { data, isLoading } = useSWR(`/admin/books/${id}`, getSingleBook, { revalidateOnFocus: false })
+  const { data, isLoading } = useSWR(`/admin/books/${id}`, getSingleBook, { revalidateOnFocus: false });
   const [isPending, startTransition] = useTransition();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -74,29 +73,23 @@ const BookForm = () => {
   const isFormPopulated = useRef(false);
   const isImageChanged = useRef(false);
   const bookData = data?.data?.data?.books?.[0];
-  const upperData = data?.data?.data
-  const bookType = data?.data?.data?.books?.[0].type;
+  const upperData = data?.data?.data;
+  const bookType = data?.data?.data?.books?.[0]?.type;
   const isEbookOrPodcast = bookType === 'e-book' || bookType === 'podcast';
 
   const validationSchema = yup.object({
     translations: yup.array().of(
       yup.object({
         language: yup.string(),
-        name: yup.string()
+        name: yup.string().nullable()
       })
     ),
     descriptionTranslations: yup.array().of(
       yup.object({
         language: yup.string().required('Language is required'),
-        content: yup.string().required('Description is required')
+        content: yup.string().required('Description is required').nullable()
       })
     ),
-    // fileTranslations: yup.array().of(
-    //   yup.object({
-    //     language: yup.string().required('Language is required'),
-    //     file: yup.mixed()
-    //   })
-    // ),
     fileTranslations: (bookType !== 'audiobook' && bookType !== 'course')
       ? yup.array().of(
         yup.object().shape({
@@ -113,9 +106,10 @@ const BookForm = () => {
   });
 
   const OverviewData = [
-    { id: "1", title: "No of Book Sold", value: upperData?.totalBookSold, icon: <DashboardIcon2 />, },
-    { id: "2", title: "Revenue By This Book", value: `$${upperData?.totalRevenue}`, icon: <DashboardIcon1 />, },
-  ]
+    { id: "1", title: "No of Book Sold", value: upperData?.totalBookSold, icon: <DashboardIcon2 /> },
+    { id: "2", title: "Revenue By This Book", value: `$${upperData?.totalRevenue}`, icon: <DashboardIcon1 /> },
+  ];
+
   const { authors } = UseAuthors();
   const { subCategory } = UseSubCategory();
   const { publishers } = UsePublisher();
@@ -157,35 +151,38 @@ const BookForm = () => {
 
   useEffect(() => {
     if (bookData && !isFormPopulated.current) {
-      // Transform name translations
-      const nameTranslations = Object.entries(bookData.name || {}).map(([lang, name], index) => ({
-        id: String(index + 1),
-        language: lang as Language,
-        name: name as string
-      }));
+      const nameTranslations = Object.entries(bookData.name || {})
+        .filter(([_, name]) => name != null && (name as string).trim() !== '')
+        .map(([lang, name], index) => ({
+          id: String(index + 1),
+          language: lang as Language,
+          name: name as string
+        }));
 
-      const descTranslations = Object.entries(bookData.description || {}).map(([lang, content], index) => ({
-        id: String(index + 1),
-        language: lang as Language,
-        content: content as string
-      }));
+      const descTranslations = Object.entries(bookData.description || {})
+        .filter(([_, content]) => content != null && (content as string).trim() !== '')
+        .map(([lang, content], index) => ({
+          id: String(index + 1),
+          language: lang as Language,
+          content: content as string
+        }));
 
-      const fileTranslations = Object.entries(bookData.file || {}).map(([lang, file], index) => ({
-        id: String(index + 1),
-        language: lang as Language,
-        file: file ? file as File : null
-      }));
+      const fileTranslations = Object.entries(bookData.file || {})
+        .filter(([_, file]) => file != null)
+        .map(([lang, file], index) => ({
+          id: String(index + 1),
+          language: lang as Language,
+          file: file as File | null
+        }));
 
-      // Update used languages sets
       setUsedLanguages(new Set(nameTranslations.map(t => t.language)));
       setUsedDescLanguages(new Set(descTranslations.map(t => t.language)));
       setUsedFileLanguages(new Set(fileTranslations.map(t => t.language)));
 
-      // Reset form with all values
       reset({
-        translations: nameTranslations,
-        descriptionTranslations: descTranslations,
-        fileTranslations: fileTranslations,
+        translations: nameTranslations.length > 0 ? nameTranslations : [{ id: "1", language: "eng", name: "" }],
+        descriptionTranslations: descTranslations.length > 0 ? descTranslations : [{ id: "1", language: "eng", content: "" }],
+        fileTranslations: fileTranslations.length > 0 ? fileTranslations : [{ id: "1", language: "eng", file: null }],
         price: bookData.price,
         authorId: bookData.authorId.map((author: any) => author?._id),
         publisherId: bookData.publisherId?._id,
@@ -196,7 +193,6 @@ const BookForm = () => {
         image: null
       });
 
-      // Set image preview if exists
       if (bookData?.image && !isImageChanged.current) {
         const imageUrl = getImageClientS3URL(bookData?.image);
         setImagePreview(imageUrl);
@@ -212,7 +208,6 @@ const BookForm = () => {
       isImageChanged.current = false;
     };
   }, []);
-
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -233,10 +228,8 @@ const BookForm = () => {
     setValue(name as any, Array.isArray(value) ? value.map(v => v.value) : value.value);
   };
 
-
-  const onSubmit = async (data: any) => {
-
-    const userName = data.translations[0].name.split(" ").join("-").toLowerCase();
+  const onSubmit = async (data: FormValues) => {
+    const userName = data.translations[0].name?.split(" ").join("-").toLowerCase() || "default-book";
     startTransition(async () => {
       try {
         let imageUrl = null;
@@ -253,7 +246,7 @@ const BookForm = () => {
         }
 
         const filePromises = data.fileTranslations
-          .filter(trans => trans.file)
+          .filter(trans => trans.file != null)
           .map(async trans => {
             const file = trans.file as File;
             const { signedUrl, key } = await generateSignedUrlBookFiles(file.name, file.type, userName, trans.language);
@@ -274,24 +267,33 @@ const BookForm = () => {
 
         const uploadedFiles = await Promise.all(filePromises);
 
-        const fileTransforms = uploadedFiles.reduce((acc, curr) => ({
-          ...acc,
-          [curr.language]: curr.fileUrl
-        }), {});
+        // Only include non-null and non-empty name translations
+        const nameTransforms = data.translations
+          .filter(trans => trans.name != null && trans.name.trim() !== '')
+          .reduce((acc, curr) => ({
+            ...acc,
+            [curr.language]: curr.name
+          }), {});
 
-        const nameTransforms = data.translations.reduce((acc, curr) => ({
-          ...acc,
-          [curr.language]: curr.name
-        }), {});
+        // Only include non-null and non-empty description translations
+        const descriptionTransforms = data.descriptionTranslations
+          .filter(trans => trans.content != null && trans.content.trim() !== '')
+          .reduce((acc, curr) => ({
+            ...acc,
+            [curr.language]: curr.content
+          }), {});
 
-        const descriptionTransforms = data.descriptionTranslations.reduce((acc, curr) => ({
-          ...acc,
-          [curr.language]: curr.content
-        }), {});
+        // Only include uploaded files (non-null fileUrls)
+        const fileTransforms = uploadedFiles
+          .filter(file => file.fileUrl != null)
+          .reduce((acc, curr) => ({
+            ...acc,
+            [curr.language]: curr.fileUrl
+          }), {});
 
         const payload = {
-          name: nameTransforms,
-          description: descriptionTransforms,
+          name: Object.keys(nameTransforms).length > 0 ? nameTransforms : { eng: "Untitled Book" },
+          description: Object.keys(descriptionTransforms).length > 0 ? descriptionTransforms : { eng: "No description provided" },
           file: fileTransforms,
           price: data.price,
           authorId: data.authorId,
@@ -302,14 +304,14 @@ const BookForm = () => {
           type: data.type,
           ...(imageUrl && { image: imageUrl })
         };
+
         if (data.type === "audiobook") {
           sessionStorage.setItem("audioBookData", JSON.stringify(payload));
           router.push(`/admin/books/${id}/timestamps`);
         } else if (data.type === "course") {
           sessionStorage.setItem("courseData", JSON.stringify(payload));
           router.push(`/admin/books/${id}/lessons`);
-        }
-        else {
+        } else {
           let response;
           if (id) {
             response = await updateSingleBook(`/admin/books/${id}`, payload);
@@ -337,8 +339,10 @@ const BookForm = () => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
   const onError = (errors: any) => {
     console.log(errors);
+    toast.error("Please fill all required fields correctly");
   };
 
   return (
@@ -374,7 +378,6 @@ const BookForm = () => {
                   >{imagePreview ? 'Edit Image' : 'Upload Image'}</button>
                 </div>
               </div>
-              {/* {bookType !=="audioBook" &&( */}
               <div className="mt-5">
                 {bookType !== "audiobook" &&
                   fileFields.map((field, index) => (
@@ -390,7 +393,6 @@ const BookForm = () => {
                               }
                             }}
                           />
-                          {/* Show file name if already uploaded */}
                           {field.file && (
                             <p className="text-sm mt-2 text-gray-600">
                               {(field as any).file.substring((field as any).file.lastIndexOf('/') + 1)}
@@ -425,7 +427,7 @@ const BookForm = () => {
                             Remove
                           </button>
                         )}
-                        {index == fileFields?.length - 1 && (
+                        {index === fileFields?.length - 1 && (
                           <button
                             type="button"
                             onClick={() => {
@@ -453,12 +455,10 @@ const BookForm = () => {
                     </div>
                   ))}
               </div>
-
             </div>
 
             <div className="main-form bg-white p-[30px] rounded-[20px]">
               <div className="space-y-5">
-                {/* Name translations */}
                 {nameFields.map((field, index) => (
                   <div key={field.id}>
                     <p className="mb-1 text-sm text-darkBlack">Name of Book</p>
@@ -518,7 +518,6 @@ const BookForm = () => {
                   <input type="number" {...register("price")} required />
                 </div>
 
-                {/* Description translations */}
                 {descriptionFields.map((field, index) => (
                   <div key={field.id}>
                     <p className="mb-1 text-sm text-darkBlack">Description</p>
@@ -593,8 +592,8 @@ const BookForm = () => {
 
                   <CustomSelect
                     name="Select Genre"
-                    value={genresOptions.find(option =>
-                      watch('genre').includes(option.value))}
+                    value={genresOptions.filter(option =>
+                      watch('genre')?.includes(option.value))}
                     isMulti={true}
                     options={genresOptions}
                     onChange={(value) => handleSelectChange('genre', value)}
