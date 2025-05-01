@@ -82,14 +82,40 @@ const Page = () => {
         <>
           <div className="grid grid-cols-4 gap-6">
             {books.map((row: any) => (
+              // <BookCard 
+              // handleClick={()=>openBookProfile(row?._id, row?.name.eng)}
+              //   key={row?._id}
+              //   author={row?.authorId?.[0]?.name?.eng}
+              //   title={row?.name?.eng}
+              //   price={`$${row?.price}`}
+              //   imgSrc={getImageClientS3URL(row?.image)}
+              // />
+
               <BookCard 
-              handleClick={()=>openBookProfile(row?._id, row?.name.eng)}
-                key={row?._id}
-                author={row?.authorId?.[0]?.name?.eng}
-                title={row?.name?.eng}
-                price={`$${row?.price}`}
-                imgSrc={getImageClientS3URL(row?.image)}
-              />
+  handleClick={() => openBookProfile(
+    row?._id, 
+    row?.name?.eng ?? 
+    row?.name?.kaz ?? 
+    row?.name?.rus ?? 
+    ''
+  )}
+  key={row?._id}
+  author={
+    row?.authorId?.[0]?.name?.eng ?? 
+    row?.authorId?.[0]?.name?.kaz ?? 
+    row?.authorId?.[0]?.name?.rus ?? 
+    ''
+  }
+  title={
+    row?.name?.eng ?? 
+    row?.name?.kaz ?? 
+    row?.name?.rus ?? 
+    ''
+  }
+  price={`$${row?.price}`}
+  imgSrc={getImageClientS3URL(row?.image)}
+/>
+
             ))}
           </div>
           

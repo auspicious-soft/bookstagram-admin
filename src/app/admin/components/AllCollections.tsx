@@ -43,13 +43,13 @@ const AllCollections = () => {
     setQuery(`page=${newPage}&limit=${itemsPerPage}`);
   };
 
-  const addCollection = ()=>{ 
+  const addCollection = () => {
     setIsAddModalOpen(true);
   }
-  
+
   const handleSubCollection = (id: string, name: string) => {
     localStorage.setItem("collectionName", name);
-    router.push(`/admin/collection/${id}`); 
+    router.push(`/admin/collection/${id}`);
   }
 
   const handleSubmit = async (formData: FormValues) => {
@@ -59,7 +59,7 @@ const AllCollections = () => {
         const summaryName = formData.descriptionTranslations[0].content.split(" ").join("-").toLowerCase();
 
         if (formData.image) {
-          const { signedUrl, key } = await generateSignedUrlForCollection(formData.image.name, formData.image.type,summaryName);
+          const { signedUrl, key } = await generateSignedUrlForCollection(formData.image.name, formData.image.type, summaryName);
 
           const uploadResponse = await fetch(signedUrl, {
             method: 'PUT',
@@ -100,15 +100,15 @@ const AllCollections = () => {
     });
   };
 
-  const updateCollection = async(id: string) => {
+  const updateCollection = async (id: string) => {
     try {
       // Find the current collection to get its displayOnMobile status
       const currentCollection = collections.find((collection: any) => collection._id === id);
-       
+
       const payload = {
         displayOnMobile: !currentCollection?.displayOnMobile
       };
-      
+
       startTransition(async () => {
         const response = await updateCollectionStatus(`/admin/collections/${id}`, payload);
         if (response.status === 200) {
@@ -126,29 +126,33 @@ const AllCollections = () => {
 
   return (
     <div>
-       <div className="flex gap-2.5 justify-end mb-5 ">
+      <div className="flex gap-2.5 justify-end mb-5 ">
         <SearchBar setQuery={setsearchParams} query={searchParams} />
-         <div><Button text="Add A New collection" onClick={addCollection} /></div>
+        <div><Button text="Add A New collection" onClick={addCollection} /></div>
       </div>
-        {collections?.length===0  &&         <p className="text-center text-gray-500">No data found.</p>
- }
-       <div className='grid grid-cols-4 gap-6'>
-          {collections?.map((row: any) => (
+      {collections?.length === 0 && <p className="text-center text-gray-500">No data found.</p>
+      }
+      <div className='grid grid-cols-4 gap-6'>
+        {collections?.map((row: any) => (
 
-            <div key={row?._id} className='bg-white rounded-[20px] relative'>
-            <div onClick={()=>handleSubCollection(row?._id, row?.name?.eng || row?.name?.kaz || row?.name?.rus  )} 
+          <div key={row?._id} className='bg-white rounded-[20px] relative'>
+            <div onClick={() => handleSubCollection(row?._id, row?.name?.eng || row?.name?.kaz || row?.name?.rus)}
               className='text-center px-5 pt-[30px] pb-5 cursor-pointer '>
-                <Image unoptimized src={getImageClientS3URL(row?.image)} alt='dgv' width={122} height={122}  className='w-[122px] h-[122px] object-cover rounded-full mx-auto ' />
-                <p className='text-darkBlack text-[15px] leading-5 tracking-[-0.24px] mt-[23px] '>{row?.name?.eng || row?.name?.kaz || row?.name?.rus }</p>
-              </div>
-                <p onClick={() => updateCollection(row?._id)} className="flex gap-2.5 justify-center pt-1 pb-[30px] px-5 items-center text-sm">
-                  <SelectSvg color={row?.displayOnMobile===true ? 'var(--tw-bg-orange)' : '#C1C1C1'} /> 
-                  Display on the mobile app
-                </p>
+              <Image unoptimized src={getImageClientS3URL(row?.image)} alt='dgv' width={122} height={122} className='w-[122px] h-[122px] object-cover rounded-full mx-auto ' />
+              <p className='text-darkBlack text-[15px] leading-5 tracking-[-0.24px] mt-[23px]'>
+                {row?.name?.eng ?? row?.name?.kaz ?? row?.name?.rus ?? ''}
+              </p>
+
+              {/* <p className='text-darkBlack text-[15px] leading-5 tracking-[-0.24px] mt-[23px] '>{row?.name?.eng || row?.name?.kaz || row?.name?.rus }</p> */}
             </div>
-            ))}
-        </div>
-        <div className="mt-10 flex justify-end">
+            <p onClick={() => updateCollection(row?._id)} className="flex gap-2.5 justify-center pt-1 pb-[30px] px-5 items-center text-sm">
+              <SelectSvg color={row?.displayOnMobile === true ? 'var(--tw-bg-orange)' : '#C1C1C1'} />
+              Display on the mobile app
+            </p>
+          </div>
+        ))}
+      </div>
+      <div className="mt-10 flex justify-end">
         <TablePagination
           setPage={handlePageChange}
           page={page}

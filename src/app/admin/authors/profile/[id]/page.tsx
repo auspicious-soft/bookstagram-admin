@@ -1,5 +1,5 @@
 'use client'
-import React, { FormEvent, useEffect, useState, useTransition, useRef  } from 'react';
+import React, { FormEvent, useEffect, useState, useTransition, useRef } from 'react';
 import Image from "next/image";
 import preview from "@/assets/images/preview.png";
 import { toast } from 'sonner';
@@ -120,54 +120,6 @@ const Page = () => {
     name: "descriptionTranslations"
   });
 
-  // Prepopulate form when author data is available
-  // useEffect(() => {
-  //   if (authorData && !isFormPopulated.current) {
-  //     // Transform name translations
-  //     const nameTranslations = Object.entries(authorData.name || {}).map(([lang, name], index) => ({
-  //       id: String(index + 1),
-  //       language: lang as Language,
-  //       name: name as string
-  //     }));
-
-  //     // Transform description translations
-  //     const descTranslations = Object.entries(authorData.description || {}).map(([lang, content], index) => ({
-  //       id: String(index + 1),
-  //       language: lang as Language,
-  //       content: content as string
-  //     }));
-
-  //     // Update used languages sets
-  //     setUsedLanguages(new Set(nameTranslations.map(t => t.language)));
-  //     setUsedDescLanguages(new Set(descTranslations.map(t => t.language)));
-
-  //     // Transform professions and genres
-  //     const professionOptions = authorData.profession.map((prof: string) => prof);
-  //     const genreOptions = authorData.genres.map((genre: string) => genre);
-
-  //     // Format date
-  //     const formattedDate = authorData.dob ? new Date(authorData.dob).toISOString().split('T')[0] : '';
-
-  //     // Reset form with all values
-  //     reset({
-  //       translations: nameTranslations,
-  //       descriptionTranslations: descTranslations,
-  //       profession: professionOptions,
-  //       country: authorData.country,
-  //       dob: formattedDate,
-  //       genres: genreOptions,
-  //     });
-
-  //     // Set image preview if exists
-  //     if (authorData?.image && !isImageChanged.current) {
-  //       const imageUrl = getImageClientS3URL(authorData?.image) ?? '';
-  //       setImagePreview(imageUrl);
-  //     }
-
-  //     isFormPopulated.current = true;
-  //   }
-  // }, [authorData, reset]);
-
   useEffect(() => {
     if (authorData && !isFormPopulated.current) {
       // Transform name translations, excluding null values
@@ -178,7 +130,7 @@ const Page = () => {
           language: lang as Language,
           name: name as string,
         }));
-  
+
       // Transform description translations, excluding null values
       const descTranslations = Object.entries(authorData.description || {})
         .filter(([_, content]) => content !== null) // Exclude null values
@@ -187,20 +139,20 @@ const Page = () => {
           language: lang as Language,
           content: content as string,
         }));
-  
+
       // Update used languages sets
       setUsedLanguages(new Set(nameTranslations.map((t) => t.language)));
       setUsedDescLanguages(new Set(descTranslations.map((t) => t.language)));
-  
+
       // Transform professions and genres
       const professionOptions = authorData.profession.map((prof: string) => prof);
       const genreOptions = authorData.genres.map((genre: string) => genre);
-  
+
       // Format date
       const formattedDate = authorData.dob
         ? new Date(authorData.dob).toISOString().split("T")[0]
         : "";
-  
+
       // Reset form with all values
       reset({
         translations: nameTranslations.length > 0 ? nameTranslations : [{ id: "1", language: "eng" as Language, name: "" }],
@@ -210,13 +162,13 @@ const Page = () => {
         dob: formattedDate,
         genres: genreOptions,
       });
-  
+
       // Set image preview if exists
       if (authorData?.image && !isImageChanged.current) {
         const imageUrl = getImageClientS3URL(authorData?.image) ?? "";
         setImagePreview(imageUrl);
       }
-  
+
       isFormPopulated.current = true;
     }
   }, [authorData, reset]);
@@ -227,7 +179,7 @@ const Page = () => {
       isImageChanged.current = false;
     };
   }, []);
-  
+
   const handleGenresChange = (selectedOptions: any) => {
     const selectedValues = selectedOptions.map((option: OptionType) => option.value);
     setValue('genres', selectedValues);
@@ -247,7 +199,7 @@ const Page = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setImageFile(file);
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
@@ -260,7 +212,7 @@ const Page = () => {
 
   const onSubmit = async (data: FormValues) => {
     const userName = data.translations[0].name.split(" ").join("-").toLowerCase() + "-" + data.dob;
-    
+
     startTransition(async () => {
       try {
         let profilePicKey = null;
@@ -286,16 +238,26 @@ const Page = () => {
           profilePicKey = key;
         }
 
-        // Transform translations to objects
-        const nameTransforms = data.translations.reduce((acc, curr) => ({
-          ...acc,
-          [curr.language]: curr.name
-        }), {});
+        // Define all possible languages
+        const allLanguages: Language[] = ["eng", "kaz", "rus"];
 
-        const descriptionTransforms = data.descriptionTranslations.reduce((acc, curr) => ({
-          ...acc,
-          [curr.language]: curr.content
-        }), {});
+        // Transform translations, setting null for unused languages
+        const nameTransforms = allLanguages.reduce((acc, lang) => {
+          const translation = data.translations.find(t => t.language === lang);
+          return {
+            ...acc,
+            [lang]: translation ? translation.name : null
+          };
+        }, {});
+
+        // Transform description translations, setting null for unused languages
+        const descriptionTransforms = allLanguages.reduce((acc, lang) => {
+          const descTranslation = data.descriptionTranslations.find(t => t.language === lang);
+          return {
+            ...acc,
+            [lang]: descTranslation ? descTranslation.content : null
+          };
+        }, {});
 
         const payload = {
           name: nameTransforms,
@@ -322,7 +284,7 @@ const Page = () => {
     });
   };
 
-  const openBookProfile =(id: string, name: string) => {
+  const openBookProfile = (id: string, name: string) => {
     localStorage.setItem("getbookName", name);
     router.push(`/admin/books/${id}`)
   }
@@ -491,100 +453,99 @@ const Page = () => {
                     <div className="flex items-start gap-[5px] w-full">
                       <label className="!flex items-start bg-[#F5F5F5] rounded-[10px] w-full">
                         <select
-                         {...register(`descriptionTranslations.${index}.language`)}
-                         className="!mt-0 max-w-[80px] !bg-[#D9D9D9]"
-                       >
-                         <option value="eng">Eng</option>
-                         <option value="kaz">Kaz</option>
-                         <option value="rus">Rus</option>
-                       </select>
-                       <textarea
-                         {...register(`descriptionTranslations.${index}.content`)}
-                         rows={5}
-                         placeholder="Add Description..."
-                         className="!mt-0 flex-1"
-                       />
-                     </label>
-                     {index === 0 ? (
-                       <button
-                         type="button"
-                         onClick={() => {
-                           const unusedLanguage = ["eng", "kaz", "rus"].find(
-                             (lang) => !usedDescLanguages.has(lang as Language)
-                           );
-                           if (unusedLanguage) {
-                             appendDescription({
-                               id: String(descriptionFields.length + 1),
-                               language: unusedLanguage as Language,
-                               content: "",
-                             });
-                             setUsedDescLanguages(
-                               (prev) => new Set([...prev, unusedLanguage as Language])
-                             );
-                           }
-                         }}
-                         disabled={usedDescLanguages.size >= 3}
-                         className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm"
-                       >
-                         Add
-                       </button>
-                     ) : (
-                       <button
-                         type="button"
-                         onClick={() => {
-                           const languageToRemove = watch(`descriptionTranslations.${index}.language`);
-                           removeDescription(index);
-                           setUsedDescLanguages((prev) => {
-                             const updated = new Set(prev);
-                             updated.delete(languageToRemove as Language);
-                             return updated;
-                           });
-                         }}
-                         className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm"
-                       >
-                         Remove
-                       </button>
-                     )}
-                   </div>
-                 </div>
-               ))}
-               <button
-                 type="submit"
-                 disabled={isPending}
-                 className="bg-orange text-white text-sm px-4 mt-5 py-[14px] text-center rounded-[28px] w-full"
-               >
-                 {isPending ? "Updating..." : "Update Details"}
-               </button>
-             </div>
-           </div>
-         </div>
-       </form>
-     </FormProvider>
+                          {...register(`descriptionTranslations.${index}.language`)}
+                          className="!mt-0 max-w-[80px] !bg-[#D9D9D9]"
+                        >
+                          <option value="eng">Eng</option>
+                          <option value="kaz">Kaz</option>
+                          <option value="rus">Rus</option>
+                        </select>
+                        <textarea
+                          {...register(`descriptionTranslations.${index}.content`)}
+                          rows={5}
+                          placeholder="Add Description..."
+                          className="!mt-0 flex-1"
+                        />
+                      </label>
+                      {index === 0 ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const unusedLanguage = ["eng", "kaz", "rus"].find(
+                              (lang) => !usedDescLanguages.has(lang as Language)
+                            );
+                            if (unusedLanguage) {
+                              appendDescription({
+                                id: String(descriptionFields.length + 1),
+                                language: unusedLanguage as Language,
+                                content: "",
+                              });
+                              setUsedDescLanguages(
+                                (prev) => new Set([...prev, unusedLanguage as Language])
+                              );
+                            }
+                          }}
+                          disabled={usedDescLanguages.size >= 3}
+                          className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm"
+                        >
+                          Add
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const languageToRemove = watch(`descriptionTranslations.${index}.language`);
+                            removeDescription(index);
+                            setUsedDescLanguages((prev) => {
+                              const updated = new Set(prev);
+                              updated.delete(languageToRemove as Language);
+                              return updated;
+                            });
+                          }}
+                          className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className="bg-orange text-white text-sm px-4 mt-5 py-[14px] text-center rounded-[28px] w-full"
+                >
+                  {isPending ? "Updating..." : "Update Details"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </FormProvider>
 
-     <div className="mt-10">
-       <h2 className="text-[32px] text-darkBlack font-aeonikRegular tracking-[0.16px] capitalize">
-         Books By The Author
-       </h2>
-       <div className="grid grid-cols-4 gap-6 mt-5">
-       {authorBooks?.length > 0 ? (
-          authorBooks?.map((data: any) => (
-            <BookCard
-            key={data?._id}
-            handleClick={()=>openBookProfile(data?._id, data?.name.eng)}
-              title={data?.name?.eng}
-              price={`$${data?.price}`}
-              imgSrc={getImageClientS3URL(data?.image)}
-              author={authorData?.name?.eng}
-            />
-          ))
-        ) : (
-          <p>No data found</p> // Show message if no books are available
-        )}
-
-       </div>
-     </div>
-   </div>
- );
+      <div className="mt-10">
+        <h2 className="text-[32px] text-darkBlack font-aeonikRegular tracking-[0.16px] capitalize">
+          Books By The Author
+        </h2>
+        <div className="grid grid-cols-4 gap-6 mt-5">
+          {authorBooks?.length > 0 ? (
+            authorBooks?.map((data: any) => (
+              <BookCard
+                key={data?._id}
+                handleClick={() => openBookProfile(data?._id, data?.name.eng)}
+                title={data?.name?.eng}
+                price={`$${data?.price}`}
+                imgSrc={getImageClientS3URL(data?.image)}
+                author={authorData?.name?.eng}
+              />
+            ))
+          ) : (
+            <p>No data found</p> // Show message if no books are available
+          )}
+        </div>
+      </div>
+    </div>
+  );
 };
 
-export default Page;  
+export default Page;

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';  
+import React, { useState, useRef, useEffect } from 'react';
 import book from '@/assets/images/bookCard.png';
 import { DropWhite, PlusIcon } from '@/utils/svgicons';
 import BookCard from '../BookCard';
@@ -135,15 +135,33 @@ const BookMarket = () => {
           ) : (
             <div className="grid grid-cols-4 gap-6">
               {booksdata?.map((book: any) => (
+                
                 <BookCard
                   key={book?._id}
-                  title={book?.name?.eng}
+                  title={
+                    book?.name?.eng ??
+                    book?.name?.kaz ??
+                    book?.name?.rus ??
+                    ''
+                  }
                   price={`$${book?.price}`}
-                  handleClick={() => openBookProfile(book?._id, book?.name?.eng)}
+                  handleClick={() => openBookProfile(
+                    book?._id,
+                    book?.name?.eng ??
+                    book?.name?.kaz ??
+                    book?.name?.rus ??
+                    ''
+                  )}
                   imgSrc={getImageClientS3URL(book?.image)}
-                  author={book?.authorId[0]?.name.eng}
+                  author={
+                    book?.authorId[0]?.name?.eng ??
+                    book?.authorId[0]?.name?.kaz ??
+                    book?.authorId[0]?.name?.rus ??
+                    ''
+                  }
                   file={book}
                 />
+
               ))}
             </div>
           )}

@@ -7,7 +7,14 @@ const UseSubCategory = () => {
   });
 
   const subCategory = data?.data?.data?.map((row: any) => ({
-    label: row?.name?.eng ?? row?.name?.kaz ?? row?.name?.rus ?? '',
+    // label: row?.name?.eng ?? row?.name?.kaz ?? row?.name?.rus ?? '',
+    label: row?.name?.eng !== null 
+  ? row.name.eng 
+  : row?.name?.kaz !== null 
+    ? row.name.kaz 
+    : row?.name?.rus !== null 
+      ? row.name.rus 
+      : '',
     value: row._id,
   })) || []; 
 

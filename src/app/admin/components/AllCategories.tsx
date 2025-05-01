@@ -22,7 +22,7 @@ interface FormValues {
     content: string;
   }[];
 }
-const   AllCategories = () => {
+const AllCategories = () => {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [page, setPage] = useState(1);
@@ -38,11 +38,11 @@ const   AllCategories = () => {
     setQuery(`page=${newPage}&limit=${itemsPerPage}`);
   };
 
-  const addCategory = ()=>{
+  const addCategory = () => {
     setIsAddModalOpen(true);
   }
   const handleSubCategory = (id: string) => {
-    router.push(`/admin/categories/${id}/sub-category`); 
+    router.push(`/admin/categories/${id}/sub-category`);
   }
 
   const handleSubmit = async (formData: FormValues) => {
@@ -52,7 +52,7 @@ const   AllCategories = () => {
         const summaryName = formData.descriptionTranslations[0].content.split(" ").join("-").toLowerCase();
 
         if (formData.image) {
-          const { signedUrl, key } = await generateSignedUrlForCategory(formData.image.name, formData.image.type,summaryName);
+          const { signedUrl, key } = await generateSignedUrlForCategory(formData.image.name, formData.image.type, summaryName);
 
           const uploadResponse = await fetch(signedUrl, {
             method: 'PUT',
@@ -96,21 +96,28 @@ const   AllCategories = () => {
 
   return (
     <div>
-       <div className="flex gap-2.5 justify-end mb-5 ">
+      <div className="flex gap-2.5 justify-end mb-5 ">
         <SearchBar setQuery={setsearchParams} query={searchParams} />
-         <div><Button text="Add A New Category" onClick={addCategory} /></div>
+        <div><Button text="Add A New Category" onClick={addCategory} /></div>
       </div>
-       <div className='grid grid-cols-4 gap-6'>
-            {category?.map((row: any) => (
-            <CategoryCard 
+      <div className='grid grid-cols-4 gap-6'>
+        {category?.map((row: any) => (
+
+          <CategoryCard
             key={row?._id}
-            name={row?.name.eng}
+            name={
+              row?.name?.eng ??
+              row?.name?.kaz ??
+              row?.name?.rus ??
+              ''
+            }
             image={getImageClientS3URL(row?.image)}
-            onClick={()=>handleSubCategory(row?._id)}
-            />
-            ))}
-        </div>
-        <div className="mt-10 flex justify-end">
+            onClick={() => handleSubCategory(row?._id)}
+          />
+
+        ))}
+      </div>
+      <div className="mt-10 flex justify-end">
         <TablePagination
           setPage={handlePageChange}
           page={page}
