@@ -270,7 +270,7 @@ const AudiobookForm = () => {
 
 const CustomFileUpload = ({ register, langIndex, existingFile, watch }) => {
   const file = watch(`languages.${langIndex}.file`);
-  const [fileName, setFileName] = useState(existingFile ? existingFile.split("/").pop() : "");
+  const [fileName, setFileName] = useState(existingFile ? existingFile?.split("/").pop() : "");
 
   useEffect(() => {
     if (file?.[0]) {

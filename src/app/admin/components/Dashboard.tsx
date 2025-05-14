@@ -123,7 +123,7 @@ const eventsProfile = (id: string) => {
             overviewData?.newestUsers?.map((row: any) => (
               <tr key={row?._id}>
                 <td>{row?.identifier}</td>
-                <td><div className='flex items-center gap-[5px]'><TableRowImage image={row?.profilePic ? getImageClientS3URL(row?.profilePic) : profile}/> {row?.fullName?.eng}</div> </td>
+                <td><div className='flex items-center gap-[5px]'><TableRowImage image={row?.profilePic ? getImageClientS3URL(row?.profilePic) : profile}/> {row?.fullName?.eng ?? row?.fullName?.rus ?? row?.fullName?.kaz }</div> </td>
                 <td>Level {row.award===null? 0 : row.award.level}</td>
                 <td>{row?.phoneNumber ? row?.phoneNumber : '-'}</td>
                 <td><button onClick={() => userProfile(row?._id)} className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]  '>View</button></td>
@@ -168,7 +168,7 @@ const eventsProfile = (id: string) => {
             overviewData?.newestEvents.map((row: any) => (
               <tr key={row?._id}>
                 <td><TableRowImage image={row?.image ? getImageClientS3URL(row?.image) : profile}/></td>
-                <td>{row?.name}</td>
+                <td>{row?.name }</td>
                 <td>{row?.createdAt}</td>
                 <td><button onClick={() => eventsProfile(row?._id)} className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]  '>View</button></td>
               </tr>

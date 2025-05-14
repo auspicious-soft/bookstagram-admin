@@ -55,6 +55,7 @@ const Page = () => {
         <Button text="Add A New Banner" onClick={addBanner} />
       </div>
       <div className="grid grid-cols-4 gap-6">
+        {banners?.length === 0 && <p className="text-center text-gray-500">No data found.</p>}
         {banners?.map((banner: any) => (
           <div key={banner?._id} className="relative">
             <Image

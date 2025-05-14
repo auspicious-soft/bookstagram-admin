@@ -154,7 +154,7 @@ const BookForm = () => {
   };
 
   const onSubmit = async (data: FormValues) => { 
-    const userName = data.translations[0].name.split(" ").join("-").toLowerCase();
+    const userName = data.translations[0].name?.split(" ").join("-").toLowerCase();
   
     startTransition(async () => {
       try {

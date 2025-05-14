@@ -23,7 +23,7 @@ const SalesChart = ({selectedYear, data, onYearChange}: Props) => {
 
   useEffect(() => {
     const formattedData = monthlyCounts.map((item: any) => ({
-      name: item.month.split("/")[0], 
+      name: item.month?.split("/")[0], 
       value: item.count,
     }));
 

@@ -52,7 +52,7 @@ const AllSummary = () => {
     startTransition(async () => {
       try {
         let imageUrl = null;
-        const summaryName = formData.descriptionTranslations[0].content.split(" ").join("-").toLowerCase();
+        const summaryName = formData.descriptionTranslations[0].content?.split(" ").join("-").toLowerCase();
 
         if (formData.image) {
           const { signedUrl, key } = await generateSignedUrlForSummary(formData.image.name, formData.image.type,summaryName);

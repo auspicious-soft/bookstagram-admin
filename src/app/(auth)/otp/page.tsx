@@ -32,7 +32,7 @@ export default function Page() {
     const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
       e.preventDefault();
       const pastedData = e.clipboardData.getData('text');
-      const pastedNumbers = pastedData.replace(/\D/g, '').slice(0, 6).split('');
+      const pastedNumbers = pastedData.replace(/\D/g, '').slice(0, 6)?.split('');
       
   
       const newOtpValues = [...otpValues];

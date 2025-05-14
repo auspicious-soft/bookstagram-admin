@@ -66,7 +66,7 @@ const userProfile = (id: string) => {
               <tr key={row?._id}>
                 <td>#{row?.identifier}</td>
                 <td><div className="flex items-center gap-[5px] capitalize"><TableRowImage image={row?.profilePic ? getImageClientS3URL(row?.profilePic) : profile}/>
-                 {row?.fullName?.eng}  </div>
+                 {row?.fullName?.eng ?? row?.fullName?.rus ?? row?.fullName?.kaz }  </div>
                   </td>
                 <td>Level {row.award===null? 0 : row.award.level}</td>
                 <td>{row?.phoneNumber}</td>

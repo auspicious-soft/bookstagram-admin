@@ -784,7 +784,7 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
 };
 
 const CustomFileUpload = ({ register, langIndex, aditionalFile, width, isRequired, existingFile }) => {
-  const [fileName, setFileName] = useState(existingFile ? existingFile.split("/").pop() : "");
+  const [fileName, setFileName] = useState(existingFile ? existingFile?.split("/").pop() : "");
 
   return (
     <div className={`mb-4 w-[${width}]`}>
@@ -794,7 +794,7 @@ const CustomFileUpload = ({ register, langIndex, aditionalFile, width, isRequire
           {...register(`${langIndex}`)}
           className="absolute inset-0 opacity-0 cursor-pointer h-11  text-[#6e6e6e] text-sm font-normal"
           onChange={(e) => {
-            const selectedFile = e.target.files?.[0]?.name || (existingFile ? existingFile.split("/").pop() : "Select File");
+            const selectedFile = e.target.files?.[0]?.name || (existingFile ? existingFile?.split("/").pop() : "Select File");
             setFileName(selectedFile);
           }}
         />

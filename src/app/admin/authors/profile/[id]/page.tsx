@@ -150,7 +150,7 @@ const Page = () => {
 
       // Format date
       const formattedDate = authorData.dob
-        ? new Date(authorData.dob).toISOString().split("T")[0]
+        ? new Date(authorData.dob)?.toISOString()?.split("T")[0]
         : "";
 
       // Reset form with all values
@@ -211,7 +211,7 @@ const Page = () => {
   };
 
   const onSubmit = async (data: FormValues) => {
-    const userName = data.translations[0].name.split(" ").join("-").toLowerCase() + "-" + data.dob;
+    const userName = data?.translations[0]?.name?.split(" ").join("-").toLowerCase() + "-" + data.dob;
 
     startTransition(async () => {
       try {
