@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import book from '@/assets/images/bookCard.png';
 import { DropWhite, PlusIcon } from '@/utils/svgicons';
-import BookCard from '../BookCard';
+import DeletableBookCard from '../DeletableBookCard';
 import SearchBar from '../SearchBar';
 import useSWR from 'swr';
 import { getAllBooks } from '@/services/admin-services';
@@ -19,20 +18,21 @@ const BookMarket = () => {
   const [searchTerm, setSearchTerm] = useState(""); // Renamed to searchTerm for clarity
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const getTypeParam = (tab) => {
-    const typeMap = {
+  const getTypeParam = (tab: string) => {
+    const typeMap: Record<string, string> = {
       'All': '',
       'e-Books': 'e-book',
       'Audiobooks': 'audiobook',
       'Courses': 'course',
-      'Podcasts': 'podcast'
+      'Podcasts': 'podcast',
+      'Video-Lecture': 'video-lecture',
     };
     return typeMap[tab] || '';
   };
 
   // Construct the API URL with proper query parameters
   const apiUrl = `/admin/books?${query}${searchTerm ? `&description=${searchTerm}` : ''}&type=${getTypeParam(activeTab)}`;
-  const { data, isLoading, error } = useSWR(apiUrl, getAllBooks);
+  const { data, isLoading, error, mutate } = useSWR(apiUrl, getAllBooks);
   const booksdata = data?.data?.data;
 
   useEffect(() => {
@@ -56,7 +56,7 @@ const BookMarket = () => {
     setQuery(`page=${newPage}&limit=${itemsPerPage}`);
   };
 
-  const handleTabClick = (tab) => {
+  const handleTabClick = (tab: string) => {
     setQuery(`page=${1}&limit=${itemsPerPage}`);
     setActiveTab(tab);
     setPage(1);
@@ -71,7 +71,8 @@ const BookMarket = () => {
     { label: "e-Books", value: "e-book" },
     { label: "Audiobooks", value: "audiobook" },
     { label: "Courses", value: "course" },
-    { label: "Podcasts", value: "podcast" }
+    { label: "Podcasts", value: "podcast" },
+    { label: "Video-Lecture", value: "video-lecture" }
   ];
 
   const onTypeSelect = (type: string) => {
@@ -83,7 +84,7 @@ const BookMarket = () => {
     <div>
       <div className='flex justify-between mb-5'>
         <div className="tabs flex flex-wrap gap-[5px]">
-          {["All", "e-Books", "Audiobooks", "Courses", "Podcasts"].map((tab) => (
+          {["All", "e-Books", "Audiobooks", "Courses", "Podcasts" , "Video-Lecture"].map((tab) => (
             <button
               key={tab}
               className={`tab-button ${activeTab === tab ? 'active text-white bg-darkBlack ' : 'text-darkBlack bg-white   '} rounded-[34px] text-sm px-5 py-[10px]`}
@@ -135,9 +136,9 @@ const BookMarket = () => {
           ) : (
             <div className="grid grid-cols-4 gap-6">
               {booksdata?.map((book: any) => (
-                
-                <BookCard
+                <DeletableBookCard
                   key={book?._id}
+                  id={book?._id}
                   title={
                     book?.name?.eng ??
                     book?.name?.kaz ??
@@ -145,13 +146,6 @@ const BookMarket = () => {
                     ''
                   }
                   price={`$${book?.price}`}
-                  handleClick={() => openBookProfile(
-                    book?._id,
-                    book?.name?.eng ??
-                    book?.name?.kaz ??
-                    book?.name?.rus ??
-                    ''
-                  )}
                   imgSrc={getImageClientS3URL(book?.image)}
                   author={
                     book?.authorId[0]?.name?.eng ??
@@ -159,9 +153,19 @@ const BookMarket = () => {
                     book?.authorId[0]?.name?.rus ??
                     ''
                   }
-                  file={book}
+                  discount={book?.discountPercentage}
+                  handleClick={() => openBookProfile(
+                    book?._id,
+                    book?.name?.eng ??
+                    book?.name?.kaz ??
+                    book?.name?.rus ??
+                    ''
+                  )}
+                  onDeleteSuccess={() => {
+                    // Refresh the data after successful deletion
+                    mutate();
+                  }}
                 />
-
               ))}
             </div>
           )}

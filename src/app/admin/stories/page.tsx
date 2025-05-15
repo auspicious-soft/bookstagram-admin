@@ -1,5 +1,6 @@
 "use client";
 import Button from "@/app/components/Button";
+import DeleteConfirmationModal from "@/app/admin/components/DeleteConfirmationModal";
 import { deleteSingleStory, getAllStories } from "@/services/admin-services";
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 import { DeleteIcon } from "@/utils/svgicons";
@@ -13,9 +14,10 @@ const Page = () => {
   const router = useRouter();
   const { data, mutate } = useSWR(`/admin/stories`, getAllStories);
   const stories = data?.data?.data;
-  const [isPending, startTransition] = useTransition();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [, startTransition] = useTransition();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [storyToDelete, setStoryToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const addStory = () => {
     router.push('/admin/stories/add-new-story');
@@ -27,29 +29,34 @@ const Page = () => {
 
   const openDeleteModal = (id: string) => {
     setStoryToDelete(id);
-    setIsModalOpen(true);
+    setIsDeleteModalOpen(true);
   };
 
   const closeDeleteModal = () => {
-    setIsModalOpen(false);
+    setIsDeleteModalOpen(false);
     setStoryToDelete(null);
   };
 
   const handleDelete = async () => {
     if (!storyToDelete) return;
+
+    setIsDeleting(true);
     try {
       startTransition(async () => {
         const response = await deleteSingleStory(`/admin/stories/${storyToDelete}`);
         if (response.status === 200) {
           toast.success("Deleted successfully");
           mutate();
-          closeDeleteModal();
         } else {
           toast.error("Failed To Delete Story");
         }
+        setIsDeleting(false);
+        closeDeleteModal();
       });
     } catch (error) {
       toast.error("An Error Occurred While Deleting The Story");
+      setIsDeleting(false);
+      closeDeleteModal();
     }
   };
 
@@ -62,7 +69,7 @@ const Page = () => {
       <div className="grid grid-cols-4 gap-6">
         {stories?.map((story: any) => (
           <div key={story?._id} className="relative">
-            {story?.file && Object.entries(story?.file).slice(0, 1).map(([key, value]: [string, string], index) => (
+            {story?.file && Object.entries(story?.file).slice(0, 1).map(([key]: [string, string], index) => (
               <div key={index} onClick={() => openSingleStory(story?._id)} className="cursor-pointer">
                 <Image
                   unoptimized
@@ -88,35 +95,14 @@ const Page = () => {
       </div>
 
       {/* Delete Confirmation Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-[20px] p-6 w-[400px] shadow-lg">
-            <h2 className="text-xl font-aeonikBold text-darkBlack mb-4">Confirm Deletion</h2>
-            <p className="text-darkBlack mb-6">Are you sure you want to delete this story?</p>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={closeDeleteModal}
-                className="w-[30%] bg-gray-200 text-darkBlack px-4 py-2 rounded-[10px] text-sm"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                disabled={isPending}
-                className={`w-[30%] bg-orange text-white px-8 py-2 rounded-[10px] text-sm flex items-center text-center gap-2 ${
-                  isPending ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                {isPending ? (
-                  "Deleting..."
-                ) : (
-                  "Delete"
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+        title="Delete Story?"
+        message="Are you sure you really want to delete this story?"
+      />
     </div>
   );
 };

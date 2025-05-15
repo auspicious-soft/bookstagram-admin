@@ -6,7 +6,7 @@ import * as yup from "yup";
 import { DeleteIcon, CrossIcon, FileIcon, DustbinIcon, AddIcon } from "@/utils/svgicons";
 import { generateSignedUrlCoursesFiles, generateSignedUrlCourseAdditionalFiles } from "@/actions";
 import { toast } from "sonner";
-import { updateCourse, getSingleCourse } from "@/services/admin-services";
+import { updateCourse, getSingleCourse, updateSingleBook } from "@/services/admin-services";
 import useSWR from "swr";
 import { useParams } from "next/navigation";
 import { deleteSingleCourseLesson, deleteSingleCourseSubLesson, deleteSingleCourselanguage } from "@/services/admin-services";
@@ -228,72 +228,89 @@ const CourseForm = () => {
     }
   }, [data, isDataLoaded, productId]);
 
-  const onSubmit = async (data) => {
-    startTransition(async () => {
-      try {
-        let transformedLessons = [];
+  // Function to transform form data into lessons format
+  const transformFormDataToLessons = async (data) => {
+    let transformedLessons = [];
 
-        for (const language of data.languages) {
-          const languageLessons = language.lessons.map((lesson, lessonIndex) => {
-            const lessonObj = {
-              name: lesson.name,
-              lang: language.language,
-              srNo: lessonIndex + 1,
-              productId: productId,
-              _id: lesson._id || null,
-              subLessons: [],
-            };
+    for (const language of data.languages) {
+      const languageLessons = language.lessons.map((lesson, lessonIndex) => {
+        const lessonObj = {
+          name: lesson.name,
+          lang: language.language,
+          srNo: lessonIndex + 1,
+          productId: productId,
+          _id: lesson._id || null,
+          subLessons: [],
+        };
 
-            if (lesson._id) {
-              lessonObj._id = lesson._id;
-            }
-
-            lessonObj.subLessons = lesson?.subLessons?.map((subLesson, subIndex) => {
-              const transformedSubLesson = {
-                name: subLesson.name,
-                srNo: subIndex + 1,
-                description: subLesson.description,
-                file: subLesson.existingFile || null,
-                additionalFiles: subLesson.additionalFiles
-                  .filter((af) => af.file || af.name || af.existingFile)
-                  .map((af) => ({
-                    file: af.existingFile || null,
-                    name: af.name,
-                  })),
-                links: subLesson.links
-                  .filter((link) => link.url || link.name)
-                  .map((link) => ({
-                    url: link.url,
-                    name: link.name,
-                  })),
-              };
-
-              if (subLesson._id && subLesson._id !== "") {
-                (transformedSubLesson as any)._id = subLesson._id;
-              }
-
-              return transformedSubLesson;
-            });
-
-            return lessonObj;
-          });
-
-          transformedLessons = [...transformedLessons, ...languageLessons];
+        if (lesson._id) {
+          lessonObj._id = lesson._id;
         }
 
-        for (const lesson of transformedLessons) {
-          const languageData = data.languages.find((lang) => lang.language === lesson.lang);
-          if (!languageData) continue;
+        lessonObj.subLessons = lesson?.subLessons?.map((subLesson, subIndex) => {
+          const transformedSubLesson = {
+            name: subLesson.name,
+            srNo: subIndex + 1,
+            description: subLesson.description,
+            file: subLesson.existingFile || null,
+            additionalFiles: subLesson.additionalFiles
+              .filter((af) => af.file || af.name || af.existingFile)
+              .map((af) => ({
+                file: af.existingFile || null,
+                name: af.name,
+              })),
+            links: subLesson.links
+              .filter((link) => link.url || link.name)
+              .map((link) => ({
+                url: link.url,
+                name: link.name,
+              })),
+          };
 
-          for (const subLesson of lesson.subLessons) {
-            const originalLesson = languageData.lessons.find((l) => l.name === lesson.name);
-            const originalSubLesson = originalLesson?.subLessons.find((sl) => sl.name === subLesson.name);
+          if (subLesson._id && subLesson._id !== "") {
+            (transformedSubLesson as any)._id = subLesson._id;
+          }
 
-            if (!originalSubLesson) continue;
+          return transformedSubLesson;
+        });
 
-            if (originalSubLesson.file?.[0] && !originalSubLesson.existingFile) {
-              const file = originalSubLesson.file[0];
-              const { signedUrl, key } = await generateSignedUrlCoursesFiles(file.name, file.type, subLesson.name, lesson.lang);
+        return lessonObj;
+      });
+
+      transformedLessons = [...transformedLessons, ...languageLessons];
+    }
+
+    for (const lesson of transformedLessons) {
+      const languageData = data.languages.find((lang) => lang.language === lesson.lang);
+      if (!languageData) continue;
+
+      for (const subLesson of lesson.subLessons) {
+        const originalLesson = languageData.lessons.find((l) => l.name === lesson.name);
+        const originalSubLesson = originalLesson?.subLessons.find((sl) => sl.name === subLesson.name);
+
+        if (!originalSubLesson) continue;
+
+        if (originalSubLesson.file?.[0] && !originalSubLesson.existingFile) {
+          const file = originalSubLesson.file[0];
+          const { signedUrl, key } = await generateSignedUrlCoursesFiles(file.name, file.type, subLesson.name, lesson.lang);
+          await fetch(signedUrl, {
+            method: "PUT",
+            body: file,
+            headers: {
+              "Content-Type": file.type,
+            },
+          });
+          subLesson.file = key;
+        } else if (originalSubLesson.existingFile) {
+          subLesson.file = originalSubLesson.existingFile;
+        }
+
+        if (originalSubLesson.additionalFiles?.length > 0) {
+          for (let i = 0; i < originalSubLesson.additionalFiles.length; i++) {
+            const additionalFileObj = originalSubLesson.additionalFiles[i];
+            if (additionalFileObj.file?.[0] && !additionalFileObj.existingFile) {
+              const file = additionalFileObj.file[0];
+              const { signedUrl, key } = await generateSignedUrlCourseAdditionalFiles(file.name, file.type, subLesson.name, lesson.lang);
               await fetch(signedUrl, {
                 method: "PUT",
                 body: file,
@@ -301,41 +318,67 @@ const CourseForm = () => {
                   "Content-Type": file.type,
                 },
               });
-              subLesson.file = key;
-            } else if (originalSubLesson.existingFile) {
-              subLesson.file = originalSubLesson.existingFile;
-            }
-
-            if (originalSubLesson.additionalFiles?.length > 0) {
-              for (let i = 0; i < originalSubLesson.additionalFiles.length; i++) {
-                const additionalFileObj = originalSubLesson.additionalFiles[i];
-                if (additionalFileObj.file?.[0] && !additionalFileObj.existingFile) {
-                  const file = additionalFileObj.file[0];
-                  const { signedUrl, key } = await generateSignedUrlCourseAdditionalFiles(file.name, file.type, subLesson.name, lesson.lang);
-                  await fetch(signedUrl, {
-                    method: "PUT",
-                    body: file,
-                    headers: {
-                      "Content-Type": file.type,
-                    },
-                  });
-                  subLesson.additionalFiles[i].file = key;
-                } else if (additionalFileObj.existingFile) {
-                  subLesson.additionalFiles[i].file = additionalFileObj.existingFile;
-                }
-              }
+              subLesson.additionalFiles[i].file = key;
+            } else if (additionalFileObj.existingFile) {
+              subLesson.additionalFiles[i].file = additionalFileObj.existingFile;
             }
           }
         }
+      }
+    }
 
+    return transformedLessons;
+  };
+
+  // Function to save lessons only
+  const onSubmit = async (data) => {
+    startTransition(async () => {
+      try {
+        const transformedLessons = await transformFormDataToLessons(data);
         const response = await updateCourse("/admin/course-lessons", transformedLessons);
 
         if (response?.status === 200) {
-          toast.success("Book added successfully");
-          sessionStorage.removeItem("courseData");
-          window.location.href = "/admin/book-hub";
+          // Keep the courseData in sessionStorage for later use
+          // Only show success message without redirecting
+          toast.success("Lessons saved successfully");
         } else {
-          toast.error("Failed to add Book");
+          toast.error("Failed to save lessons");
+        }
+      } catch (error) {
+        console.error("Error submitting form: ", error);
+        toast.error("An error occurred while submitting the form");
+      }
+    });
+  };
+
+  // Function to save lessons and update book details
+  const saveAndUpdateBook = async () => {
+    const data = watch();
+    startTransition(async () => {
+      try {
+        // First save the lessons
+        const transformedLessons = await transformFormDataToLessons(data);
+        const lessonsResponse = await updateCourse("/admin/course-lessons", transformedLessons);
+
+        if (lessonsResponse?.status === 200) {
+          // Then update the book with the courseData from sessionStorage
+          const courseData = sessionStorage.getItem("courseData");
+          if (courseData) {
+            const bookData = JSON.parse(courseData);
+            const bookResponse = await updateSingleBook(`/admin/books/${productId}`, bookData);
+
+            if (bookResponse?.status === 200) {
+              toast.success("Lessons and book details updated successfully");
+              sessionStorage.removeItem("courseData");
+              window.location.href = "/admin/book-hub";
+            } else {
+              toast.error("Lessons saved but failed to update book details");
+            }
+          } else {
+            toast.warning("Lessons saved but no book data found to update");
+          }
+        } else {
+          toast.error("Failed to save lessons");
         }
       } catch (error) {
         console.error("Error submitting form: ", error);
@@ -475,13 +518,21 @@ const CourseForm = () => {
             type="button"
             className="px-6 py-2 border rounded-full"
             onClick={() => {
-              window.location.href = "/admin/book-hub";
+              window.location.href = `/admin/books/${productId}`;
             }}
           >
-            Cancel
+            Back to Book Details
           </button>
-          <button type="submit" disabled={isPending} className="bg-orange text-white px-5 py-2 rounded-[28px]">
-            {isPending ? "Saving..." : "Save Lesson"}
+          <button type="submit" disabled={isPending} className="bg-blue-500 text-white px-5 py-2 rounded-[28px]">
+            {isPending ? "Saving..." : "Save Lessons Only"}
+          </button>
+          <button
+            type="button"
+            disabled={isPending}
+            onClick={saveAndUpdateBook}
+            className="bg-orange text-white px-5 py-2 rounded-[28px]"
+          >
+            {isPending ? "Saving..." : "Save & Update Book"}
           </button>
         </div>
       </div>

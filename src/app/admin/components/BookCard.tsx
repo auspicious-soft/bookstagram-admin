@@ -15,6 +15,7 @@ interface CardProps {
     file?:any;
   }
   const BookCard: React.FC<CardProps> = ({ title, author, price, imgSrc, discount, handleDelete, handleClick ,file}) => {
+    console.log('discount: ', discount);
         // const [fileUrls, setFileUrls] = useState(null);
     
         // const [metadatas, setMetadatas] = useState(null);
@@ -36,7 +37,7 @@ interface CardProps {
         <h5 className='text-darkBlack mt-3 text-lg font-aeonikBold leading-[normal] mb-[5px] capitalize '>{title}</h5>
         <div className='flex justify-between items-center'>
         <p className='text-lg text-darkBlack  '>{price}</p>
-        {discount && (
+        { discount !== 0 &&  (
           <p className='text-lg text-orange '>{discount}% Off</p>
           )} 
           

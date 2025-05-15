@@ -14,12 +14,14 @@ interface Props {
   isPending: any;
   selectedBooks: string[];
   onSelectBooks: (books: string[]) => void;
+  type?: string;
 }
 
-const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSelectBooks, selectedBooks }: Props) => {
+const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSelectBooks, selectedBooks,type }: Props) => {
   const [searchParams, setSearchParams] = useState("");
-  const { data, error, isLoading } = useSWR(`/admin/books?description=${searchParams}`, getAllBooks);
+  const { data, error, isLoading } = useSWR(`/admin/books?type=${type}&description=${searchParams}`, getAllBooks);
   const allBooks = data?.data?.data;
+  console.log('allBooks: ', allBooks);
 
   const handleSelect = (id: string) => {
     onSelectBooks(
@@ -59,7 +61,7 @@ const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSele
             {allBooks?.map((data: any) => (
               <CourseCard
                 key={data?._id}
-                title={data?.name?.eng}
+                title={data?.name?.eng ?? data?.name?.kaz ?? data?.name?.rus ?? ''}
                 image={getImageClientS3URL(data?.image)}
                 selected={selectedBooks.includes(data?._id)}
                 onSelect={() => handleSelect(data?._id)}

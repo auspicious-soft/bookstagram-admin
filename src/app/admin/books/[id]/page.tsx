@@ -379,7 +379,7 @@ const BookForm = () => {
                 </div>
               </div>
               <div className="mt-5">
-                {bookType !== "audiobook" &&
+                {bookType !== "audiobook" && bookType !== "course" &&
                   fileFields.map((field, index) => (
                     <div key={field.id} className="mb-4">
                       <div className="w-full">
@@ -395,7 +395,9 @@ const BookForm = () => {
                           />
                           {field.file && (
                             <p className="text-sm mt-2 text-gray-600">
-                              {(field as any).file.substring((field as any).file.lastIndexOf('/') + 1)}
+                              {typeof (field as any).file === 'string'
+                                ? (field as any).file.substring((field as any).file.lastIndexOf('/') + 1 || 0)
+                                : (field as any).file?.name || 'Selected file'}
                             </p>
                           )}
                           <select

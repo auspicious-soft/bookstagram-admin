@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useTransition } from "react"; 
-import Button from "@/app/components/Button"; 
+import React, { useState, useTransition } from "react";
+import Button from "@/app/components/Button";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { addToBookMasters, deleteBookMasters, getAllBookMasters } from "@/services/admin-services";
@@ -13,6 +13,7 @@ import SearchBar from "../SearchBar";
 import TablePagination from "../TablePagination";
 import { toast } from "sonner";
 import AddToBookCommon from "../AddToBookCommon";
+import DeleteConfirmationModal from "../DeleteConfirmationModal";
 
 const BookMasters = () => {
   const router = useRouter();
@@ -28,6 +29,12 @@ const BookMasters = () => {
       getAllBookMasters
   );
   const masters = data?.data?.data;
+  const getName = (name) => name?.eng || name?.kaz || name?.rus;
+
+  // Delete confirmation modal state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ id: string; name: string } | null>(null);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -35,19 +42,36 @@ const BookMasters = () => {
   };
 
 
-  const handleDelete = async (id: string) => {
+  const openDeleteModal = (id: string, name: string) => {
+    setItemToDelete({ id, name });
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setItemToDelete(null);
+  };
+
+  const handleDelete = async () => {
+    if (!itemToDelete) return;
+
+    setIsDeleting(true);
     try {
-      startTransition(async()=>{
-      const response = await deleteBookMasters(`/admin/book-masters/${id}`);
-      if (response.status === 200) {
-        toast.success("Deleted successfully");
-        mutate()
-      } else {
-      toast.error("Failed To Delete");
-      }
-    });
+      startTransition(async () => {
+        const response = await deleteBookMasters(`/admin/book-masters/${itemToDelete.id}`);
+        if (response.status === 200) {
+          toast.success("Deleted successfully");
+          mutate();
+        } else {
+          toast.error("Failed To Delete");
+        }
+        setIsDeleting(false);
+        closeDeleteModal();
+      });
     } catch (error) {
-    toast.error("an Error Occurred While Deleting");
+      toast.error("An error occurred while deleting");
+      setIsDeleting(false);
+      closeDeleteModal();
     }
   }
 
@@ -67,7 +91,7 @@ const BookMasters = () => {
         if (response.status===201 ) {
           toast.success("Books added to Book Masters successfully");
           mutate();
-          setOpenModal(false); 
+          setOpenModal(false);
           setSelectedBooks([]);
         } else {
           toast.error("Failed To add books");
@@ -95,8 +119,8 @@ const BookMasters = () => {
             <tr>
               <th>Name of Course</th>
               <th>Author Name</th>
-              <th>Language</th>
-              <th>Categories</th> 
+              {/* <th>Language</th> */}
+              <th>Categories</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -113,23 +137,24 @@ const BookMasters = () => {
               masters?.map((row: any) => (
                 <tr key={row?._id}>
                   <td><div className="flex items-center gap-2.5 capitalize">
-                  <TableRowImage image={row?.productsId?.image ? getImageClientS3URL(row?.productsId?.image) : profile}/> {row?.productsId?.name?.eng}
+                  <TableRowImage image={row?.productsId?.image ? getImageClientS3URL(row?.productsId?.image) : profile}/> {row?.productsId?.name?.eng ?? row?.productsId?.name?.kaz ?? row?.productsId?.name?.rus}
                     </div></td>
                   <td>
                     {row?.productsId?.authorId?.map((item) => (
                     <p key={item?._id}>{item?.name?.eng}</p>
                     ))}</td>
-                  <td>
+                  {/* <td>
                   {row?.productsId?.file &&Object.entries(row?.productsId?.file).slice(0, 1).map(([key, value]: [string, string], index) => (
                     <p key={index}>
                     {key === "eng" ? "English" : key === "rus" ? "Russian" : key ==="kaz" ? "Kazakh": key}
                     </p>))}
-                  </td>
+                  </td> */}
                   <td>
                   <div className="flex flex-wrap gap-2">
                   {(row?.productsId?.categoryId)?.slice(0, 3)?.map((item) => (
                       <span key={item?._id} className="bg-[#EDEDED] px-2.5 py-1 rounded-full capitalize" >
-                        {item?.name.eng}
+                        {item?.name.rus  ?? item?.name?.kaz ?? item?.name?.eng}
+                        {/* {getName(item?.name)} */}
                       </span>
                     ))}
                   {(row?.productsId?.categoryId)?.length > 3 && (
@@ -138,7 +163,15 @@ const BookMasters = () => {
                 </div>
                   </td>
                   <td className="space-x-1">
-                    <button onClick={() => handleDelete(row?._id)} className="p-[10px]"><DeleteIcon/></button>
+                    <button
+                      onClick={() => openDeleteModal(
+                        row?._id,
+                        row?.productsId?.name?.eng ?? row?.productsId?.name?.kaz ?? row?.productsId?.name?.rus ?? 'this course'
+                      )}
+                      className="p-[10px]"
+                    >
+                      <DeleteIcon/>
+                    </button>
                   </td>
                 </tr>
               ))
@@ -173,9 +206,20 @@ const BookMasters = () => {
         title="Add To Book Master"
         selectedBooks={selectedBooks}
         onSelectBooks={setSelectedBooks}
-        handleSubmit={addBookToBookMaster} 
-        isPending={isPending}    
-      />      
+        handleSubmit={addBookToBookMaster}
+        isPending={isPending}
+        type="video-lecture"
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+        title="Delete Course?"
+        message={itemToDelete ? `Are you sure you really want to delete "${itemToDelete.name}"?` : "Are you sure you want to delete this course?"}
+      />
     </div>
   );
 };

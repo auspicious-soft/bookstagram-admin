@@ -1,0 +1,24 @@
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Trash bin -->
+  <rect x="120" y="80" width="60" height="80" rx="5" fill="#F91515" />
+  <rect x="110" y="70" width="80" height="10" rx="2" fill="#F91515" />
+  <rect x="140" y="50" width="20" height="20" rx="2" fill="#F91515" />
+  
+  <!-- Trash lid flying -->
+  <rect x="160" y="40" width="60" height="10" rx="2" transform="rotate(30 160 40)" fill="#F91515" />
+  
+  <!-- Papers flying out -->
+  <rect x="130" y="60" width="30" height="40" rx="2" transform="rotate(-15 130 60)" fill="white" />
+  <rect x="170" y="70" width="30" height="40" rx="2" transform="rotate(15 170 70)" fill="white" />
+  
+  <!-- Warning icon -->
+  <circle cx="220" cy="60" r="15" fill="#FF9900" />
+  <rect x="218" y="50" width="4" height="12" rx="2" fill="white" />
+  <circle cx="220" cy="68" r="2" fill="white" />
+  
+  <!-- Person -->
+  <circle cx="80" cy="100" r="15" fill="#FF6B00" /> <!-- Head -->
+  <rect x="65" y="115" width="30" height="40" rx="5" fill="#FF6B00" /> <!-- Body -->
+  <rect x="50" y="120" width="20" height="5" rx="2" fill="#FF6B00" /> <!-- Left arm -->
+  <rect x="90" y="120" width="30" height="5" rx="2" transform="rotate(30 90 120)" fill="#FF6B00" /> <!-- Right arm -->
+</svg>

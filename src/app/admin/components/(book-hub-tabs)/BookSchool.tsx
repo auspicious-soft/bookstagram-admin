@@ -14,6 +14,7 @@ import TablePagination from '../TablePagination';
 import { DeleteIcon, ViewIcon } from '@/utils/svgicons';
 import { toast } from 'sonner';
 import CouponCode from '../CouponCode';
+import DeleteConfirmationModal from '../DeleteConfirmationModal';
 
 const BookSchool = () => {
   const router = useRouter();
@@ -30,6 +31,11 @@ const BookSchool = () => {
   const [couponModal, setCouponModal] = useState(false);
   const [coupon, setCoupon] = useState();
 
+  // Delete confirmation modal state
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<{ id: string; name: string } | null>(null);
+
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     setQuery(`page=${newPage}&limit=${itemsPerPage}`);
@@ -40,22 +46,36 @@ const BookSchool = () => {
     setCoupon(code);
   };
 
-  const handleDelete = async (id: string) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this school?");
-    if (confirmDelete) {
-      try {
-        startTransition(async () => {
-          const response = await deleteBookSchool(`/admin/book-schools/${id}`);
-          if (response.status === 200) {
-            toast.success("Deleted successfully");
-            mutate()
-          } else {
-            toast.error("Failed To Delete");
-          }
-        });
-      } catch (error) {
-        toast.error("an Error Occurred While Deleting");
-      }
+  const openDeleteModal = (id: string, name: string) => {
+    setItemToDelete({ id, name });
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+    setItemToDelete(null);
+  };
+
+  const handleDelete = async () => {
+    if (!itemToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      startTransition(async () => {
+        const response = await deleteBookSchool(`/admin/book-schools/${itemToDelete.id}`);
+        if (response.status === 200) {
+          toast.success("Deleted successfully");
+          mutate();
+        } else {
+          toast.error("Failed To Delete");
+        }
+        setIsDeleting(false);
+        closeDeleteModal();
+      });
+    } catch (error) {
+      toast.error("An error occurred while deleting");
+      setIsDeleting(false);
+      closeDeleteModal();
     }
   }
 
@@ -103,7 +123,12 @@ const BookSchool = () => {
                     <td>
                       <div>
                         <button onClick={() => openCouponModal(row?.couponCode)} className='p-2.5'><ViewIcon /></button>
-                        <button onClick={() => handleDelete(row?._id)} className='p-2.5'><DeleteIcon /> </button>
+                        <button
+                          onClick={() => openDeleteModal(row?._id, row?.name?.eng || 'this school')}
+                          className='p-2.5'
+                        >
+                          <DeleteIcon />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -140,6 +165,16 @@ const BookSchool = () => {
         onClose={() => setIsOpen(false)}
         mutateCoupons={mutate}
       />}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+        title="Delete School?"
+        message={itemToDelete ? `Are you sure you really want to delete "${itemToDelete.name}"?` : "Are you sure you want to delete this school?"}
+      />
     </div>
   );
 };
