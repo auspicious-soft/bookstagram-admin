@@ -1,21 +1,21 @@
 "use client";
-import { generateSignedUrlAudioBookFile } from "@/actions";
+import { generateSignedUrlAudioBookChaptersFiles } from "@/actions";
 import { addNewBook } from "@/services/admin-services";
-import { DeleteIcon, CrossIcon, FileIcon } from "@/utils/svgicons";
-import React, { useState, useEffect,  useTransition } from "react";
+import { DeleteIcon, FileIcon } from "@/utils/svgicons";
+import React, { useState, useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-const AudiobookForm = () => {
+const AudiobookChaptersForm = () => {
   const [isPending, startTransition] = useTransition();
-  const { register, control, handleSubmit, watch } = useForm({
+  const bookData = JSON.parse(sessionStorage.getItem('audioBookData'));
+  const { register, control, handleSubmit, watch, setValue } = useForm({
     defaultValues: {
-      courseName: "",
+      audiobookName: "",
       languages: [
         {
           language: "",
-          file: null,
-          timestamps: [{ id: "1", chapterName: "", startTime: "00:00:00", endTime: "00:00:00" }],
+          chapters: [{ srNo: 1, chapterName: "", file: null }],
         },
       ],
     },
@@ -30,86 +30,72 @@ const AudiobookForm = () => {
     name: "languages",
   });
 
-  const [formData, setFormData] = useState<any>(null);
-
-  useEffect(() => {
-    const data = sessionStorage.getItem("audioBookData");
-    if (data) {
-      setFormData(JSON.parse(data));
-    }
-  }, []);
-
-  const userName = formData?.name
-    ? Object.values(formData.name)
-        .find((name) => name && (name as string).trim() !== "")
-        .toString()
-    : "Audiobook Name";
-
   const handleCancel = () => {
-    sessionStorage.removeItem("audioBookData");
     window.location.href = "/admin/book-hub";
   };
 
   const onSubmit = async (data: any) => {
     startTransition(async () => {
       try {
-        const filePromises = data.languages
-          .filter((lang) => lang.file && lang.language)
-          .map(async (lang) => {
-            const file = lang.file[0] as File;
-            const timestampsMetadata = Array.isArray(lang.timestamps) ? lang.timestamps : [];
-            const timestampsEncoded = Buffer.from(JSON.stringify(timestampsMetadata)).toString("base64");
+        // Prepare chapters data for each language
+        const chaptersData = [];
 
-            const { signedUrl, key } = await generateSignedUrlAudioBookFile(
-              file.name,
-              file.type,
-              userName,
-              lang.language,
-              { timestamps: timestampsEncoded }
-            );
+        for (const lang of data.languages) {
+          if (lang.language && lang.chapters.length > 0) {
+            for (const chapter of lang.chapters) {
+              if (chapter.chapterName && chapter.file && chapter.file[0]) {
+                const file = chapter.file[0] as File;
 
-            await fetch(signedUrl, {
-              method: "PUT",
-              body: file,
-              headers: { "Content-Type": file.type },
-            });
+                // Upload file and get URL
+                const { signedUrl, key } = await generateSignedUrlAudioBookChaptersFiles(
+                  file.name,
+                  file.type,
+                  bookData.name.eng,
+                  lang.language,
+                );
 
-            return { language: lang.language, fileUrl: key };
-          });
+                await fetch(signedUrl, {
+                  method: "PUT",
+                  body: file,
+                  headers: { "Content-Type": file.type },
+                });
 
-        const uploadedFiles = await Promise.all(filePromises);
+                chaptersData.push({
+                  name: chapter.chapterName,
+                  description: `Chapter ${chapter.srNo}`,
+                  srNo: chapter.srNo,
+                  file: key,
+                  lang: lang.language,
+                });
+              }
+            }
+          }
+        }
 
-        const fileTransforms = uploadedFiles.reduce(
-          (acc, curr) => ({
-            ...acc,
-            [curr.language]: curr.fileUrl,
-          }),
-          {}
-        );
-
-        const finalPayload = {
-          ...formData,
-          file: fileTransforms,
+        // Create the payload structure as specified
+        const payload = {
+          bookDetails: bookData,
+          chapters: chaptersData,
         };
 
-
-        const response = await addNewBook("/admin/books", finalPayload);
+        console.log('payload: ', payload);
+        const response = await addNewBook("/admin/audiobook-chapters", payload);
         if (response?.status === 201 || response?.status === 200) {
-          toast.success("Book added successfully");
-          sessionStorage.setItem("audioBookData", "");
+          toast.success("Audiobook added successfully");
           window.location.href = "/admin/book-hub";
         } else {
-          toast.error("Failed to add Book");
+          toast.error("Failed to add Audiobook");
         }
       } catch (error) {
         console.error("Error during submission:", error);
-        toast.error("An error occurred while adding the Book");
+        toast.error("An error occurred while adding the Audiobook");
       }
     });
   };
 
   // Watch the languages field to get real-time updates
   const languages = watch("languages");
+  const audiobookName = watch("audiobookName");
 
   // Get the list of currently selected languages dynamically
   const getSelectedLanguages = () => {
@@ -121,27 +107,41 @@ const AudiobookForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="bg-[#FFF] p-8 rounded-[20px] shadow-md">
       <div className="flex justify-between mb-4 h-10">
-        <h2 className="text-[#060606] text-2xl font-normal tracking-tight">{userName}</h2>
+        <h2 className="text-[#060606] text-2xl font-normal tracking-tight">
+          {bookData.name.eng || bookData.name.kaz || bookData.name.rus || "Name of the Audiobook"}
+        </h2>
         <button
           type="button"
           onClick={() => {
             if (languageFields.length < 3) {
               appendLanguage({
                 language: "",
-                file: null,
-                timestamps: [{ id: Date.now().toString(), chapterName: "", startTime: "00:00:00", endTime: "00:00:00" }],
+                chapters: [{ srNo: 1, chapterName: "", file: null }],
               });
             }
           }}
-          className="bg-orange text-white px-5 py-2 rounded-[28px]"
+          className="bg-[#f96815] text-white px-5 py-2 rounded-[28px]"
           disabled={languageFields.length >= 3}
         >
           Add New Language
         </button>
       </div>
 
+      {/* Audiobook Name Input */}
+      {/* <div className="mb-6">
+        <input
+          type="text"
+          {...register("audiobookName", { required: "Audiobook name is required" })}
+          placeholder="Enter audiobook name"
+          className="w-full p-3 border rounded-lg text-[#6e6e6e] text-sm font-normal"
+        />
+      </div> */}
+
       {languageFields.map((languageField, langIndex) => (
         <div key={languageField.id} className="bg-[#fef7f3] p-6 rounded-xl shadow-md mb-4">
+          <div className="mb-4 flex gap-3">
+            <label className="block mb-1 text-sm font-medium">Select Language</label>
+          </div>
           <div className="mb-4 flex gap-3">
             <select
               {...register(`languages.${langIndex}.language`, { required: "Language is required" })}
@@ -173,19 +173,20 @@ const AudiobookForm = () => {
               </button>
             )}
           </div>
-          <div className="p-5 bg-white rounded-[10px]">
-            <CustomFileUpload register={register} langIndex={langIndex} />
-            <TimestampsFieldArray control={control} langIndex={langIndex} register={register} />
+
+          {/* Chapters Table */}
+          <div className="bg-white rounded-[10px] p-4">
+            <ChaptersFieldArray control={control} langIndex={langIndex} register={register} />
           </div>
         </div>
       ))}
 
       <div className="flex justify-end gap-[10px] mt-6 h-10">
-        <button type="button" onClick={() => handleCancel()} className="border border-orange text-orange px-5 py-2 rounded-[28px]">
+        <button type="button" onClick={() => handleCancel()} className="border border-[#f96815] text-[#f96815] px-5 py-2 rounded-[28px]">
           Cancel
         </button>
         <button disabled={isPending} type="submit" className="bg-[#f96815] text-white px-5 py-2 rounded-[28px] hover:bg-opacity-90 disabled:bg-opacity-50">
-          {isPending ? "Saving..." :"Save Audiobook"}
+          {isPending ? "Saving..." : "Save Audiobook"}
         </button>
       </div>
     </form>
@@ -193,18 +194,17 @@ const AudiobookForm = () => {
 };
 
 // Custom File Upload Component
-const CustomFileUpload = ({ register, langIndex }) => {
+const CustomFileUpload = ({ register, chapterIndex, langIndex }) => {
   const [fileName, setFileName] = useState("");
 
   return (
-    <div className="mb-4">
-      <label className="block mb-1 text-sm font-medium">Select File</label>
+    <div className="">
       <div className="h-11 relative border rounded-lg p-3 flex items-center bg-white cursor-pointer">
         <input
           type="file"
-          required
-          {...register(`languages.${langIndex}.file`)}
-          className="absolute inset-0 opacity-0 cursor-pointer text-[#6e6e6e] text-sm font-normal"
+          accept="audio/*"
+          {...register(`languages.${langIndex}.chapters.${chapterIndex}.file`)}
+          className="absolute inset-0 opacity-0 cursor-pointer text-sm font-normal border border-gray-300 text-[#6e6e6e]"
           onChange={(e) => {
             const selectedFile = e.target.files?.[0]?.name || "Select File";
             setFileName(selectedFile);
@@ -219,66 +219,78 @@ const CustomFileUpload = ({ register, langIndex }) => {
   );
 };
 
-// Timestamp Input Section
-const TimestampsFieldArray = ({ control, langIndex, register }) => {
+// Chapters Field Array Component
+const ChaptersFieldArray = ({ control, langIndex, register }) => {
   const { fields, append, remove } = useFieldArray({
     control,
-    name: `languages.${langIndex}.timestamps`,
+    name: `languages.${langIndex}.chapters`,
   });
 
   return (
     <>
+     
+      {/* Chapter Rows */}
       {fields.map((field, index) => (
-        <div key={field.id} className="flex flex-col gap-2 mb-4 w-full">
-          <div className="flex flex-wrap items-center gap-2 justify-between md:flex-nowrap">
-            {["Name of Chapter", "Start Time", "End Time"].map((label, i) => (
-              <div key={i} className="flex-1 min-w-[120px] max-w-[33%] md:max-w-[30%]">
-                <label className="mb-1 block text-[#060606] text-sm font-normal">{label}</label>
-                {i === 0 ? (
-                  <input
-                    type="text"
-                    {...register(`languages.${langIndex}.timestamps.${index}.chapterName`)}
-                    placeholder="Name of chapter"
-                    className="w-full p-2 border border-gray-300 rounded-lg text-[#6e6e6e] text-sm font-normal"
-                  />
-                ) : i === 1 ? (
-                  <input
-                    type="time"
-                    step="1"
-                    {...register(`languages.${langIndex}.timestamps.${index}.startTime`)}
-                    className="w-full p-2 border border-gray-300 rounded-lg text-[#6e6e6e] text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <input
-                    type="time"
-                    step="1"
-                    {...register(`languages.${langIndex}.timestamps.${index}.endTime`)}
-                    className="w-full p-2 border border-gray-300 rounded-lg text-[#6e6e6e] text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                )}
-              </div>
-            ))}
-            <div className="mt-[20px]">
-              <button
-                type="button"
-                onClick={() => remove(index)}
-                className="border-[#989898] border-[1px] items-center text-white p-[5px] rounded-[28px]"
-              >
-                <CrossIcon />
-              </button>
+        <div key={field.id} className="flex gap-[20px] mb-4 items-center w-full">
+          {/* Sr No */}
+          {/* <div className="flex-col font-medium text-sm text-[#060606]"> */}
+
+          <div className="w-[8%] flex-col text-[#6e6e6e] text-sm font-normal space-y-[10px]">
+            <div className="text-[#060606] text-sm font-normal">Sr No.</div>
+            <div className="w-12 px-3.5 py-3 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-start items-start gap-2.5">
+              {String(index + 1).padStart(2, '0')}
             </div>
           </div>
+          {/* </div> */}
+
+          {/* Chapter Name */}
+          <div className="flex-col font-medium text-sm text-[#060606] w-full space-y-[10px]">
+            {/* <div className="flex-col font-medium text-sm text-[#060606]"> */}
+            <div>Chapter Name</div>
+            <input
+              type="text"
+              {...register(`languages.${langIndex}.chapters.${index}.chapterName`)}
+              placeholder="Chapter Name"
+              className="w-full p-2 border border-gray-300 text-[#6e6e6e] text-sm font-normal h-11 px-5 py-4 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-72"
+            />
+          </div>
+
+          {/* File Upload */}
+          <div className="flex-col font-medium text-sm text-[#060606] w-full space-y-[10px]">
+            <div>Select File</div>
+
+            <CustomFileUpload register={register} chapterIndex={index} langIndex={langIndex} />
+          </div>
+
+          {/* Delete Button */}
+
+          <div className="flex justify-end items-end mt-6">
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              className="w-11 h-11 bg-[#f91515] rounded-full flex items-center justify-center text-white"
+            >
+              <DeleteIcon stroke="#FFF" />
+            </button>
+          </div>
+        
         </div>
       ))}
+
+      {/* Add New Chapter Button */}
       <button
         type="button"
-        onClick={() => append({ id: Date.now().toString(), chapterName: "", startTime: "00:00:00", endTime: "00:00:00" })}
-        className="px-5 py-3 bg-[#157ff9] rounded-[28px] text-white text-sm font-normal"
+        onClick={() => append({
+          srNo: fields.length + 1,
+          chapterName: "",
+          file: null
+        })}
+        className="px-5 py-3 bg-[#157ff9] rounded-[28px] text-white text-sm font-normal flex items-center gap-2"
       >
-        Add New Timestamp
+        <span>+</span> Add New Chapter
       </button>
     </>
   );
 };
 
-export default AudiobookForm;
+export default AudiobookChaptersForm;

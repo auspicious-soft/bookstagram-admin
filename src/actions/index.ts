@@ -267,6 +267,22 @@ export const generateSignedUrlBookFiles = async (fileName: string, fileType: str
 		throw error;
 	}
 };
+export const generateSignedUrlAudioBookChaptersFiles = async (fileName: string, fileType: string, name: string, language: string) => {
+	const uploadParams = {
+		Bucket: process.env.AWS_BUCKET_NAME,
+		Key: `audiobooks/${name}/files/${language}/${fileName}`,
+		ContentType: fileType,
+		acl: "public-read",
+	};
+	try {
+		const command = new PutObjectCommand(uploadParams);
+		const signedUrl = await getSignedUrl(await createS3Client(), command);
+		return { signedUrl, key: uploadParams.Key };
+	} catch (error) {
+		console.error("Error generating signed URL:", error);
+		throw error;
+	}
+};
 export const generateSignedUrlCoursesFiles = async (fileName: string, fileType: string, name: string, language: string) => {
 	const uploadParams = {
 		Bucket: process.env.AWS_BUCKET_NAME,

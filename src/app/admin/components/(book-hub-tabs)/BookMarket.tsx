@@ -107,7 +107,7 @@ const BookMarket = () => {
               <PlusIcon /> Add <span>|</span> <DropWhite />
             </button>
             {showData && (
-              <div className="space-y-2 absolute z-[2] top-[45px] right-0 w-full h-auto bg-white p-2 rounded-lg shadow-lg">
+              <div className="space-y-2 absolute top-[45px] right-0 w-full z-50 h-auto bg-white p-2 rounded-lg shadow-lg">
                 {bookTypes.map((type) => (
                   <button
                     key={type.value}

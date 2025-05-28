@@ -15,9 +15,11 @@ const AudiobookForm = () => {
   const [metadatas, setMetadatas] = useState<{ [key: string]: any } | null>(null);
   const [bookData, setBookData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { data, isLoading: isFetchingData } = useSWR(`/admin/books/${id}`, getSingleBook);
+  const { data, isLoading: isFetchingData } = useSWR(`/admin/audiobook-chapters/product/${id}`, getSingleBook);
+  console.log('data: ', data?.data?.data?.chapters);
 
   const fileName = data?.data?.data?.books?.[0]?.file || {};
+  console.log('DATA: ', data?.data?.data);
   const availableLanguages = ["eng", "kaz", "rus"];
 
   const { register, control, handleSubmit, reset, watch, setValue } = useForm({
@@ -250,7 +252,6 @@ const AudiobookForm = () => {
             )}
           </div>
           <div className="p-5 bg-white rounded-[10px]">
-            <CustomFileUpload register={register} langIndex={langIndex} existingFile={fileName[languageField.language]} watch={watch} />
             <TimestampsFieldArray control={control} langIndex={langIndex} register={register} />
           </div>
         </div>
@@ -268,38 +269,7 @@ const AudiobookForm = () => {
   );
 };
 
-const CustomFileUpload = ({ register, langIndex, existingFile, watch }) => {
-  const file = watch(`languages.${langIndex}.file`);
-  const [fileName, setFileName] = useState(existingFile ? existingFile?.split("/").pop() : "");
 
-  useEffect(() => {
-    if (file?.[0]) {
-      setFileName(file[0].name);
-    }
-  }, [file]);
-
-  return (
-    <div className="mb-4">
-      <label className="block mb-1 text-sm font-medium">Select File</label>
-      <div className="h-11 relative border rounded-lg p-3 flex items-center bg-white cursor-pointer">
-        <input
-          type="file"
-          required
-          {...register(`languages.${langIndex}.file`)}
-          className="absolute inset-0 opacity-0 cursor-pointer text-[#6e6e6e] text-sm font-normal"
-          onChange={(e) => {
-            const selectedFile = e.target.files?.[0]?.name || "Select File";
-            setFileName(selectedFile);
-          }}
-        />
-        <span className="flex-1 text-[#6e6e6e] text-sm font-normal">{fileName || "Select File"}</span>
-        <span className="text-[#060606]">
-          <FileIcon />
-        </span>
-      </div>
-    </div>
-  );
-};
 
 const TimestampsFieldArray = ({ control, langIndex, register }) => {
   const { fields, append, remove } = useFieldArray({
@@ -308,57 +278,82 @@ const TimestampsFieldArray = ({ control, langIndex, register }) => {
   });
 
   return (
-    <>
+    <div className="w-full">
+      {/* Table Header */}
+      <div className="grid grid-cols-12 gap-4 mb-4">
+        <div className="col-span-2">
+          <label className="block text-[#060606] text-sm font-normal">Sr No.</label>
+        </div>
+        <div className="col-span-4">
+          <label className="block text-[#060606] text-sm font-normal">Chapter Name</label>
+        </div>
+        <div className="col-span-5">
+          <label className="block text-[#060606] text-sm font-normal">Select File</label>
+        </div>
+        <div className="col-span-1">
+          {/* Remove button column header */}
+        </div>
+      </div>
+
+      {/* Table Rows */}
       {fields.map((field, index) => (
-        <div key={field.id} className="w-full flex flex-col gap-1 mb-4">
-          <div className="flex flex-wrap items-center justify-between md:flex-nowrap">
-            {["Name of Chapter", "Start Time", "End Time"].map((label, i) => (
-              <div key={i} className="flex-1 min-w-[120px] max-w-[33%] md:max-w-[30%]">
-                <label className="mb-1 block text-[#060606] text-sm font-normal">{label}</label>
-                {i === 0 ? (
-                  <input
-                    type="text"
-                    {...register(`languages.${langIndex}.timestamps.${index}.chapterName`)}
-                    placeholder="Name of chapter"
-                    className="w-full p-2 border border-gray-300 rounded-lg text-[#6e6e6e] text-sm font-normal"
-                  />
-                ) : i === 1 ? (
-                  <input
-                    type="time"
-                    step="1"
-                    {...register(`languages.${langIndex}.timestamps.${index}.startTime`)}
-                    className="w-full p-2 border border-gray-300 rounded-lg text-[#6e6e6e] text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                ) : (
-                  <input
-                    type="time"
-                    step="1"
-                    {...register(`languages.${langIndex}.timestamps.${index}.endTime`)}
-                    className="w-full p-2 border border-gray-300 rounded-lg text-[#6e6e6e] text-sm font-normal focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                )}
-              </div>
-            ))}
-            <div className="mt-[20px]">
-              <button
-                type="button"
-                onClick={() => remove(index)}
-                className="border-[#989898] border-[1px] items-center text-white p-[5px] rounded-[28px]"
-              >
-                <CrossIcon />
-              </button>
+        <div key={field.id} className="grid grid-cols-12 gap-4 mb-4 items-center">
+          {/* Sr No. */}
+          <div className="col-span-2">
+            <div className="text-[#6e6e6e] text-sm font-normal p-2">
+              {String(index + 1).padStart(2, '0')}
             </div>
+          </div>
+
+          {/* Chapter Name */}
+          <div className="col-span-4">
+            <input
+              type="text"
+              {...register(`languages.${langIndex}.timestamps.${index}.chapterName`)}
+              placeholder="Select File"
+              className="w-full p-2 border border-gray-300 rounded-lg text-[#6e6e6e] text-sm font-normal"
+            />
+          </div>
+
+          {/* Select File */}
+          <div className="col-span-5">
+            <div className="relative border rounded-lg p-2 flex items-center bg-white cursor-pointer">
+              <input
+                type="file"
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                onChange={() => {
+                  // Handle file selection if needed
+                }}
+              />
+              <span className="flex-1 text-[#6e6e6e] text-sm font-normal">Select File</span>
+              <span className="text-[#060606] ml-2">
+                <FileIcon />
+              </span>
+            </div>
+          </div>
+
+          {/* Remove Button */}
+          <div className="col-span-1 flex justify-center">
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              className="w-8 h-8 bg-[#f91515] rounded-full flex items-center justify-center text-white"
+            >
+              <CrossIcon />
+            </button>
           </div>
         </div>
       ))}
+
+      {/* Add New Chapter Button */}
       <button
         type="button"
         onClick={() => append({ id: Date.now().toString(), chapterName: "", startTime: "00:00:00", endTime: "00:00:00" })}
         className="px-5 py-3 bg-[#157ff9] rounded-[28px] text-white text-sm font-normal"
       >
-        Add New Timestamp
+        + Add New Chapter
       </button>
-    </>
+    </div>
   );
 };
 

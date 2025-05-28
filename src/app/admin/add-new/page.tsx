@@ -318,7 +318,7 @@ const BookForm = () => {
                         />
                         <select
                           {...register(`fileTranslations.${index}.language`)}
-                          className="w-full bg-[#f5f5f5] py-4 px-4 rounded-[10px] p-2 mt-4"
+                          className="w-full bg-[#f5f5f5] py-4 px-4  rounded-[10px] p-2 mt-4"
                         >
                           <option value="" disabled>Select Language</option>
                           <option value="eng">Eng</option>
