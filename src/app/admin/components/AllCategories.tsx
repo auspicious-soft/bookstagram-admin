@@ -101,6 +101,7 @@ const AllCategories = () => {
         <div><Button text="Add A New Category" onClick={addCategory} /></div>
       </div>
       <div className='grid grid-cols-4 gap-6'>
+        {category?.length === 0 && <p className="text-center text-gray-500">No data found.</p>}
         {category?.map((row: any) => (
 
           <CategoryCard
