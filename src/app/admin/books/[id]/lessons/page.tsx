@@ -740,6 +740,7 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
                     langIndex={`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.file`}
                     aditionalFile={false}
                     existingFile={existingFile}
+                    accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/x-ms-wmv"
                   />
                 </div>
               </div>
@@ -782,6 +783,7 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
                             width="100%"
                             isRequired="false"
                             existingFile={existingAdditionalFile}
+                            accept=".pdf,.doc,.docx"
                           />
                         </div>
                         <input
@@ -834,20 +836,44 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
   );
 };
 
-const CustomFileUpload = ({ register, langIndex, aditionalFile, width, isRequired, existingFile }) => {
+const CustomFileUpload = ({ register, langIndex, aditionalFile,accept, width, isRequired, existingFile }) => {
   const [fileName, setFileName] = useState(existingFile ? existingFile?.split("/").pop() : "");
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+
+    if (file && accept) {
+      const allowedTypes = accept.split(",").map((type) => type.trim().toLowerCase());
+      const fileType = file.type.toLowerCase();
+      const fileExt = file.name.split(".").pop()?.toLowerCase();
+
+      const isValid = allowedTypes.some((type) => {
+        return type.startsWith(".") ? fileExt === type.slice(1) : fileType === type;
+      });
+
+      if (!isValid) {
+        alert(`Only files of types ${accept} are allowed.`);
+        e.target.value = "";
+        return;
+      }
+
+      setFileName(file.name);
+    } else if (file) {
+      setFileName(file.name);
+    } else {
+      setFileName(existingFile ? existingFile?.split("/").pop() : "");
+    }
+  };
 
   return (
     <div className={`mb-4 w-[${width}]`}>
       <div className="relative border rounded-lg p-3 flex items-center bg-white cursor-pointer">
         <input
           type="file"
+          accept={accept}
           {...register(`${langIndex}`)}
           className="absolute inset-0 opacity-0 cursor-pointer h-11  text-[#6e6e6e] text-sm font-normal"
-          onChange={(e) => {
-            const selectedFile = e.target.files?.[0]?.name || (existingFile ? existingFile?.split("/").pop() : "Select File");
-            setFileName(selectedFile);
-          }}
+          onChange={handleFileChange}
         />
         <span className="flex-1 text-[#6e6e6e] opacity-0.5  text-sm font-normal">
           {fileName || (aditionalFile ? "Additional files" : "Select File")}

@@ -446,6 +446,7 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
                   register={register}
                   langIndex={`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.file`}
                   aditionalFile={false}
+                  accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/x-ms-wmv"
                 />
               </div>
             </div>
@@ -475,6 +476,7 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
                       langIndex={`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.additionalFiles.${fileIndex}.file`}
                       aditionalFile={true}
                       width="50%"
+                      accept=".pdf,.doc,.docx"
                     />
                     <input
                       {...register(`languages.${nestIndex}.lessons.${lessonIndex}.subLessons.${subIndex}.additionalFiles.${fileIndex}.name`)}
@@ -524,7 +526,7 @@ const SubLessonFieldArray = ({ control, register, nestIndex, lessonIndex, watch,
   );
 };
 
-const CustomFileUpload = ({ register, langIndex, aditionalFile, width }) => {
+const CustomFileUpload = ({ register, langIndex,accept, aditionalFile, width }) => {
   const [fileName, setFileName] = useState("");
 
   return (
@@ -532,6 +534,7 @@ const CustomFileUpload = ({ register, langIndex, aditionalFile, width }) => {
       <div className="relative border rounded-lg p-3 flex items-center bg-white cursor-pointer">
         <input
           type="file"
+          accept={accept}
           {...register(`${langIndex}`)}
           className="absolute inset-0 opacity-0 cursor-pointer h-11 text-[#6e6e6e]"
           onChange={(e) => {
