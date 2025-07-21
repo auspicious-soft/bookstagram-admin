@@ -4,7 +4,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { DeleteIcon, CrossIcon, FileIcon, DustbinIcon, AddIcon } from "@/utils/svgicons";
-import { generateSignedUrlCoursesFiles, generateSignedUrlCourseAdditionalFiles } from "@/actions";
+import { generateSignedUrlCoursesFiles, generateSignedUrlCourseAdditionalFiles, deleteFileFromS3 } from "@/actions";
 import { toast } from "sonner";
 import { updateCourse, getSingleCourse, updateSingleBook } from "@/services/admin-services";
 import useSWR from "swr";
@@ -278,6 +278,7 @@ const CourseForm = () => {
       });
 
       transformedLessons = [...transformedLessons, ...languageLessons];
+      console.log('transformedLessons: ', transformedLessons);
     }
 
     for (const lesson of transformedLessons) {
@@ -287,10 +288,11 @@ const CourseForm = () => {
       for (const subLesson of lesson.subLessons) {
         const originalLesson = languageData.lessons.find((l) => l.name === lesson.name);
         const originalSubLesson = originalLesson?.subLessons.find((sl) => sl.name === subLesson.name);
+        console.log('originalSubLesson: ', originalSubLesson);
 
         if (!originalSubLesson) continue;
 
-        if (originalSubLesson.file?.[0] && !originalSubLesson.existingFile) {
+        if (originalSubLesson.file?.[0] ) {
           const file = originalSubLesson.file[0];
           const { signedUrl, key } = await generateSignedUrlCoursesFiles(file.name, file.type, subLesson.name, lesson.lang);
           await fetch(signedUrl, {
@@ -301,6 +303,9 @@ const CourseForm = () => {
             },
           });
           subLesson.file = key;
+          if(originalSubLesson.existingFile){
+            await deleteFileFromS3(originalSubLesson.existingFile)
+          }
         } else if (originalSubLesson.existingFile) {
           subLesson.file = originalSubLesson.existingFile;
         }
@@ -335,6 +340,8 @@ const CourseForm = () => {
     startTransition(async () => {
       try {
         const transformedLessons = await transformFormDataToLessons(data);
+        console.log('transformedLessons upload: ', transformedLessons);
+        
         const response = await updateCourse("/admin/course-lessons", transformedLessons);
 
         if (response?.status === 200) {
