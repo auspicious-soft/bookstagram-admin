@@ -15,7 +15,6 @@ interface CardProps {
     file?:any;
   }
   const BookCard: React.FC<CardProps> = ({ title, author, price, imgSrc, discount, handleDelete, handleClick ,file}) => {
-    console.log('discount: ', discount);
         // const [fileUrls, setFileUrls] = useState(null);
     
         // const [metadatas, setMetadatas] = useState(null);

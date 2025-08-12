@@ -1,35 +1,28 @@
 "use client";
 
-import { generateSignedUrlAudioBookFile, getFileWithMetadata, deleteFileFromS3, updateS3ObjectMetadata } from "@/actions";
-import { addNewBook, getSingleBook, updateSingleBook } from "@/services/admin-services";
-import { CrossIcon, DeleteIcon, FileIcon } from "@/utils/svgicons";
+import { generateSignedUrlAudioBookChaptersFiles, getFileWithMetadata, deleteFileFromS3 } from "@/actions";
+import { getSingleBook, updateSingleBook } from "@/services/admin-services";
+import { DeleteIcon, FileIcon } from "@/utils/svgicons";
 import { useParams } from "next/navigation";
-import React, { useState, useEffect, startTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import useSWR from "swr";
 
-const AudiobookForm = () => {
+const AudiobookChaptersForm = () => {
   const { id } = useParams();
-  const [fileUrls, setFileUrls] = useState<{ [key: string]: string } | null>(null);
-  const [metadatas, setMetadatas] = useState<{ [key: string]: any } | null>(null);
   const [bookData, setBookData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isPending, startTransition] = useTransition();
+  const [isFormInitialized, setIsFormInitialized] = useState(false);
   const { data, isLoading: isFetchingData } = useSWR(`/admin/audiobook-chapters/product/${id}`, getSingleBook);
-  console.log('data: ', data?.data?.data?.chapters);
-
-  const fileName = data?.data?.data?.books?.[0]?.file || {};
-  console.log('DATA: ', data?.data?.data);
-  const availableLanguages = ["eng", "kaz", "rus"];
-
-  const { register, control, handleSubmit, reset, watch, setValue } = useForm({
+  const productId = data?.data?.data?.productData._id;
+  const { register, control, handleSubmit, watch, reset, setValue } = useForm({
     defaultValues: {
-      courseName: "",
+      audiobookName: "",
       languages: [
         {
           language: "",
-          file: null,
-          timestamps: [{ id: "1", chapterName: "", startTime: "00:00:00", endTime: "00:00:00" }],
+          chapters: [{ srNo: 1, chapterName: "", file: null }],
         },
       ],
     },
@@ -44,8 +37,7 @@ const AudiobookForm = () => {
     name: "languages",
   });
 
-  const [formData, setFormData] = useState<any>(null);
-  const [isFormInitialized, setIsFormInitialized] = useState(false);
+  const [formData, setFormData] = useState(null);
 
   useEffect(() => {
     const courseData = sessionStorage.getItem("audioBookData");
@@ -57,118 +49,215 @@ const AudiobookForm = () => {
   }, []);
 
   useEffect(() => {
-    const fetchFileMetadata = async () => {
-      const urls: { [key: string]: string } = {};
-      const metas: { [key: string]: any } = {};
+    if (data?.data?.data?.chapters && !isFormInitialized) {
+      const chapters = data.data.data.chapters;
+      const languagesMap = {};
 
-      for (const [lang, path] of Object.entries(fileName)) {
-        try {
-          const { fileUrl, metadata } = await getFileWithMetadata(path as string);
-          urls[lang] = fileUrl;
-          // Decode base64 timestamps and ensure they're in the correct format
-          const decodedTimestamps = metadata?.timestamps
-            ? metadata?.timestamps
-            : [];
-          // Ensure timestamps have the required structure
-          metas[lang] = Array.isArray(decodedTimestamps)
-            ? decodedTimestamps.map((ts: any) => ({
-                id: ts.id || Date.now().toString(),
-                chapterName: ts.chapterName || "",
-                startTime: ts.startTime || "00:00:00",
-                endTime: ts.endTime || "00:00:00",
-              }))
-            : [];
-        } catch (error) {
-          console.error(`Error fetching metadata for ${lang}:`, error);
-          metas[lang] = [];
+      chapters.forEach((chapter) => {
+        const lang = chapter.lang || 'eng';
+        if (!languagesMap[lang]) {
+          languagesMap[lang] = [];
         }
-      }
-      setFileUrls(urls);
-      setMetadatas(metas);
-      setIsLoading(false);
-    };
+        languagesMap[lang].push({
+          srNo: chapter.srNo || languagesMap[lang].length + 1,
+          chapterName: chapter.name || "",
+          file: null,
+          existingFile: chapter.file || null, // Store the existing file path
+        });
+      });
 
-    if (Object.keys(fileName).length > 0) {
-      fetchFileMetadata();
-    } else {
-      setIsLoading(false);
-    }
-  }, [fileName]);
-
-  useEffect(() => {
-    if (fileUrls && metadatas && !isFormInitialized) {
-      const languages = Object.entries(fileName).map(([lang]) => ({
+      const formLanguages = Object.entries(languagesMap).map(([lang, chapters]) => ({
         language: lang,
-        file: null, // No file is uploaded initially; this is for edits
-        timestamps: metadatas[lang].length > 0
-          ? metadatas[lang]
-          : [{ id: Date.now().toString(), chapterName: "", startTime: "00:00:00", endTime: "00:00:00" }],
+        chapters: Array.isArray(chapters) ? chapters : [],
       }));
-      reset({ languages });
+
+      reset({ languages: formLanguages });
       setIsFormInitialized(true);
     }
-  }, [fileUrls, metadatas, reset, isFormInitialized]);
-
-  const userName = formData?.name
-    ? Object.values(formData.name)
-        .find((name) => name && (name as string).trim() !== "")
-        ?.toString()
-    : "Audiobook Name";
+  }, [data, reset, isFormInitialized]);
 
   const handleCancel = () => {
     sessionStorage.removeItem("audioBookData");
     window.location.href = "/admin/book-hub";
   };
 
-  const onSubmit = async (data: any) => {
-    startTransition(async () => {
-      try {
-        const filePromises = data.languages.map(async (lang) => {
-          const timestampsEncoded = Buffer.from(JSON.stringify(lang.timestamps || [])).toString("base64");
-          const existingFilePath = fileName[lang.language];
+  // const onSubmit = async (data:any) => {
+  //   console.log('data---payload: ', data);
+  //   startTransition(async () => {console.log();
+  //     try {
+  //       const chaptersData = [];
+  //       const existingFiles = data?.data?.data?.chapters?.reduce((acc, chapter) => ({
+  //         ...acc,
+  //         [chapter.lang]: chapter.file
+  //       }), {}) || {};
 
-          if (lang.file?.[0]) {
-            if (existingFilePath) {
-              await deleteFileFromS3(existingFilePath);
+  //       for (const lang of data.languages) {
+  //         if (lang.language && lang.chapters.length > 0) {
+  //           for (const chapter of lang.chapters) {
+  //             if (chapter.chapterName) {
+  //               let fileKey = existingFiles[lang.language];
+                
+  //               if (chapter.file && chapter.file[0]) {
+  //                 const file = chapter.file[0];
+  //                 if (fileKey) {
+  //                   await deleteFileFromS3(fileKey);
+  //                 }
+
+  //                 const { signedUrl, key } = await generateSignedUrlAudioBookChaptersFiles(
+  //                   file.name,
+  //                   file.type,
+  //                   bookData.name.eng,
+  //                   lang.language,
+  //                 );
+
+  //                 await fetch(signedUrl, {
+  //                   method: "PUT",
+  //                   body: file,
+  //                   headers: { "Content-Type": file.type },
+  //                 });
+
+  //                 fileKey = key;
+  //               } else if (chapter.existingFile) {
+  //                 // Use existing file if no new file is uploaded
+  //                 fileKey = chapter.existingFile;
+  //               }
+
+  //               if (fileKey) {
+  //                 chaptersData.push({
+  //                   name: chapter.chapterName,
+  //                   description: `Chapter ${chapter.srNo}`,
+  //                   srNo: chapter.srNo,
+  //                   file: fileKey,
+  //                   lang: lang.language,
+  //                   productId: productId,
+  //                   _id: chapter._id || null
+  //                 });
+  //               }
+  //             }
+  //           }
+  //         }
+  //       }
+
+  //       const payload = {
+  //         bookDetails: bookData,
+  //         chapters: chaptersData,
+  //       };
+
+  //       const response = await updateSingleBook(`/admin/audiobook-chapters`, payload);
+  //       if (response?.status === 200 || response?.status === 201) {
+  //         toast.success("Audiobook updated successfully");
+  //         // sessionStorage.removeItem("audioBookData");
+  //         // window.location.href = "/admin/book-hub";
+  //       } else {
+  //         toast.error("Failed to update Audiobook");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error during submission:", error);
+  //       toast.error("An error occurred while updating the Audiobook");
+  //     }
+  //   });
+  // };
+
+  const onSubmit = async (formData) => {
+  console.log('data---payload: ', formData);
+  startTransition(async () => {
+    try {
+      const chaptersData = [];
+      const existingFiles = data?.data?.data?.chapters?.reduce((acc, chapter) => ({
+        ...acc,
+        [`${chapter.lang}_${chapter.srNo}`]: chapter.file
+      }), {}) || {};
+
+      // Create a map of existing chapters by language and srNo for easy lookup of _id
+      const existingChaptersMap = data?.data?.data?.chapters?.reduce((acc, chapter) => ({
+        ...acc,
+        [`${chapter.lang}_${chapter.srNo}`]: chapter
+      }), {}) || {};
+
+      for (const lang of formData.languages) {
+        if (lang.language && lang.chapters.length > 0) {
+          for (const chapter of lang.chapters) {
+            if (chapter.chapterName) {
+              const chapterKey = `${lang.language}_${chapter.srNo}`;
+              const existingChapter = existingChaptersMap[chapterKey];
+              let fileKey = existingFiles[chapterKey];
+              
+              if (chapter.file && chapter.file[0]) {
+                const file = chapter.file[0];
+                if (fileKey) {
+                  await deleteFileFromS3(fileKey);
+                }
+
+                const { signedUrl, key } = await generateSignedUrlAudioBookChaptersFiles(
+                  file.name,
+                  file.type,
+                  bookData.name.eng,
+                  lang.language,
+                );
+
+                await fetch(signedUrl, {
+                  method: "PUT",
+                  body: file,
+                  headers: { "Content-Type": file.type },
+                });
+
+                fileKey = key;
+              } else if (chapter.existingFile) {
+                // Use existing file if no new file is uploaded
+                fileKey = chapter.existingFile;
+              }
+
+              if (fileKey) {
+                const chapterPayload: {
+                  name: any;
+                  description: string;
+                  srNo: any;
+                  file: any;
+                  lang: any;
+                  productId: any;
+                  _id?: any;
+                } = {
+                  name: chapter.chapterName,
+                  description: `Chapter ${chapter.srNo}`,
+                  srNo: chapter.srNo,
+                  file: fileKey,
+                  lang: lang.language,
+                  productId: productId,
+                };
+
+                // Add _id only if it exists for this specific chapter
+                if (existingChapter && existingChapter._id) {
+                  chapterPayload._id = existingChapter._id;
+                }
+
+                chaptersData.push(chapterPayload);
+              }
             }
-
-            const file = lang.file[0] as File;
-            const { signedUrl, key } = await generateSignedUrlAudioBookFile(file.name, file.type, userName, lang.language, { timestamps: timestampsEncoded });
-            await fetch(signedUrl, {
-              method: "PUT",
-              body: file,
-              headers: { "Content-Type": file.type },
-            });
-            return { language: lang.language, fileUrl: key };
           }
-
-          if (existingFilePath && !lang.file?.[0]) {
-            await updateS3ObjectMetadata(existingFilePath, { timestamps: timestampsEncoded });
-            return { language: lang.language, fileUrl: existingFilePath };
-          }
-
-          return { language: lang.language, fileUrl: existingFilePath };
-        });
-
-        const uploadedFiles = await Promise.all(filePromises);
-        const fileTransforms = uploadedFiles.reduce((acc, curr) => ({ ...acc, [curr.language]: curr.fileUrl }), {});
-
-        const finalPayload = { ...formData, file: fileTransforms };
-        const response = await updateSingleBook(`/admin/books/${id}`, finalPayload);
-
-        if (response?.status === 200 || response?.status === 201) {
-          toast.success("Book updated successfully");
-          sessionStorage.removeItem("audioBookData");
-          window.location.href = "/admin/book-hub";
-        } else {
-          toast.error("Failed to update Book");
         }
-      } catch (error) {
-        console.error("Error", error);
-        toast.error("An error occurred while updating the Book");
       }
-    });
-  };
+
+      const payload = {
+        bookDetails: bookData,
+        chapters: chaptersData,
+      };
+
+      console.log('Final payload with _ids: ', payload);
+
+      const response = await updateSingleBook(`/admin/audiobook-chapters`, payload);
+      if (response?.status === 200 || response?.status === 201) {
+        toast.success("Audiobook updated successfully");
+        sessionStorage.removeItem("audioBookData");
+        window.location.href = "/admin/book-hub";
+      } else {
+        toast.error("Failed to update Audiobook");
+      }
+    } catch (error) {
+      console.error("Error during submission:", error);
+      toast.error("An error occurred while updating the Audiobook");
+    }
+  });
+};
 
   const languages = watch("languages");
   const getSelectedLanguages = () => {
@@ -177,26 +266,36 @@ const AudiobookForm = () => {
       .filter((lang) => lang !== "" && lang !== undefined);
   };
 
-  const handleRemoveLanguage = async (index: number) => {
+  const handleRemoveLanguage = async (index) => {
     const languageToRemove = languages[index].language;
-    const filePath = fileName[languageToRemove];
-
-    if (filePath) {
+    const chapters = data?.data?.data?.chapters?.filter(chapter => chapter.lang === languageToRemove);
+    
+    if (chapters && chapters.length > 0) {
       try {
-        await deleteFileFromS3(filePath);
-        toast.success(`File for ${languageToRemove} removed`);
+        for (const chapter of chapters) {
+          if (chapter.file) {
+            await deleteFileFromS3(chapter.file);
+          }
+        }
+        toast.success(`Files for ${languageToRemove} removed`);
       } catch (error) {
-        console.error("Error deleting file from S3:", error);
-        toast.error("Failed to delete file from S3");
+        console.error("Error deleting files from S3:", error);
+        toast.error("Failed to delete files from S3");
       }
     }
 
     removeLanguage(index);
   };
 
-  if (isLoading || isFetchingData) {
-    return <div className=" text-[#060606] text-lg">Loading...</div>;
+  if (isFetchingData) {
+    return <div className="text-[#060606] text-lg">Loading...</div>;
   }
+
+  const userName = formData?.name
+    ? Object.values(formData.name)
+        .find((name) => typeof name === "string" && name.trim() !== "")
+        ?.toString()
+    : "Audiobook Name";
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="bg-[#FFF] p-8 rounded-[20px] shadow-md">
@@ -208,12 +307,11 @@ const AudiobookForm = () => {
             if (languageFields.length < 3) {
               appendLanguage({
                 language: "",
-                file: null,
-                timestamps: [{ id: Date.now().toString(), chapterName: "", startTime: "00:00:00", endTime: "00:00:00" }],
+                chapters: [{ srNo: 1, chapterName: "", file: null }],
               });
             }
           }}
-          className="bg-orange text-white px-5 py-2 rounded-[28px] text-sm font-normal"
+          className="bg-[#f96815] text-white px-5 py-2 rounded-[28px]"
           disabled={languageFields.length >= 3}
         >
           Add New Language
@@ -223,6 +321,9 @@ const AudiobookForm = () => {
       {languageFields.map((languageField, langIndex) => (
         <div key={languageField.id} className="bg-[#fef7f3] p-6 rounded-xl shadow-md mb-4">
           <div className="mb-4 flex gap-3">
+            <label className="block mb-1 text-sm font-medium">Select Language</label>
+          </div>
+          <div className="mb-4 flex gap-3">
             <select
               {...register(`languages.${langIndex}.language`, { required: "Language is required" })}
               className="w-full p-3 border rounded-lg text-[#6e6e6e] text-sm font-normal"
@@ -230,7 +331,7 @@ const AudiobookForm = () => {
               <option value="" disabled>
                 Select Language
               </option>
-              {availableLanguages
+              {["eng", "kaz", "rus"]
                 .filter(
                   (lang) =>
                     !getSelectedLanguages().includes(lang) || languages[langIndex]?.language === lang
@@ -241,6 +342,7 @@ const AudiobookForm = () => {
                   </option>
                 ))}
             </select>
+
             {languageFields.length > 1 && (
               <button
                 type="button"
@@ -251,110 +353,135 @@ const AudiobookForm = () => {
               </button>
             )}
           </div>
-          <div className="p-5 bg-white rounded-[10px]">
-            <TimestampsFieldArray control={control} langIndex={langIndex} register={register} />
+
+          <div className="bg-white rounded-[10px] p-4">
+            <ChaptersFieldArray control={control} langIndex={langIndex} register={register} watch={watch} />
           </div>
         </div>
       ))}
 
       <div className="flex justify-end gap-[10px] mt-6 h-10">
-        <button type="button" onClick={handleCancel} className="border border-orange text-orange px-5 py-2 rounded-[28px] text-sm font-normal">
+        <button type="button" onClick={handleCancel} className="border border-[#f96815] text-[#f96815] px-5 py-2 rounded-[28px]">
           Cancel
         </button>
-        <button type="submit" className="bg-[#f96815] text-white px-5 py-2 rounded-[28px] text-sm font-normal">
-          Save Audiobook
+        <button disabled={isPending} type="submit" className="bg-[#f96815] text-white px-5 py-2 rounded-[28px] hover:bg-opacity-90 disabled:bg-opacity-50">
+          {isPending ? "Saving..." : "Save Audiobook"}
         </button>
       </div>
     </form>
   );
 };
 
+const CustomFileUpload = ({ register, chapterIndex, langIndex, existingFileName }) => {
+  const [fileName, setFileName] = useState(existingFileName || "");
 
+  // Function to extract filename from path
+  const getFileNameFromPath = (filePath) => {
+    if (!filePath) return "";
+    return filePath.split('/').pop() || "";
+  };
 
-const TimestampsFieldArray = ({ control, langIndex, register }) => {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: `languages.${langIndex}.timestamps`,
-  });
+  useEffect(() => {
+    if (existingFileName) {
+      setFileName(getFileNameFromPath(existingFileName));
+    }
+  }, [existingFileName]);
 
   return (
-    <div className="w-full">
-      {/* Table Header */}
-      <div className="grid grid-cols-12 gap-4 mb-4">
-        <div className="col-span-2">
-          <label className="block text-[#060606] text-sm font-normal">Sr No.</label>
-        </div>
-        <div className="col-span-4">
-          <label className="block text-[#060606] text-sm font-normal">Chapter Name</label>
-        </div>
-        <div className="col-span-5">
-          <label className="block text-[#060606] text-sm font-normal">Select File</label>
-        </div>
-        <div className="col-span-1">
-          {/* Remove button column header */}
-        </div>
+    <div className="">
+      <div className="h-11 relative border rounded-lg p-3 flex items-center bg-white cursor-pointer">
+        <input
+          type="file"
+          accept="audio/*"
+          {...register(`languages.${langIndex}.chapters.${chapterIndex}.file`)}
+          className="absolute inset-0 opacity-0 cursor-pointer text-sm font-normal border border-gray-300 text-[#6e6e6e]"
+          onChange={(e) => {
+            const selectedFile = e.target.files?.[0]?.name || "";
+            setFileName(selectedFile);
+          }}
+        />
+        <span className="flex-1 text-[#6e6e6e] text-sm font-normal">
+          {fileName || "Select File"}
+        </span>
+        <span className="text-[#060606]">
+          <FileIcon />
+        </span>
       </div>
+    </div>
+  );
+};
 
-      {/* Table Rows */}
+const ChaptersFieldArray = ({ control, langIndex, register, watch }) => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: `languages.${langIndex}.chapters`,
+  });
+
+  const watchedChapters = watch(`languages.${langIndex}.chapters`) || [];
+
+  return (
+    <>
       {fields.map((field, index) => (
-        <div key={field.id} className="grid grid-cols-12 gap-4 mb-4 items-center">
-          {/* Sr No. */}
-          <div className="col-span-2">
-            <div className="text-[#6e6e6e] text-sm font-normal p-2">
+        <div key={field.id} className="flex gap-[20px] mb-4 items-center w-full">
+          <div className="w-[8%] flex-col text-[#6e6e6e] text-sm font-normal space-y-[10px]">
+            <div className="text-[#060606] text-sm font-normal">Sr No.</div>
+            <div className="w-12 px-3.5 py-3 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex flex-col justify-start items-start gap-2.5">
               {String(index + 1).padStart(2, '0')}
             </div>
           </div>
 
-          {/* Chapter Name */}
-          <div className="col-span-4">
+          <div className="flex-col font-medium text-sm text-[#060606] w-full space-y-[10px]">
+            <div>Chapter Name</div>
             <input
               type="text"
-              {...register(`languages.${langIndex}.timestamps.${index}.chapterName`)}
-              placeholder="Select File"
-              className="w-full p-2 border border-gray-300 rounded-lg text-[#6e6e6e] text-sm font-normal"
+              {...register(`languages.${langIndex}.chapters.${index}.chapterName`)}
+              placeholder="Chapter Name"
+              className="w-full p-2 border border-gray-300 text-[#6e6e6e] text-sm font-normal h-11 px-5 py-4 rounded-[10px] outline outline-1 outline-offset-[-1px] outline-gray-200 inline-flex justify-start items-center gap-72"
             />
           </div>
 
-          {/* Select File */}
-          <div className="col-span-5">
-            <div className="relative border rounded-lg p-2 flex items-center bg-white cursor-pointer">
-              <input
-                type="file"
-                className="absolute inset-0 opacity-0 cursor-pointer"
-                onChange={() => {
-                  // Handle file selection if needed
-                }}
-              />
-              <span className="flex-1 text-[#6e6e6e] text-sm font-normal">Select File</span>
-              <span className="text-[#060606] ml-2">
-                <FileIcon />
-              </span>
-            </div>
+          <div className="flex-col font-medium text-sm text-[#060606] w-full space-y-[10px]">
+            <div>Select File</div>
+            <CustomFileUpload 
+              register={register} 
+              chapterIndex={index} 
+              langIndex={langIndex}
+              existingFileName={watchedChapters[index]?.existingFile}
+            />
           </div>
 
-          {/* Remove Button */}
-          <div className="col-span-1 flex justify-center">
+          {/* Hidden input to store existing file path */}
+          <input
+            type="hidden"
+            {...register(`languages.${langIndex}.chapters.${index}.existingFile`)}
+          />
+
+          <div className="flex justify-end items-end mt-6">
             <button
               type="button"
               onClick={() => remove(index)}
-              className="w-8 h-8 bg-[#f91515] rounded-full flex items-center justify-center text-white"
+              className="w-11 h-11 bg-[#f91515] rounded-full flex items-center justify-center text-white"
             >
-              <CrossIcon />
+              <DeleteIcon stroke="#FFF" />
             </button>
           </div>
         </div>
       ))}
 
-      {/* Add New Chapter Button */}
       <button
         type="button"
-        onClick={() => append({ id: Date.now().toString(), chapterName: "", startTime: "00:00:00", endTime: "00:00:00" })}
-        className="px-5 py-3 bg-[#157ff9] rounded-[28px] text-white text-sm font-normal"
+        onClick={() => append({
+          srNo: fields.length + 1,
+          chapterName: "",
+          file: null,
+          existingFile: null
+        })}
+        className="px-5 py-3 bg-[#157ff9] rounded-[28px] text-white text-sm font-normal flex items-center gap-2"
       >
-        + Add New Chapter
+        <span>+</span> Add New Chapter
       </button>
-    </div>
+    </>
   );
 };
 
-export default AudiobookForm;
+export default AudiobookChaptersForm;
