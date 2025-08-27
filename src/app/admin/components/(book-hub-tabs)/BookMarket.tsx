@@ -11,6 +11,7 @@ import TablePagination from '../TablePagination';
 const BookMarket = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('All');
+  console.log('activeTab: ', activeTab);
   const [showData, setShowData] = useState(false);
   const [page, setPage] = useState(1);
   const itemsPerPage = 12;
@@ -26,9 +27,11 @@ const BookMarket = () => {
       'Courses': 'course',
       'Podcasts': 'podcast',
       'Video-Lecture': 'video-lecture',
+      'Audio & E-book': 'audioebook'
     };
     return typeMap[tab] || '';
   };
+  console.log('getTypeParam: ', getTypeParam(activeTab));
 
   // Construct the API URL with proper query parameters
   const apiUrl = `/admin/books?${query}${searchTerm ? `&description=${searchTerm}` : ''}&type=${getTypeParam(activeTab)}`;
@@ -72,11 +75,13 @@ const BookMarket = () => {
     { label: "Audiobooks", value: "audiobook" },
     { label: "Courses", value: "course" },
     { label: "Podcasts", value: "podcast" },
-    { label: "Video-Lecture", value: "video-lecture" }
+    { label: "Video-Lecture", value: "video-lecture" },
+    { label: "Audio & E-book", value: "audioebook" }
   ];
 
   const onTypeSelect = (type: string) => {
     const encodedType = encodeURIComponent(type);
+    console.log('encodedType: ', encodedType);
     router.push(`/admin/add-new?type=${encodedType}`);
   };
 
@@ -84,7 +89,7 @@ const BookMarket = () => {
     <div>
       <div className='flex justify-between mb-5'>
         <div className="tabs flex flex-wrap gap-[5px]">
-          {["All", "e-Books", "Audiobooks", "Courses", "Podcasts" , "Video-Lecture"].map((tab) => (
+          {["All", "e-Books", "Courses", "Podcasts" , "Video-Lecture","Audio & E-book"].map((tab) => (
             <button
               key={tab}
               className={`tab-button ${activeTab === tab ? 'active text-white bg-darkBlack ' : 'text-darkBlack bg-white   '} rounded-[34px] text-sm px-5 py-[10px]`}
