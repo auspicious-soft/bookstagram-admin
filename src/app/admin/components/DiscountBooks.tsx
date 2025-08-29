@@ -26,6 +26,7 @@ const DiscountBooks = ({data}: Props) => {
             price={`$${row?.price}`}
             discount={row?.discountPercentage}
             imgSrc={getImageClientS3URL(row?.image)}
+            format={row?.format}
             />
             ))}
         </div>

@@ -90,6 +90,7 @@ const Page = () => {
                   handleClick={() => openBookProfile(book?._id, book?.name?.eng)}
                   imgSrc={getImageClientS3URL(book?.image)}
                   author={book?.authorId[0]?.name?.eng}
+                  format={book?.format}                  
                 />
               ))}
             </div>

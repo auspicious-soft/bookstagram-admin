@@ -114,6 +114,8 @@ const Page = () => {
   }
   price={`$${row?.price}`}
   imgSrc={getImageClientS3URL(row?.image)}
+              format={row?.format}
+
 />
 
             ))}

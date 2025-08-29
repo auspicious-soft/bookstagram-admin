@@ -14,6 +14,7 @@ interface DeletableBookCardProps {
   price: string;
   imgSrc?: string | StaticImageData;
   discount?: string | number;
+  format?: string | null;
   handleClick?: React.MouseEventHandler;
   onDeleteSuccess?: () => void;
 }
@@ -25,9 +26,11 @@ const DeletableBookCard: React.FC<DeletableBookCardProps> = ({
   price,
   imgSrc,
   discount,
+  format,
   handleClick,
   onDeleteSuccess
 }) => {
+  console.log('format: ', format);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -75,6 +78,7 @@ const DeletableBookCard: React.FC<DeletableBookCardProps> = ({
         discount={discount}
         handleClick={handleClick}
         handleDelete={handleOpenModal}
+        format={format}
       />
 
       <DeleteConfirmationModal

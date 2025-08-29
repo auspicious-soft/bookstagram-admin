@@ -178,6 +178,7 @@ return (
               title={row?.name?.eng}
               price={`$${row?.price}`}
               imgSrc={getImageClientS3URL(row?.image)}
+              format={row?.format}
             />
           ))}
         </div>

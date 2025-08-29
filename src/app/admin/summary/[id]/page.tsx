@@ -65,6 +65,7 @@ const Page = () => {
             
             // discount={row?.discountPercentage}
             imgSrc={getImageClientS3URL(row?.image)}
+            format={row?.format}
             />
             ))}
         </div>

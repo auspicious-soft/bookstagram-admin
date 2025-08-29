@@ -6,12 +6,12 @@ const UsePublisher = () => {
   const { data, error, isLoading } = useSWR(`/admin/publishers`, getAllPublishers, {
     revalidateOnFocus: false,
   });
- 
-  const publishers = data?.data?.data?.map((row: any) => ({
-      label: `${row?.publisher?.name?.eng}`,
-      value: row?.publisher?._id,
-  })) || []; 
 
+  const publishers = data?.data?.data?.map((row: any) => ({
+    label: `${row?.name?.eng || row?.name?.kaz || row?.name?.rus}`,
+    value: row?.id,
+  })) || []; 
+  
   return {
     publishers,
       isLoading: isLoading,

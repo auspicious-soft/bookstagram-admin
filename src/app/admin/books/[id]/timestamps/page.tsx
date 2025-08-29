@@ -41,6 +41,7 @@ const AudiobookChaptersForm = () => {
 
   useEffect(() => {
     const courseData = sessionStorage.getItem("audioBookData");
+    console.log('courseData: ', courseData);
     if (courseData && courseData !== "undefined" && courseData !== "null" && courseData.trim() !== "") {
       const parsedData = JSON.parse(courseData);
       setBookData(parsedData);
@@ -235,15 +236,13 @@ const AudiobookChaptersForm = () => {
             }
           }
         }
-      }
-
+      }      
       const payload = {
         bookDetails: bookData,
         chapters: chaptersData,
       };
-
       console.log('Final payload with _ids: ', payload);
-
+      const bookResponse = await updateSingleBook(`/admin/books/${id}`, bookData);
       const response = await updateSingleBook(`/admin/audiobook-chapters`, payload);
       if (response?.status === 200 || response?.status === 201) {
         toast.success("Audiobook updated successfully");

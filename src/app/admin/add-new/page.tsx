@@ -652,10 +652,11 @@ const BookForm = () => {
   const router = useRouter();
 
   const searchParams = useSearchParams();
-  const bookType = searchParams.get('type') || 'e-book';
+  const bookType = searchParams.get('type') || 'audioebook';
   const { authors } = UseAuthors();
   const { subCategory } = UseSubCategory();
   const { publishers } = UsePublisher();
+  console.log('publishers: ', publishers);
   const { category } = UseCategory();
 
   // Helper function to determine if file upload should be shown
@@ -1016,7 +1017,7 @@ const BookForm = () => {
                 <div>
                   <p className="mb-3 text-sm text-darkBlack">Select Format</p>
                   <div className="flex gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    <label className="flex flex-row items-center justify-center px-4 py-2 border rounded-md cursor-pointer hover:bg-gray-50 transition-all w-full sm:w-auto space-x-2">
                       <input
                         type="radio"
                         name="format"
@@ -1027,7 +1028,7 @@ const BookForm = () => {
                       />
                       <span className="text-sm">Audiobook</span>
                     </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    <label className="flex flex-row items-center justify-center px-4 py-2 border rounded-md cursor-pointer hover:bg-gray-50 transition-all w-full sm:w-auto space-x-2">
                       <input
                         type="radio"
                         name="format"
@@ -1038,7 +1039,7 @@ const BookForm = () => {
                       />
                       <span className="text-sm">E-book</span>
                     </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    <label className="flex flex-row items-center justify-center px-4 py-2 border rounded-md cursor-pointer hover:bg-gray-50 transition-all w-full sm:w-auto space-x-2">
                       <input
                         type="radio"
                         name="format"
@@ -1199,7 +1200,7 @@ const BookForm = () => {
                 <CustomSelect
                   name="Select Publisher"
                   value={publishers.find(option => 
-                    watch('publisherId').includes(option.value)
+                    watch('publisherId')?.includes(option.value)
                   )}
                   options={publishers}
                   onChange={(value) => handleSelectChange('publisherId', value)}

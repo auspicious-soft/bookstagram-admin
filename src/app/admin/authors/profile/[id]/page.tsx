@@ -537,6 +537,7 @@ const Page = () => {
                 price={`$${data?.price}`}
                 imgSrc={getImageClientS3URL(data?.image)}
                 author={authorData?.name?.eng}
+                format={data?.format}                
               />
             ))
           ) : (

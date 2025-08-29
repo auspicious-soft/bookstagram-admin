@@ -11,7 +11,6 @@ import TablePagination from '../TablePagination';
 const BookMarket = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('All');
-  console.log('activeTab: ', activeTab);
   const [showData, setShowData] = useState(false);
   const [page, setPage] = useState(1);
   const itemsPerPage = 12;
@@ -31,7 +30,6 @@ const BookMarket = () => {
     };
     return typeMap[tab] || '';
   };
-  console.log('getTypeParam: ', getTypeParam(activeTab));
 
   // Construct the API URL with proper query parameters
   const apiUrl = `/admin/books?${query}${searchTerm ? `&description=${searchTerm}` : ''}&type=${getTypeParam(activeTab)}`;
@@ -71,12 +69,12 @@ const BookMarket = () => {
   };
 
   const bookTypes = [
-    { label: "e-Books", value: "e-book" },
-    { label: "Audiobooks", value: "audiobook" },
+    // { label: "e-Books", value: "e-book" },
+    // { label: "Audiobooks", value: "audiobook" },
+    { label: "Audio & e-book", value: "audioebook" },
     { label: "Courses", value: "course" },
     { label: "Podcasts", value: "podcast" },
     { label: "Video-Lecture", value: "video-lecture" },
-    { label: "Audio & E-book", value: "audioebook" }
   ];
 
   const onTypeSelect = (type: string) => {
@@ -89,7 +87,7 @@ const BookMarket = () => {
     <div>
       <div className='flex justify-between mb-5'>
         <div className="tabs flex flex-wrap gap-[5px]">
-          {["All", "e-Books", "Courses", "Podcasts" , "Video-Lecture","Audio & E-book"].map((tab) => (
+          {["All", "Courses", "Podcasts" , "Video-Lecture","Audio & E-book"].map((tab) => (
             <button
               key={tab}
               className={`tab-button ${activeTab === tab ? 'active text-white bg-darkBlack ' : 'text-darkBlack bg-white   '} rounded-[34px] text-sm px-5 py-[10px]`}
@@ -101,7 +99,7 @@ const BookMarket = () => {
         </div>
         <div className='flex justify-end items-center gap-2.5'>
           <SearchBar query={searchTerm} setQuery={setSearchTerm} />
-          <div className='relative' ref={dropdownRef}>
+          <div className= ' relative' ref={dropdownRef}>
             <button
               onClick={(e) => {
                 e.stopPropagation(); // Stop event propagation
@@ -159,6 +157,7 @@ const BookMarket = () => {
                     ''
                   }
                   discount={book?.discountPercentage}
+                  format= {book?.format}
                   handleClick={() => openBookProfile(
                     book?._id,
                     book?.name?.eng ??
