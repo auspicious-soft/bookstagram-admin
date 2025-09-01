@@ -29,6 +29,8 @@ const SideNav = () => {
   //    await signOut({ redirect: false })
   //   router.push('/login');
   // }
+  const isBookHubActive = pathname.startsWith('/admin/add-new') || pathname.startsWith('/admin/book-hub');
+
   return (
     <div className="relative h-full">
       <button onClick={toggleSidebar} className="hide-content absolute top-[30px] -right-2.5 z-10 "> {isCollapsed ? <SideBarIconMirrored /> : <SideBarIcon />} </button>
@@ -54,7 +56,8 @@ const SideNav = () => {
                 {!isCollapsed && <span>Dashboard</span>}
               </Link>
             </li>
-            <li className={`${isActive('/admin/book-hub')} ${pathname.startsWith('/admin/book-hub') ? 'active' : ''}`}>
+            <li className={`${isActive('/admin/book-hub')} ${pathname.startsWith('/admin/add-new') ? 'active' : ''}`}>
+            {/* <li className={`${isActive('/admin/book-hub')} ${isBookHubActive}`}> */}
               <Link href="/admin/book-hub">
                 <BookHubIcon />
                 {!isCollapsed && <span>Book Hub</span>}
@@ -108,7 +111,7 @@ const SideNav = () => {
                 {!isCollapsed && <span>Publishers</span>}
               </Link>
             </li>
-            <li className={isActive('/admin/stories')}>
+            <li className={`${isActive('/admin/stories')} ${pathname.startsWith('/admin/stories/single-story') ? 'active' : ''}`}>
               <Link href="/admin/stories">
                 <StoriesIcon />
                 {!isCollapsed && <span>Stories</span>}
