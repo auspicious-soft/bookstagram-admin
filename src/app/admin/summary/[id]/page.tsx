@@ -38,7 +38,7 @@ const Page = () => {
   return (
     <div>
        <div className="flex gap-2.5 justify-end mb-5 ">
-        <SearchBar setQuery={setsearchParams} query={searchParams} />
+        {/* <SearchBar setQuery={setsearchParams} query={searchParams} /> */}
          <div><Button text="Add to Summary" onClick={addToSummary} /></div>
       </div> 
       {isLoading && (

@@ -21,7 +21,7 @@ const Page = () => {
   const itemsPerPage = 12;
   const [query, setQuery] = useState(`page=${page}&limit=${itemsPerPage}`);
   const [searchParams, setsearchParams] = useState("");
-  const { data, error, isLoading, mutate } = useSWR(`/admin/sub-categories/${id}?${query}`, getSubCategoryData);
+  const { data, error, isLoading, mutate } = useSWR(`/admin/sub-categories/${id}?${query}&description=${searchParams}`, getSubCategoryData);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBooks, setSelectedBooks] = useState<string[]>([]);
   const [bookModal, setBookModal] = useState(false);
