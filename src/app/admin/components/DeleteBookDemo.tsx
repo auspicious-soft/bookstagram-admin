@@ -7,6 +7,7 @@ import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import useSWR from 'swr';
 import { useRouter } from 'next/navigation';
 import ReactLoading from 'react-loading';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 const DeleteBookDemo = () => {
   const router = useRouter();
@@ -67,7 +68,7 @@ const DeleteBookDemo = () => {
                 'Unknown Author'
               }
               price={`$${book?.price}`}
-              imgSrc={getImageClientS3URL(book?.image)}
+              imgSrc={getProfileImageUrl(book?.image)}
               discount={book?.discountPercentage}
               handleClick={() => openBookProfile(book?._id, book?.name?.eng)}
               onDeleteSuccess={handleDeleteSuccess}

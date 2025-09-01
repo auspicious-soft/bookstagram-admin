@@ -30,7 +30,6 @@ const DeletableBookCard: React.FC<DeletableBookCardProps> = ({
   handleClick,
   onDeleteSuccess
 }) => {
-  console.log('format: ', format);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPending, startTransition] = useTransition();

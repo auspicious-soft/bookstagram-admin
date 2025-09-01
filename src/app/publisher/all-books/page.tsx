@@ -7,6 +7,7 @@ import SearchBar from "@/app/admin/components/SearchBar";
 import BookCard from "@/app/admin/components/BookCard";
 import TablePagination from "@/app/admin/components/TablePagination";
 import { getPublisherAllBooks } from "@/services/publisher/publisher-service";
+import { getProfileImageUrl } from "@/utils/getImageUrl";
 
 const Page = () => {
   const router = useRouter();
@@ -88,9 +89,10 @@ const Page = () => {
                   title={book?.name?.eng}
                   price={`$${book?.price}`}
                   handleClick={() => openBookProfile(book?._id, book?.name?.eng)}
-                  imgSrc={getImageClientS3URL(book?.image)}
+                  imgSrc={getProfileImageUrl(book?.image)}
                   author={book?.authorId[0]?.name?.eng}
-                  format={book?.format}                  
+                  format={book?.format} 
+                  discount={book?.discountPercentage}                 
                 />
               ))}
             </div>

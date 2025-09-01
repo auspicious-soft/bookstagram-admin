@@ -11,6 +11,7 @@ import profile from '@/assets/images/preview.png';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import SalesChart from '../components/SalesChart';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 
 const Page = () => {
@@ -56,7 +57,7 @@ const Page = () => {
         {stats?.topBooks?.map((book) => (
           <div key={book?._id} className='flex gap-[15px] items-center'>
             <div>
-              <Image src={getImageClientS3URL(book?.image)} unoptimized alt='img' width={62} height={62} className='rounded-[5px] aspect-square' />
+              <Image src={getProfileImageUrl(book?.image)} unoptimized alt='img' width={62} height={62} className='rounded-[5px] aspect-square' />
             </div>
             <div className='space-y=[6px] '>
               <h3 className='text-sm font-aeonikBold capitalize text-darkBlack'>{book?.name?.eng}</h3>
@@ -94,7 +95,7 @@ const Page = () => {
             ) : allBooks?.length > 0 ? (
               allBooks?.map((row: any) => (
                 <tr key={row?._id}>
-                  <td><TableRowImage image={row?.image ? getImageClientS3URL(row?.image) : profile} /></td>
+                  <td><TableRowImage image={row?.image ? getProfileImageUrl(row?.image) : profile} /></td>
                   <td> {row?.name?.eng} </td>
                   <td>{row?.authorId[0]?.name?.eng}</td>
                   <td>{row?.averageRating}</td>

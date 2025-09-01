@@ -6,6 +6,7 @@ import { PlusIcon, SelectSvg } from "@/utils/svgicons";
 import useSWR from "swr";
 import { addBookToCollectio, getAllBooks } from "@/services/admin-services";
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
+import { getProfileImageUrl } from "@/utils/getImageUrl";
 
 interface ModalProp {
   open: boolean;
@@ -109,7 +110,7 @@ const AddToCollection: React.FC<ModalProp> = ({ open, onClose, mutate, id }) => 
                 >
                   <Image
                     unoptimized
-                    src={getImageClientS3URL(book?.image)}
+                    src={getProfileImageUrl(book?.image)}
                     alt="books"
                     width={216}
                     height={112}

@@ -18,6 +18,7 @@ import BookCard from "@/app/admin/components/BookCard";
 import { useFieldArray, useForm, FormProvider } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { getProfileImageUrl } from "@/utils/getImageUrl";
 
 type Language = "eng" | "kaz" | "rus";
 
@@ -169,7 +170,7 @@ const Page = () => {
         );
 
         if (publishersData.image) {
-          const imageUrl = getImageClientS3URL(publishersData.image);
+          const imageUrl = getProfileImageUrl(publishersData.image);
           setImagePreview(imageUrl);
         }
 
@@ -561,9 +562,10 @@ const Page = () => {
                 handleClick={() => openBookProfile(data?._id, data?.name.eng)}
                 title={data?.name?.eng}
                 price={`$${data?.price}`}
-                imgSrc={getImageClientS3URL(data?.image)}
+                imgSrc={getProfileImageUrl(data?.image)}
                 author={data?.authorId[0]?.name?.eng}
                 format={data?.format}
+                discount={data?.discountPercentage}
               />
             ))
           ) : (

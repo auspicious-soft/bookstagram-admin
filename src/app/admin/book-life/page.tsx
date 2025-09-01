@@ -12,6 +12,7 @@ import CategoryCard from '../components/CategoryCard';
 import SearchBar from '../components/SearchBar';
 import TablePagination from '../components/TablePagination';
 import AddCommonModal from '../components/AddCommonModal';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 type Language = "eng" | "kaz" | "rus";
 interface FormValues {
@@ -125,7 +126,7 @@ const Page = () => {
             <CategoryCard
               key={row?._id}
               name={row.name.eng || row.name.kaz || row.name.rus}
-              image={getImageClientS3URL(row?.image)}
+              image={getProfileImageUrl(row?.image)}
               onClick={() => openBookLife(row?._id,row.name.eng || row.name.kaz || row.name.rus )}
               handleDelete={()=>deleteBookLives(row?._id)}
             />

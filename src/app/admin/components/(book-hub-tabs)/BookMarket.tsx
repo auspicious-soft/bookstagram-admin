@@ -7,6 +7,7 @@ import { getAllBooks } from '@/services/admin-services';
 import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import { useRouter } from 'next/navigation';
 import TablePagination from '../TablePagination';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 const BookMarket = () => {
   const router = useRouter();
@@ -149,7 +150,7 @@ const BookMarket = () => {
                     ''
                   }
                   price={`$${book?.price}`}
-                  imgSrc={getImageClientS3URL(book?.image)}
+                  imgSrc={getProfileImageUrl(book?.image)}
                   author={
                     book?.authorId[0]?.name?.eng ??
                     book?.authorId[0]?.name?.kaz ??

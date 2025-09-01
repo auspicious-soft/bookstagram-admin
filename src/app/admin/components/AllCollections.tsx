@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { generateSignedUrlForCollection } from '@/actions';
 import { SelectSvg } from '@/utils/svgicons';
 import Image from 'next/image';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 type Language = "eng" | "kaz" | "rus";
 interface FormValues {
@@ -138,7 +139,7 @@ const AllCollections = () => {
           <div key={row?._id} className='bg-white rounded-[20px] relative'>
             <div onClick={() => handleSubCollection(row?._id, row?.name?.eng || row?.name?.kaz || row?.name?.rus)}
               className='text-center px-5 pt-[30px] pb-5 cursor-pointer '>
-              <Image unoptimized src={getImageClientS3URL(row?.image)} alt='dgv' width={122} height={122} className='w-[122px] h-[122px] object-cover rounded-full mx-auto ' />
+              <Image unoptimized src={getProfileImageUrl(row?.image)} alt='dgv' width={122} height={122} className='w-[122px] h-[122px] object-cover rounded-full mx-auto ' />
               <p className='text-darkBlack text-[15px] leading-5 tracking-[-0.24px] mt-[23px]'>
                 {row?.name?.eng ?? row?.name?.kaz ?? row?.name?.rus ?? ''}
               </p>

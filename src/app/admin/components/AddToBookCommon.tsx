@@ -5,6 +5,7 @@ import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import { getAllBooks } from '@/services/admin-services';
 import { Modal } from '@mui/material';
 import { PlusIcon } from '@/utils/svgicons';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 interface Props {
   open: boolean;
@@ -62,7 +63,7 @@ const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSele
               <CourseCard
                 key={data?._id}
                 title={data?.name?.eng ?? data?.name?.kaz ?? data?.name?.rus ?? ''}
-                image={getImageClientS3URL(data?.image)}
+                image={getProfileImageUrl(data?.image)}
                 selected={selectedBooks.includes(data?._id)}
                 onSelect={() => handleSelect(data?._id)}
               />

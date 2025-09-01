@@ -16,6 +16,7 @@ import subCatImg from '@/assets/images/subCat.png';
 import cartoon from '@/assets/images/1.png';
 import BookCard from '@/app/admin/components/BookCard';
 import AddToBookCommon from '@/app/admin/components/AddToBookCommon';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 type Language = "eng" | "kaz" | "rus";
 interface FormValues {
@@ -150,7 +151,7 @@ return (
             <CategoryCard
               key={row?._id}
               name={row?.name.eng}
-              image={getImageClientS3URL(row?.image)}
+              image={getProfileImageUrl(row?.image)}
               onClick={() => handleSubCategory(row?._id, row?.name?.eng)}
             />
           ))}
@@ -177,8 +178,9 @@ return (
               author={row?.authorId?.[0]?.name?.eng}
               title={row?.name?.eng}
               price={`$${row?.price}`}
-              imgSrc={getImageClientS3URL(row?.image)}
+              imgSrc={getProfileImageUrl(row?.image)}
               format={row?.format}
+              discount={row?.discountPercentage}
             />
           ))}
         </div>

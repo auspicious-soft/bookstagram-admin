@@ -10,6 +10,7 @@ import useSWR from 'swr';
 import { addToBookSchool, getAllPublishers } from '@/services/admin-services';
 import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import { toast } from 'sonner';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 type Language = "eng" | "kaz" | "rus";
 
@@ -253,7 +254,7 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
                   <CourseCard
                     key={data?.publisher?._id}
                     title={data?.publisher?.name?.eng}
-                    image={getImageClientS3URL(data?.publisher?.image)}
+                    image={getProfileImageUrl(data?.publisher?.image)}
                     selected={selectedPublishers.includes(data?.publisher?._id)}
                     onSelect={() => handleSelect(data?.publisher?._id)}
                   />

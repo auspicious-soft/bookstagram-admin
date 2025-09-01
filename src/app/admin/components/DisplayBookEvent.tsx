@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { getProfileImageUrl } from "@/utils/getImageUrl";
 
 const DisplayBookEvent = () => {
   const params = useParams();
@@ -74,7 +75,7 @@ const DisplayBookEvent = () => {
               {imagePreview === "" && eventImage && (
                 <Image
                   unoptimized
-                  src={getImageClientS3URL(eventImage)}
+                  src={getProfileImageUrl(eventImage)}
                   alt={eventName}
                   className="w-full h-full object-cover rounded-[10px]"
                   style={{ borderRadius: "20px" }}

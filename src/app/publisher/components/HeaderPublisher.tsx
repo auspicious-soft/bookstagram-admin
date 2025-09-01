@@ -6,6 +6,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { DropIcon } from "@/utils/svgicons";
 import { signOut, useSession } from "next-auth/react";
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
+import { getProfileImageUrl } from "@/utils/getImageUrl";
 
 
 
@@ -46,7 +47,7 @@ const HeaderPublisher: React.FC = () => {
           <div onClick={() => setShowData(!showData)}
           className="flex gap-2.5 items-center bg-white p-[5px] pr-5 rounded-[24px] cursor-pointer ">
           <Image
-              src={getImageClientS3URL(publisher?.image)}
+              src={getProfileImageUrl(publisher?.image)}
               unoptimized
               alt="Profile"
               width={38}

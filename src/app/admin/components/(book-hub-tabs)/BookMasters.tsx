@@ -14,6 +14,7 @@ import TablePagination from "../TablePagination";
 import { toast } from "sonner";
 import AddToBookCommon from "../AddToBookCommon";
 import DeleteConfirmationModal from "../DeleteConfirmationModal";
+import { getProfileImageUrl } from "@/utils/getImageUrl";
 
 const BookMasters = () => {
   const router = useRouter();
@@ -137,7 +138,7 @@ const BookMasters = () => {
               masters?.map((row: any) => (
                 <tr key={row?._id}>
                   <td><div className="flex items-center gap-2.5 capitalize">
-                  <TableRowImage image={row?.productsId?.image ? getImageClientS3URL(row?.productsId?.image) : profile}/> {row?.productsId?.name?.eng ?? row?.productsId?.name?.kaz ?? row?.productsId?.name?.rus}
+                  <TableRowImage image={row?.productsId?.image ? getProfileImageUrl(row?.productsId?.image) : profile}/> {row?.productsId?.name?.eng ?? row?.productsId?.name?.kaz ?? row?.productsId?.name?.rus}
                     </div></td>
                   <td>
                     {row?.productsId?.authorId?.map((item) => (

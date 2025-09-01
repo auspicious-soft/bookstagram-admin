@@ -35,8 +35,8 @@ return (
             ) : orders?.length > 0 ? (
                 orders?.map((row: any) => (
               <tr key={row?._id}>
-                <td>{row?.identifier}</td>
-                <td className='capitalize'>{row?.productIds[0].name.eng}</td>
+                <td>#{row?.identifier}</td>
+                <td className='capitalize'>{row?.productIds[0]?.name.eng ?? row?.productIds[0]?.name.kaz ?? row?.productIds[0]?.name.rus}</td>
                 <td>{row?.productIds[0]?.authorId[0]?.name.eng} </td>
                 <td className='text-right'>${row?.totalAmount}</td> 
                 

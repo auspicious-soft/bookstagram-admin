@@ -9,6 +9,7 @@ import React, { useState, useTransition } from 'react';
 import useSWR from 'swr';
 import { toast } from 'sonner';
 import EditStoryModal from '@/app/admin/components/EditStoryModal';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 const Page = () => {
   const { id } = useParams();
@@ -66,7 +67,7 @@ const Page = () => {
           <div key={index} className='relative'>
             <Link href={value} target='blank'>
               <Image
-                src={getImageClientS3URL(key)}
+                src={getProfileImageUrl(key)}
                 alt='story'
                 width={200}
                 height={100}

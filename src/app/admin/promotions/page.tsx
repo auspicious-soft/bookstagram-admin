@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import React, { useState, useTransition } from "react";
 import { toast } from "sonner";
 import useSWR from "swr";
+import { getProfileImageUrl } from "@/utils/getImageUrl";
 
 const Page = () => {
   const router = useRouter();
@@ -67,7 +68,7 @@ const Page = () => {
           <div key={banner?._id} className="relative">
             <Image
               unoptimized
-              src={getImageClientS3URL(banner?.image)}
+              src={getProfileImageUrl(banner?.image)}
               width={264}
               height={163}
               alt="banner"

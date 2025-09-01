@@ -12,6 +12,7 @@ import sumImg from '@/assets/images/Summary.png';
 import { toast } from 'sonner';
 import { generateSignedUrlForSummary } from '@/actions';
 import { useRouter } from 'next/navigation';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 type Language = "eng" | "kaz" | "rus";
 interface FormValues {
@@ -108,7 +109,7 @@ const AllSummary = () => {
             <CategoryCard
               key={row?._id}
               name={row?.name?.eng || row?.name?.kaz || row?.name?.rus }
-              image={getImageClientS3URL(row?.image)}
+              image={getProfileImageUrl(row?.image)}
               onClick={() => handleSummary(row?._id, row?.name?.eng || row?.name?.kaz || row?.name?.rus )}
             />
           ))

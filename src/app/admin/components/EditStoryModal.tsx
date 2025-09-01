@@ -10,6 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { updateStory } from "@/services/admin-services";
 import { PlusIcon2 } from "@/utils/svgicons";
 import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 type Language = "eng" | "kaz" | "rus";
 
@@ -125,7 +126,7 @@ const EditStoryModal = ({open, onClose, data}: Props) => {
         // Initialize file sections
         const initialFileSections = Object.entries(data.file).map(([key, value]) => ({
           imageFile: null,
-          imagePreview: getImageClientS3URL(key),
+          imagePreview: getProfileImageUrl(key),
           link: value as string,
           key: key,
           isNewImage: false

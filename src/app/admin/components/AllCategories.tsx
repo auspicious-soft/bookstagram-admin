@@ -12,6 +12,7 @@ import AddCommonModal from './AddCommonModal';
 import categoryImg from '@/assets/images/categoryModal.png'
 import { toast } from 'sonner';
 import { generateSignedUrlForCategory } from '@/actions';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 type Language = "eng" | "kaz" | "rus";
 interface FormValues {
@@ -112,7 +113,7 @@ const AllCategories = () => {
               row?.name?.rus ??
               ''
             }
-            image={getImageClientS3URL(row?.image)}
+            image={getProfileImageUrl(row?.image)}
             onClick={() => handleSubCategory(row?._id)}
           />
 

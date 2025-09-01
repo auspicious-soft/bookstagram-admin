@@ -61,7 +61,6 @@ const Dashboard = () => {
   const eventsProfile = (id: string) => {
     router.push(`/admin/book-events/${id}`);
   }
-  console.log('overviewData?.newestUsers: ', overviewData?.newestUsers);
 
   return (
     <div>

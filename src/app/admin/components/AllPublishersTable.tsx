@@ -13,6 +13,7 @@ import TableRowImage from "@/app/components/TableRowImage";
 import profile from '@/assets/images/preview.png';
 import { useSession } from "next-auth/react";
 import UseCategory from "@/utils/useCategory";
+import { getProfileImageUrl } from "@/utils/getImageUrl";
 
 const AllPublishersTable = () => {
   const router = useRouter();
@@ -83,7 +84,7 @@ const AllPublishersTable = () => {
                 publishersData?.map((row: any, index: number) => (
                 <tr key={row?.id || `publisher-${index}`}>
                   <td><div className="flex items-center gap-2.5 capitalize">
-                  <TableRowImage image={row?.image ? getImageClientS3URL(row?.image) : profile}/>  {row?.name.eng || row?.name.kaz || row?.name.rus} </div></td>
+                  <TableRowImage image={row?.image ? getProfileImageUrl(row?.image) : profile}/>  {row?.name.eng || row?.name.kaz || row?.name.rus} </div></td>
                   <td>
                   <div className="flex flex-wrap gap-2">
                   {getCategoryNames(row?.categoryId).slice(0, 3).map((categoryName, index) => (

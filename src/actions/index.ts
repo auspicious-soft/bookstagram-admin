@@ -8,6 +8,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { DeleteObjectCommand, GetObjectCommand, HeadObjectCommand, ObjectCannedACL, PutObjectCommand, CopyObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getImageClientS3URL } from "@/config/axios";
 import { MetadataDirective } from "@aws-sdk/client-s3";
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 export const loginAction = async (payload: any) => {
 	try {
@@ -437,7 +438,7 @@ export const getFileWithMetadata = async (fileKey: string) => {
 				console.error("Error decoding metadata timestamps:", error);
 			}
 		}
-		const fileUrl = await getImageClientS3URL(fileKey);
+		const fileUrl = await getProfileImageUrl(fileKey);
 		return {
 			fileUrl,
 			metadata,

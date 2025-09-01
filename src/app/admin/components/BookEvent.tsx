@@ -9,6 +9,7 @@ import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 import SearchBar from "./SearchBar";
 import TablePagination from "./TablePagination";
 import Image from "next/image";
+import { getProfileImageUrl } from "@/utils/getImageUrl";
 
 const BooksEvents = () => {
   const router = useRouter();
@@ -52,14 +53,14 @@ const BooksEvents = () => {
             <div key={index} className="  overflow-hidden  " onClick={() => router.push(`/admin/book-events/${event?._id}`)}>
               <div className="aspect-square relative ">
                 {/* <Image
-                  src={getImageClientS3URL(event.image)}
+                  src={getProfileImageUrl(event.image)}
                   alt={event.name}
                   layout="fill"
                   objectFit="cover"
                   className="round-[10px]"
                   style={{borderRadius:"10px"}}
                 /> */} 
-                <Image unoptimized src={getImageClientS3URL(event.image)} alt={event.name} width={263} height={263} className="w-full h-full object-cover round-[10px]" style={{ borderRadius: "10px" }} />
+                <Image unoptimized src={getProfileImageUrl(event.image)} alt={event.name} width={263} height={263} className="w-full h-full object-cover round-[10px]" style={{ borderRadius: "10px" }} />
               </div>
               <div className="p-4">
                 <h3 className="text-[18px] font-medium text-color-[#060606]">{event.name}</h3>

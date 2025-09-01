@@ -662,6 +662,7 @@ import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import { DashboardIcon1, DashboardIcon2 } from '@/utils/svgicons';
 import DashboardCard from '../../components/DashboardCard';
 import { useRouter } from 'next/navigation';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 type Language = "eng" | "kaz" | "rus";
 
@@ -866,7 +867,7 @@ const BookForm = () => {
       initialFormat.current = bookData.format || (bookType === 'e-book' ? 'e-book' : bookType === 'audiobook' ? 'audiobook' : 'both');
 
       if (bookData?.image && !isImageChanged.current) {
-        const imageUrl = getImageClientS3URL(bookData?.image);
+        const imageUrl = getProfileImageUrl(bookData?.image);
         setImagePreview(imageUrl);
       }
 

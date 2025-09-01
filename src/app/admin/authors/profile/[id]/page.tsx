@@ -13,6 +13,7 @@ import BookCard from '@/app/admin/components/BookCard';
 import { useFieldArray, useForm, FormProvider } from "react-hook-form";
 import * as yup from 'yup';
 import { yupResolver } from "@hookform/resolvers/yup";
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 // Types
 interface OptionType {
@@ -165,7 +166,7 @@ const Page = () => {
 
       // Set image preview if exists
       if (authorData?.image && !isImageChanged.current) {
-        const imageUrl = getImageClientS3URL(authorData?.image) ?? "";
+        const imageUrl = getProfileImageUrl(authorData?.image) ?? "";
         setImagePreview(imageUrl);
       }
 
@@ -535,9 +536,10 @@ const Page = () => {
                 handleClick={() => openBookProfile(data?._id, data?.name.eng)}
                 title={data?.name?.eng}
                 price={`$${data?.price}`}
-                imgSrc={getImageClientS3URL(data?.image)}
+                imgSrc={getProfileImageUrl(data?.image)}
                 author={authorData?.name?.eng}
-                format={data?.format}                
+                format={data?.format} 
+                discount={data?.discountPercentage}               
               />
             ))
           ) : (

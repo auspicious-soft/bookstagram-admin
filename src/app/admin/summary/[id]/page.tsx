@@ -9,6 +9,7 @@ import SearchBar from '../../components/SearchBar';
 import BookCard from '../../components/BookCard';
 import TablePagination from '../../components/TablePagination';
 import AddToSummaryModal from '../../components/AddToSummaryModal';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 const Page = () => {
   const router = useRouter();
@@ -63,8 +64,8 @@ const Page = () => {
             title={row?.name.eng}
             price={`$${row?.price}`}
             
-            // discount={row?.discountPercentage}
-            imgSrc={getImageClientS3URL(row?.image)}
+            discount={row?.discountPercentage}
+            imgSrc={getProfileImageUrl(row?.image)}
             format={row?.format}
             />
             ))}

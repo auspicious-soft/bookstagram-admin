@@ -9,6 +9,7 @@ import { useParams } from 'next/navigation'
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { getProfileImageUrl } from "@/utils/getImageUrl";
 
 const DisplayBlog = () => {
   const Params = useParams()
@@ -90,7 +91,7 @@ const handleUpload = async () => {
             <div className="aspect-square bg-gray-100 rounded-[20px]  flex items-center justify-center">
               {  imagePreview ==="" && blogImage && (
                 <Image unoptimized
-                  src={getImageClientS3URL(blogImage)  }
+                  src={getProfileImageUrl(blogImage)  }
                   alt={blogName}
                   className="w-full h-full object-cover round-[10px]"
                   style={{borderRadius:"20px"}}

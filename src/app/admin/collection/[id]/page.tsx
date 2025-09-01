@@ -10,6 +10,7 @@ import BookCard from '../../components/BookCard';
 import TablePagination from '../../components/TablePagination';
 import AddToSummaryModal from '../../components/AddToSummaryModal';
 import AddToCollection from '../../components/AddToCollection';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 const Page = () => {
   const router = useRouter();
@@ -63,9 +64,9 @@ const Page = () => {
                 author={row?.authorId?.[0]?.name?.eng}
                 title={row?.name?.eng}
                 price={`$${row?.price}`}
-                imgSrc={getImageClientS3URL(row?.image)}
+                imgSrc={getProfileImageUrl(row?.image)}
                 format={row?.format}
-
+                discount={row?.discountPercentage}
               />
             ))}
           </div>

@@ -11,6 +11,7 @@ import { ViewIcon } from "@/utils/svgicons";
 import TableRowImage from "@/app/components/TableRowImage";
 import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 import profile from '@/assets/images/preview.png';
+import { getProfileImageUrl } from "@/utils/getImageUrl";
 
 const AllAuthorsTable = () => {
   const router = useRouter();
@@ -72,7 +73,7 @@ const AllAuthorsTable = () => {
               authorsData?.map((row: any) => (
                 <tr key={row?._id}>
                   <td><div className="flex items-center gap-2.5 capitalize">
-                  <TableRowImage image={row?.image ? getImageClientS3URL(row?.image) : profile}/> {row?.name.eng} 
+                  <TableRowImage image={row?.image ? getProfileImageUrl(row?.image) : profile}/> {row?.name.eng} 
                     </div></td>
                   <td className="capitalize"> {row?.profession.join(", ")}</td>
                   <td>{new Date(row?.dob).toLocaleDateString()}</td>

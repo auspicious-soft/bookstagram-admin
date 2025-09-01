@@ -3,6 +3,7 @@ import React from 'react';
 import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import BookCard from './BookCard';
 import { useRouter } from 'next/navigation';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
  interface Props {
   data: any;
  }
@@ -25,7 +26,7 @@ const DiscountBooks = ({data}: Props) => {
             title={row?.name?.eng}
             price={`$${row?.price}`}
             discount={row?.discountPercentage}
-            imgSrc={getImageClientS3URL(row?.image)}
+            imgSrc={getProfileImageUrl(row?.image)}
             format={row?.format}
             />
             ))}
