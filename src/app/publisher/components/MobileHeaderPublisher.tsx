@@ -5,7 +5,8 @@ import Link from "next/link";
 import { BookHubIcon, DashboardIcon, HamburgerIcon } from "@/utils/svgicons";
 import Image from "next/image";
 import logo from '@/assets/images/logo.png';
-import { signOut } from "@/auth";
+import { signOut } from "next-auth/react";
+
 
 const MobileHeaderPublisher = () => {
   const pathname = usePathname(); 

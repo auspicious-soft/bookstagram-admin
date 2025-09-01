@@ -21,8 +21,7 @@ const Page = () => {
   const getTypeParam = (tab) => {
     const typeMap = {
       All: "",
-      "e-Books": "e-book",
-      Audiobooks: "audiobook",
+      "Audio & E-books": "audioebook",
       Courses: "course",
       Podcasts: "podcast",
     };
@@ -30,11 +29,9 @@ const Page = () => {
   };
 
   const { data, isLoading, error } = useSWR(
-    `/publisher/books?${query}&description=${searchParams}&type=${getTypeParam(
-      activeTab
-    )}`,
-    getPublisherAllBooks
-  );
+  `/publisher/books?${query}&description=${searchParams}${activeTab !== "All" ? `&type=${getTypeParam(activeTab)}` : ""}`,
+  getPublisherAllBooks
+);
   const booksdata = data?.data?.data; 
 
   const handlePageChange = (newPage: number) => {
@@ -53,7 +50,7 @@ const Page = () => {
     <div>
       <div className="flex justify-between mb-5">
         <div className="tabs flex flex-wrap gap-[5px] ">
-          {["All", "e-Books", "Audiobooks", "Courses", "Podcasts"].map(
+          {["All","Audio & E-books", "Courses", "Podcasts"].map(
             (tab) => (
               <button
                 key={tab}

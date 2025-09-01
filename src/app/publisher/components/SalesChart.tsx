@@ -14,6 +14,7 @@ const yAxisTickFormatter = (value: number) => {
 };
 
 const SalesChart = ({selectedYear, data, onYearChange}: Props) => { 
+  console.log('data: ', data);
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 6 }, (_, i) => currentYear - i);
 
@@ -21,14 +22,34 @@ const SalesChart = ({selectedYear, data, onYearChange}: Props) => {
 
   const [userGrowth, setUserGrowth] = useState<{ name: string; value: number }[]>([]);
 
-  useEffect(() => {
-    const formattedData = monthlyCounts.map((item: any) => ({
-      name: item.month?.split("/")[0], 
-      value: item.count,
-    }));
+  // useEffect(() => {
+  //   const formattedData = monthlyCounts.map((item: any) => ({
+  //     name: item.month?.split("/")[0], 
+  //     value: item.count,
+  //   }));
 
-    setUserGrowth(formattedData);
-  }, [monthlyCounts]);
+  //   setUserGrowth(formattedData);
+  // }, [monthlyCounts]);
+
+useEffect(() => {
+  const allMonths = Array.from({ length: 12 }, (_, i) => {
+    const month = String(i + 1).padStart(2, "0");
+    return { name: month, value: 0 };
+  });
+
+  const filledData = allMonths.map((monthData) => {
+    const match = monthlyCounts.find(
+      (item: any) => item.month?.split("/")[0] === monthData.name
+    );
+    return {
+      name: monthData.name,
+      value: match ? match.count : 0,
+    };
+  });
+
+  setUserGrowth(filledData);
+}, [monthlyCounts]);
+
 
   return (
     <Card
