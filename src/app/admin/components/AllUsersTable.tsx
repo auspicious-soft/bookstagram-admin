@@ -11,6 +11,8 @@ import ReactLoading from 'react-loading';
 import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import TableRowImage from '@/app/components/TableRowImage';
 import profile from '@/assets/images/preview.png';
+import defaultprofile from '@/assets/images/default-avatar.jpg';
+import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 const AllUsersTable = () => {
   const router = useRouter();
@@ -65,8 +67,8 @@ const userProfile = (id: string) => {
             userData?.map((row: any) => (
               <tr key={row?._id}>
                 <td>#{row?.identifier}</td>
-                <td><div className="flex items-center gap-[5px] capitalize"><TableRowImage image={row?.profilePic ? getImageClientS3URL(row?.profilePic) : profile}/>
-                 {row?.fullName?.eng ?? row?.fullName?.rus ?? row?.fullName?.kaz }  </div>
+                <td><div className="flex items-center gap-[5px] capitalize"><TableRowImage image={row?.profilePic !== null ? getProfileImageUrl(row?.profilePic) : defaultprofile}/>
+                 {row?.fullName?.eng ?? row?.fullName?.rus ?? row?.fullName?.kaz ?? row.firstName?.eng ?? row.firstName?.kaz ?? row.firstName?.rus ?? "-"}  </div>
                   </td>
                 <td>Level {row.award===null? 0 : row.award.level}</td>
                 <td>{row?.phoneNumber}</td>

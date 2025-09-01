@@ -81,25 +81,25 @@ const AllPublishersTable = () => {
               </tr>
             ) : publishersData?.length > 0 ? (
                 publishersData?.map((row: any, index: number) => (
-                <tr key={row?._id || `publisher-${index}`}>
+                <tr key={row?.id || `publisher-${index}`}>
                   <td><div className="flex items-center gap-2.5 capitalize">
-                  <TableRowImage image={row?.publisher?.image ? getImageClientS3URL(row?.publisher?.image) : profile}/>  {row?.publisher?.name.eng} </div></td>
+                  <TableRowImage image={row?.image ? getImageClientS3URL(row?.image) : profile}/>  {row?.name.eng || row?.name.kaz || row?.name.rus} </div></td>
                   <td>
                   <div className="flex flex-wrap gap-2">
-                  {getCategoryNames(row?.publisher?.categoryId).slice(0, 3).map((categoryName, index) => (
+                  {getCategoryNames(row?.categoryId).slice(0, 3).map((categoryName, index) => (
                       <span key={index} className="bg-[#EDEDED] px-2.5 py-1 rounded-full capitalize" >
                         {categoryName}
                       </span>
                     ))}
-                  {getCategoryNames(row?.publisher?.categoryId).length > 3 && (
+                  {getCategoryNames(row?.categoryId).length > 3 && (
                     <span className="bg-[#EDEDED] px-2.5 py-1 rounded-full">...</span>
                   )}
                 </div>  
                   </td>
-                  <td>{row?.publisher?.country}</td> 
-                  <td>{row?.publisher?.bookCount}</td>
+                  <td>{row?.country}</td> 
+                  <td>{row?.bookCount}</td>
                   <td className="space-x-1">
-                    <button onClick={() => authorProfile(row?.publisher?._id)} className="p-[10px]"><ViewIcon/></button>
+                    <button onClick={() => authorProfile(row?.id)} className="p-[10px]"><ViewIcon/></button>
                   </td>
                 </tr>
               ))
