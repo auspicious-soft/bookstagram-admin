@@ -13,6 +13,7 @@ import { getImageClientS3URL } from "@/utils/get-image-ClientS3URL";
 import { useFieldArray, useForm, FormProvider } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { getProfileImageUrl } from "@/utils/getImageUrl";
 
 type Language = "eng" | "kaz" | "rus";
 
@@ -120,7 +121,8 @@ const UserProfile = ({ id }: Props) => {
       });
 
       if (profileData?.profilePic) {
-        const imageUrl = getImageClientS3URL(profileData?.profilePic) ?? '';
+        const imageUrl = getProfileImageUrl(profileData?.profilePic) ?? '';
+        console.log('imageUrl: ', imageUrl);
         setImagePreview(imageUrl);
       }
     }
