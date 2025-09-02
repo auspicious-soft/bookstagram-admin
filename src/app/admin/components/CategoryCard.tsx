@@ -64,6 +64,7 @@ const CategoryCard: React.FC<CategoryProps> = ({
   onSelect,
 }) => {
   const [showConfirm, setShowConfirm] = useState(false);
+  console.log('name: ', name);
 
   const confirmDelete = () => {
     handleDelete?.();

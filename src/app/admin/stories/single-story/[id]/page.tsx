@@ -58,7 +58,7 @@ const Page = () => {
     <div className="p-5 bg-white rounded-[20px]">
       <div className='flex items-center justify-between mb-10 '>
         <h2 className="text-2xl text-[#10375C] capitalize">
-          {storyData?.name.eng}
+          {storyData?.name.eng || storyData?.name.kaz || storyData?.name.rus}
         </h2>
         <button onClick={()=>setStoryModal(true)} className='bg-orange text-white text-sm px-5 py-2.5  rounded-[28px]'>Edit Story</button>
       </div>

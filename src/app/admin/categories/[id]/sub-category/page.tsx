@@ -150,7 +150,7 @@ return (
           {subCategory?.map((row) => (
             <CategoryCard
               key={row?._id}
-              name={row?.name.eng}
+              name={row?.name?.eng || row?.name?.kaz || row?.name?.rus}
               image={getProfileImageUrl(row?.image)}
               onClick={() => handleSubCategory(row?._id, row?.name?.eng)}
             />
@@ -175,8 +175,8 @@ return (
             <BookCard
               handleClick={() => openBookProfile(row?._id, row?.name.eng)}
               key={row?._id}
-              author={row?.authorId?.[0]?.name?.eng}
-              title={row?.name?.eng}
+              author={row?.authorId?.[0]?.name?.eng || row?.authorId?.[0]?.name?.kaz || row?.authorId?.[0]?.name?.rus}
+              title={row?.name?.eng || row?.name?.kaz || row?.name?.rus}
               price={`$${row?.price}`}
               imgSrc={getProfileImageUrl(row?.image)}
               format={row?.format}

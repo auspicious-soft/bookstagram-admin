@@ -83,11 +83,11 @@ const Page = () => {
               {booksdata?.map((book: any) => (
                 <BookCard
                   key={book?._id}
-                  title={book?.name?.eng}
+                  title={book?.name.eng || book?.name.kaz || book?.name.rus}
                   price={`$${book?.price}`}
-                  handleClick={() => openBookProfile(book?._id, book?.name?.eng)}
+                  handleClick={() => openBookProfile(book?._id, book?.name.eng || book?.name.kaz || book?.name.rus)}
                   imgSrc={getProfileImageUrl(book?.image)}
-                  author={book?.authorId[0]?.name?.eng}
+                  author={book?.authorId[0]?.name?.eng || book?.authorId[0]?.name?.kaz || book?.authorId[0]?.name?.rus}
                   format={book?.format} 
                   discount={book?.discountPercentage}                 
                 />

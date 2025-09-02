@@ -7,7 +7,7 @@ const UseCategory = () => {
       });
 
     const category = data?.data?.data?.map((row: any) => ({
-        label: `${row?.name.eng}`,
+        label: `${row?.name.eng || row?.name.kaz || row?.name.rus }`,
         value: row._id,
     })) || []; 
 

@@ -70,6 +70,7 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
   });
 
   const allPublishers = data?.data?.data;
+  console.log('allPublishers: ', allPublishers);
   const methods = useForm<FormData>({
     resolver: yupResolver(schema) as any,
     defaultValues: {
@@ -252,11 +253,11 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
               <div className="mt-5 pt-5 grid grid-cols-4 gap-5 border-t border-dashed border-[#D0D0D0]">
                 {allPublishers?.map((data) => (
                   <CourseCard
-                    key={data?.publisher?._id}
-                    title={data?.publisher?.name?.eng}
-                    image={getProfileImageUrl(data?.publisher?.image)}
-                    selected={selectedPublishers.includes(data?.publisher?._id)}
-                    onSelect={() => handleSelect(data?.publisher?._id)}
+                    key={data?.id}
+                    title={data?.name?.eng || data?.name?.kaz || data?.name?.rus}
+                    image={getImageClientS3URL(data?.image)}
+                    selected={selectedPublishers.includes(data?.id)}
+                    onSelect={() => handleSelect(data?.id)}
                   />
                 ))}
               </div>

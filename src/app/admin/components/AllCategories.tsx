@@ -108,10 +108,7 @@ const AllCategories = () => {
           <CategoryCard
             key={row?._id}
             name={
-              row?.name?.eng ??
-              row?.name?.kaz ??
-              row?.name?.rus ??
-              ''
+              row?.name.eng ?? (row?.name.eng === null ? row?.name.kaz : row?.name.rus)
             }
             image={getProfileImageUrl(row?.image)}
             onClick={() => handleSubCategory(row?._id)}

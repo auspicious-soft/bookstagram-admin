@@ -72,7 +72,6 @@ const BookForm = () => {
   const { authors } = UseAuthors();
   const { subCategory } = UseSubCategory();
   const { publishers } = UsePublisher();
-  console.log('publishers: ', publishers);
   const { category } = UseCategory();
 
   // Helper function to determine if file upload should be shown

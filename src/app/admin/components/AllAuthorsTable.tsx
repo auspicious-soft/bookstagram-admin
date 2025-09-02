@@ -73,7 +73,7 @@ const AllAuthorsTable = () => {
               authorsData?.map((row: any) => (
                 <tr key={row?._id}>
                   <td><div className="flex items-center gap-2.5 capitalize">
-                  <TableRowImage image={row?.image ? getProfileImageUrl(row?.image) : profile}/> {row?.name.eng} 
+                  <TableRowImage image={row?.image ? getProfileImageUrl(row?.image) : profile}/> {row?.name.eng || row?.name.kaz || row?.name.rus} 
                     </div></td>
                   <td className="capitalize"> {row?.profession.join(", ")}</td>
                   <td>{new Date(row?.dob).toLocaleDateString()}</td>

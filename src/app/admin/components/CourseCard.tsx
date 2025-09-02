@@ -17,9 +17,9 @@ const CourseCard: React.FC<CourseCardProps> = ({ title, image, selected, onSelec
         src={image}
         unoptimized
         width={217}
-        height={113}
+        height={100}
         alt="image"
-        className="w-full rounded-lg object-cover"
+        className="w-full h-30 rounded-lg object-cover"
       />
       <div className="absolute top-2 right-2  ">
         {selected ? <SelectSvg color="var(--tw-bg-orange)" /> : <SelectSvg color="#DADADA"/>}

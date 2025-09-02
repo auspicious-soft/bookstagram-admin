@@ -82,7 +82,7 @@ const Page = () => {
                 />
               </div>
             ))}
-            <h2 className="font-aeonikBold text-lg capitalize text-darkBlack mt-[11px]">{story?.name.eng}</h2>
+            <h2 className="font-aeonikBold text-lg capitalize text-darkBlack mt-[11px]">{story?.name.eng || story?.name.kaz || story?.name.rus}</h2>
             <div className="absolute top-[5px] right-[6px] z-10">
               <button
                 onClick={() => openDeleteModal(story?._id)}

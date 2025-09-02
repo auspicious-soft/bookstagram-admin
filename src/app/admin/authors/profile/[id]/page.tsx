@@ -537,7 +537,7 @@ const Page = () => {
                 title={data?.name?.eng}
                 price={`$${data?.price}`}
                 imgSrc={getProfileImageUrl(data?.image)}
-                author={authorData?.name?.eng}
+                author={authorData?.name?.eng || authorData?.name?.kaz || authorData?.name?.rus }
                 format={data?.format} 
                 discount={data?.discountPercentage}               
               />

@@ -122,7 +122,8 @@ const Page = () => {
     control,
     name: "descriptionTranslations",
   });
-
+  // const bookName= data?.name?.eng || data?.name?.kaz || data?.name?.rus;
+  // console.log('bookName: ', bookName);
   // Initialize form data once when publishersData is available
   useEffect(() => {
     if (publishersData && category && !isFormInitialized) {
@@ -559,11 +560,11 @@ const Page = () => {
             bookData?.map((data: any) => (
               <BookCard
                 key={data?._id}
-                handleClick={() => openBookProfile(data?._id, data?.name.eng)}
-                title={data?.name?.eng}
+                handleClick={() => openBookProfile(data?._id, data?.name?.eng || data?.name?.kaz || data?.name?.rus)}
+                title={data?.name?.eng || data?.name?.kaz || data?.name?.rus}
                 price={`$${data?.price}`}
                 imgSrc={getProfileImageUrl(data?.image)}
-                author={data?.authorId[0]?.name?.eng}
+                author={data?.authorId[0]?.name?.eng || data?.authorId[0]?.name?.kaz || data?.authorId[0]?.name?.rus}
                 format={data?.format}
                 discount={data?.discountPercentage}
               />

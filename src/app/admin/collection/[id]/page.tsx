@@ -61,7 +61,7 @@ const Page = () => {
               <BookCard 
                 key={row?._id}
                 handleClick={()=>openBookProfile(row?._id, row?.name?.eng)}
-                author={row?.authorId?.[0]?.name?.eng}
+                author={row?.authorId?.[0]?.name?.eng || row?.authorId?.[0]?.name?.kaz || row?.authorId?.[0]?.name?.rus}
                 title={row?.name?.eng}
                 price={`$${row?.price}`}
                 imgSrc={getProfileImageUrl(row?.image)}

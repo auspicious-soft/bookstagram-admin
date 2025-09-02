@@ -324,6 +324,7 @@ const AddCommonModal: React.FC<ModalProps> = ({
       const allLanguages: Language[] = ["eng", "kaz", "rus"];
       const transformedTranslations = allLanguages.map((lang) => {
         const existingTranslation = data.descriptionTranslations.find(t => t.language === lang);
+      
         return {
           id: existingTranslation?.id || String(allLanguages.indexOf(lang) + 1),
           language: lang,
@@ -335,6 +336,7 @@ const AddCommonModal: React.FC<ModalProps> = ({
         ...data,
         descriptionTranslations: transformedTranslations,
       });
+      handleClose();
     }
   };
 
