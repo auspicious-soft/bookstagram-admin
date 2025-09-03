@@ -77,39 +77,39 @@ const BookUniversity = () => {
     }
   }
 
-  const addBookToBookUniversity = async() => {
+  const addBookToBookUniversity = async () => {
     if (selectedBooks.length === 0) {
       toast.error("Please select at least one book.");
       return;
     }
-      try {
-        const payload = {
-          productsId: selectedBooks
-        };
+    try {
+      const payload = {
+        productsId: selectedBooks
+      };
 
-       startTransition(async () => {
-          const response = await addToBookUniversity('/admin/book-universities', payload);
+      startTransition(async () => {
+        const response = await addToBookUniversity('/admin/book-universities', payload);
 
-          if (response.status===201 ) {
-            toast.success("Books added to Book University successfully");
-            mutate();
-            setOpenModal(false);
-            setSelectedBooks([]);
-          } else {
-            toast.error("Failed To add books ");
-          }
-        });
-      } catch (error) {
-        console.error('Error adding books:', error);
-        toast.error("An error occurred while adding books");
-      }
+        if (response.status === 201) {
+          toast.success("Books added to Book University successfully");
+          mutate();
+          setOpenModal(false);
+          setSelectedBooks([]);
+        } else {
+          toast.error("Failed To add books ");
+        }
+      });
+    } catch (error) {
+      console.error('Error adding books:', error);
+      toast.error("An error occurred while adding books");
     }
+  }
   return (
     <div>
       <div className="flex gap-2.5 justify-end mb-5 ">
         <SearchBar setQuery={setsearchParams} query={searchParams} />
         <div>
-          <Button text="Add To University" onClick={()=>setOpenModal(true)} />
+          <Button text="Add To University" onClick={() => setOpenModal(true)} />
         </div>
       </div>
 
@@ -138,26 +138,26 @@ const BookUniversity = () => {
               university?.map((row: any) => (
                 <tr key={row?._id}>
                   <td><div className="flex items-center gap-2.5 capitalize">
-                  <TableRowImage image={row?.productsId?.image ? getProfileImageUrl(row?.productsId?.image) : profile}/> {row?.productsId?.name?.eng ?? row?.productsId?.name?.kaz ?? row?.productsId?.name?.rus}
+                    <TableRowImage image={row?.productsId?.image ? getProfileImageUrl(row?.productsId?.image) : profile} /> {row?.productsId?.name?.eng ?? row?.productsId?.name?.kaz ?? row?.productsId?.name?.rus}
                   </div></td>
-                  <td>{row?.productsId?.authorId[0]?.name?.eng }</td>
+                  <td>{row?.productsId?.authorId[0]?.name?.eng || row?.productsId?.authorId[0]?.name?.kaz || row?.productsId?.authorId[0]?.name?.rus}</td>
                   {/* <td>{row?.productsId?.file &&Object.entries(row?.productsId?.file).slice(0, 1).map(([key, value]: [string, string], index) => (
                   <p key={index}>
                   {key === "eng" ? "English" : key === "rus" ? "Russian" : key ==="kaz" ? "Kazakh": key}
                   </p>))}
                 </td> */}
                   <td>
-                  <div className="flex flex-wrap gap-2">
-                  {(row?.productsId?.categoryId)?.slice(0, 3)?.map((item) => (
-                      <span key={item?._id} className="bg-[#EDEDED] px-2.5 py-1 rounded-full capitalize" >
-                                                {item?.name.rus  ?? item?.name?.kaz ?? item?.name?.eng}
+                    <div className="flex flex-wrap gap-2">
+                      {(row?.productsId?.categoryId)?.slice(0, 3)?.map((item) => (
+                        <span key={item?._id} className="bg-[#EDEDED] px-2.5 py-1 rounded-full capitalize" >
+                          {item?.name.rus ?? item?.name?.kaz ?? item?.name?.eng}
 
-                      </span>
-                    ))}
-                  {(row?.productsId?.categoryId)?.length > 3 && (
-                    <span className="bg-[#EDEDED] px-2.5 py-1 rounded-full">...</span>
-                  )}
-                </div>
+                        </span>
+                      ))}
+                      {(row?.productsId?.categoryId)?.length > 3 && (
+                        <span className="bg-[#EDEDED] px-2.5 py-1 rounded-full">...</span>
+                      )}
+                    </div>
                   </td>
                   <td className="space-x-1">
                     <button
@@ -167,7 +167,7 @@ const BookUniversity = () => {
                       )}
                       className="p-[10px]"
                     >
-                      <DeleteIcon/>
+                      <DeleteIcon />
                     </button>
                   </td>
                 </tr>
@@ -175,14 +175,14 @@ const BookUniversity = () => {
             ) : (
               <tr>
                 <td colSpan={6}>{isLoading ? (<ReactLoading
-                      type={"spin"}
-                      color={"#26395e"}
-                      height={"20px"}
-                      width={"20px"}
-                    />
-                  ) : (
-                    <p>No data found</p>
-                  )}
+                  type={"spin"}
+                  color={"#26395e"}
+                  height={"20px"}
+                  width={"20px"}
+                />
+                ) : (
+                  <p>No data found</p>
+                )}
                 </td>
               </tr>
             )}
@@ -206,6 +206,7 @@ const BookUniversity = () => {
         handleSubmit={addBookToBookUniversity}
         isPending={isPending}
         type="course"
+        route="/admin/book-universities/books"
       />
 
       {/* Delete Confirmation Modal */}

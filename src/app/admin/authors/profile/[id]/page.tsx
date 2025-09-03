@@ -533,8 +533,8 @@ const Page = () => {
             authorBooks?.map((data: any) => (
               <BookCard
                 key={data?._id}
-                handleClick={() => openBookProfile(data?._id, data?.name.eng)}
-                title={data?.name?.eng}
+                handleClick={() => openBookProfile(data?._id, data?.name.eng || data?.name.kaz || data?.name.rus)}
+                title={data?.name.eng || data?.name.kaz || data?.name.rus}
                 price={`$${data?.price}`}
                 imgSrc={getProfileImageUrl(data?.image)}
                 author={authorData?.name?.eng || authorData?.name?.kaz || authorData?.name?.rus }

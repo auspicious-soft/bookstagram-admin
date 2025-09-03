@@ -17,7 +17,7 @@ import { useRouter } from 'next/navigation';
 import UseSubCategory from '@/utils/useSubCategory';
 
 type Language = "eng" | "kaz" | "rus";
-type Format = "audiobook" | "e-book" | "both";
+type Format = "audiobook" | "e-book" | "both" | "video" | "audio";
 
 interface OptionType {
   value: string;
@@ -149,7 +149,10 @@ const BookForm = () => {
 
   const { control, handleSubmit, register, watch, setValue, formState: { errors } } = methods;
   console.log('errors: ', errors);
-
+  
+  if(bookType ==="podcast"){
+    setValue('format', "video"); //TODO--
+  }
   const { fields: nameFields, append: appendName, remove: removeName } = useFieldArray({
     control,
     name: "translations"
@@ -187,7 +190,19 @@ const BookForm = () => {
     setSelectedFormat(format);
     setValue('format', format);
   };
-
+ const getAcceptedFileTypes = () => {
+    switch (bookType) {
+      case "audiobook":
+        return ".epub"; // Only EPUB for audiobook
+      case "podcast":
+      case "video-lecture":
+        return ".mp4,.mov,.avi"; // Video files for podcast and video-lecture
+      case "audioebook":
+        return selectedFormat === "e-book" || selectedFormat === "both" ? ".epub" : "";
+      default:
+        return ""; // No restrictions for other types
+    }
+  };
   const onSubmit = async (data: FormValues) => {
     const userName = data.translations[0].name?.split(" ").join("-").toLowerCase();
 
@@ -368,6 +383,7 @@ const BookForm = () => {
                       <div className='bg-white p-5 rounded-[20px]'>
                         <input
                           type="file"
+                          accept={getAcceptedFileTypes()}
                           className="border border-[#BDBDBD] py-5 rounded-[10px] px-5 bg-[#F5F5F5] flex-1 w-full"
                           onChange={(e) => {
                             if (e.target.files?.[0]) {

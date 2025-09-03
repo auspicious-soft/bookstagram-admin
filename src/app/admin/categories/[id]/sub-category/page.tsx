@@ -152,7 +152,7 @@ return (
               key={row?._id}
               name={row?.name?.eng || row?.name?.kaz || row?.name?.rus}
               image={getProfileImageUrl(row?.image)}
-              onClick={() => handleSubCategory(row?._id, row?.name?.eng)}
+              onClick={() => handleSubCategory(row?._id, row?.name?.eng || row?.name?.kaz || row?.name?.rus)}
             />
           ))}
         </div>
@@ -173,7 +173,7 @@ return (
         <div className="grid grid-cols-4 gap-6">
           {booksData?.map((row) => (
             <BookCard
-              handleClick={() => openBookProfile(row?._id, row?.name.eng)}
+              handleClick={() => openBookProfile(row?._id, row?.name?.eng || row?.name?.kaz || row?.name?.rus)}
               key={row?._id}
               author={row?.authorId?.[0]?.name?.eng || row?.authorId?.[0]?.name?.kaz || row?.authorId?.[0]?.name?.rus}
               title={row?.name?.eng || row?.name?.kaz || row?.name?.rus}

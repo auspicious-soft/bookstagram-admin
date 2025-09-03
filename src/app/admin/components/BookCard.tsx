@@ -36,7 +36,7 @@ const BookCard: React.FC<CardProps> = ({ title, author, price, imgSrc, discount,
         >{author}</p>
         {format !== null && (
           <div className="absolute left-[6px] bottom-[6px]  text-center ">
-            {format === "e-book" ? <EBookIcon /> : format === "audiobook" ? <AudioBookIcon /> : <div className="flex gap-1"><AudioBookIcon /> <EBookIcon /></div>}
+            {format === "e-book" ? <EBookIcon /> : format === "audiobook" ? <AudioBookIcon /> :format === "both" ?  <div className="flex gap-1"><AudioBookIcon /> <EBookIcon /></div> : null}
           </div>
         )}
       </div>

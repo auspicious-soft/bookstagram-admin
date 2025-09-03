@@ -142,7 +142,7 @@ const BookStudy = () => {
                   </div></td>
                   <td>
                     {row?.productsId?.authorId?.map((item) => (
-                    <p key={item?._id}>{item?.name?.eng}</p>
+                    <p key={item?._id}>{item?.name?.eng || item?.name?.kaz || item?.name?.rus}</p>
                     ))}
                   </td>
                   {/* <td>
@@ -205,6 +205,7 @@ const BookStudy = () => {
         handleSubmit={addBookToBookStudy}
         isPending={isPending}
         type="course"
+        route = "/admin/book-studies/books"
       />
 
       {/* Delete Confirmation Modal */}

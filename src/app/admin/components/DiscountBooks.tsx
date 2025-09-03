@@ -21,7 +21,7 @@ const DiscountBooks = ({data}: Props) => {
             {data?.map((row: any) => (
             <BookCard 
             key={row?._id}
-            handleClick={()=>openBookProfile(row?._id, row?.name.eng)}
+            handleClick={()=>openBookProfile(row?._id, row?.name?.eng || row?.name?.kaz || row?.name?.rus)}
             author={row?.authorId[0]?.name?.eng || row?.authorId[0]?.name?.kaz || row?.authorId[0]?.name?.rus}
             title={row?.name?.eng || row?.name?.kaz || row?.name?.rus}
             price={`$${row?.price}`}

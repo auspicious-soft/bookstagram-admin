@@ -114,11 +114,11 @@ const BookMasters = () => {
       </div>
 
       <div className="table-common overflo-custom">
-        <h3>Courses</h3>
+        <h3>Videos</h3>
         <table className="">
           <thead className="">
             <tr>
-              <th>Name of Course</th>
+              <th>Name of Video</th>
               <th>Author Name</th>
               {/* <th>Language</th> */}
               <th>Categories</th>
@@ -142,7 +142,7 @@ const BookMasters = () => {
                     </div></td>
                   <td>
                     {row?.productsId?.authorId?.map((item) => (
-                    <p key={item?._id}>{item?.name?.eng}</p>
+                    <p key={item?._id}>{item?.name?.eng || item?.name?.kaz || item?.name?.rus}</p>
                     ))}</td>
                   {/* <td>
                   {row?.productsId?.file &&Object.entries(row?.productsId?.file).slice(0, 1).map(([key, value]: [string, string], index) => (
@@ -210,6 +210,7 @@ const BookMasters = () => {
         handleSubmit={addBookToBookMaster}
         isPending={isPending}
         type="video-lecture"
+        route="/admin/book-masters/books"
       />
 
       {/* Delete Confirmation Modal */}

@@ -70,7 +70,7 @@ const DeleteBookDemo = () => {
               price={`$${book?.price}`}
               imgSrc={getProfileImageUrl(book?.image)}
               discount={book?.discountPercentage}
-              handleClick={() => openBookProfile(book?._id, book?.name?.eng)}
+              handleClick={() => openBookProfile(book?._id, book?.name?.eng || book?.name?.kaz || book?.name?.rus )}
               onDeleteSuccess={handleDeleteSuccess}
             />
           ))}
