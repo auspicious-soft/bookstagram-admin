@@ -5,13 +5,14 @@ import Link from "next/link";
 import { AuthorsIcon, BookEventsIcon, BookHubIcon, BookLifeIcon, CategoryIcon, CollectionIcon, DashboardIcon, DiscountIcon, HamburgerIcon, NotificationsIcon, PromotionsIcon, PublishersIcon, StoriesIcon, SummaryIcon, UsersIcon } from "@/utils/svgicons";
 import Image from "next/image";
 import logo from '@/assets/images/logo.png';
-import { signOut } from "next-auth/react";
+import { signOut, useSession} from "next-auth/react";
   
 
 const MobileHeader = () => {
   const pathname = usePathname(); 
   const [isCollapsed, setIsCollapsed] = useState(false);
-
+  const { data } = useSession();
+  const userData = (data as any)?.user;
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -45,25 +46,25 @@ const MobileHeader = () => {
                 <span>Dashboard</span>
               </Link>
             </li>
-            <li className={isActive('/admin/book-hub')}>
+            <li className={`${isActive('/admin/book-hub')} ${pathname.startsWith('/admin/add-new') ? 'active' : ''}`}>
               <Link href="/admin/book-hub" onClick={() => handleLinkClick("/admin/book-hub")}>
                 <BookHubIcon />
                 <span>Book Hub</span>
               </Link>
             </li>
-            <li className={isActive('/admin/categories')}>
+            <li className={`${isActive('/admin/categories')} ${pathname.startsWith('/admin/categories') ? 'active' : ''}`}>
               <Link href="/admin/categories" onClick={() => handleLinkClick("/admin/categories")}>
                 <CategoryIcon />
                 <span>Categories</span>
               </Link>
             </li>
-            <li className={isActive('/admin/collection')}>
+            <li className={`${isActive('/admin/collection')} ${pathname.startsWith('/admin/collection') ? 'active' : ''}`}>
               <Link href="/admin/collection" onClick={() => handleLinkClick("/admin/collection")}>
                 <CollectionIcon />
                 <span>Collection</span>
               </Link>
             </li>
-            <li className={isActive('/admin/summary')}>
+            <li className={`${isActive('/admin/summary')} ${pathname.startsWith('/admin/summary') ? 'active' : ''}`}>
               <Link href="/admin/summary" onClick={() => handleLinkClick("/admin/summary")}>
                 <SummaryIcon />
                 <span>Summary</span>
@@ -75,31 +76,31 @@ const MobileHeader = () => {
                 <span>Discounts</span>
               </Link>
             </li>
-            <li className={isActive('/admin/book-life')}>
+            <li className={`${isActive('/admin/book-life')} ${pathname.startsWith('/admin/book-life') ? 'active' : ''}`}>
               <Link href="/admin/book-life" onClick={() => handleLinkClick("/admin/book-life")}>
                 <BookLifeIcon />
                 <span>Book Life</span>
               </Link>
             </li>
-            <li className={isActive('/admin/book-events')}>
+            <li className={`${isActive('/admin/book-events')} ${pathname.startsWith('/admin/book-events') ? 'active' : ''}`}>
               <Link href="/admin/book-events" onClick={() => handleLinkClick("/admin/book-events")}>
                 <BookEventsIcon />
                 <span>Book Events</span>
               </Link>
             </li>
-            <li className={isActive('/admin/authors')}>
+            <li className={`${isActive('/admin/authors')} ${pathname.startsWith('/admin/authors') ? 'active' : ''}`}>
               <Link href="/admin/authors" onClick={() => handleLinkClick("/admin/authors")}>
                 <AuthorsIcon />
                 <span>Authors</span>
               </Link>
             </li>
-            <li className={isActive('/admin/publishers')}>
+            <li className={`${isActive('/admin/publishers')} ${pathname.startsWith('/admin/publishers') ? 'active' : ''}`}>
               <Link href="/admin/publishers" onClick={() => handleLinkClick("/admin/publishers")}>
                 <PublishersIcon />
                 <span>Publishers</span>
               </Link>
             </li>
-            <li className={isActive('/admin/stories')}>
+            <li className={`${isActive('/admin/stories')} ${pathname.startsWith('/admin/stories/single-story') ? 'active' : ''}`}>
               <Link href="/admin/stories" onClick={() => handleLinkClick("/admin/summary")}>
                 <StoriesIcon />
                 <span>Stories</span>
@@ -111,18 +112,22 @@ const MobileHeader = () => {
                 <span>Promotions</span>
               </Link>
             </li>
-            <li className={isActive('/admin/users')}>
+            <li className={`${isActive('/admin/users')} ${pathname.startsWith('/admin/users') ? 'active' : ''}`}>
               <Link href="/admin/users" onClick={() => handleLinkClick("/admin/users")}>
                 <UsersIcon />
                 <span>Users</span>
               </Link>
             </li>
+            {userData.role ==="admin" && 
+
             <li className={isActive('/admin/notifications')}>
               <Link href="/admin/notifications" onClick={() => handleLinkClick("/admin/notifications")}>
                 <NotificationsIcon />
                 <span>Notifications</span>
               </Link>
             </li>
+            }
+
           </ul>
         </div>
 

@@ -7,7 +7,7 @@ import Link from "next/link";
 import { AuthorsIcon, BookEventsIcon, BookHubIcon, BookLifeIcon, CategoryIcon, CollectionIcon, DashboardIcon, DiscountIcon, NewBookIcon, SideBarIconMirrored, NotificationsIcon, PromotionsIcon, PublishersIcon, SideBarIcon, StoriesIcon, SummaryIcon, UsersIcon } from "@/utils/svgicons";
 import Image from "next/image";
 // import { signOut } from "next-auth/react";
-
+import {  useSession } from "next-auth/react";
 const SideNav = () => {
   // const router = useRouter();
 
@@ -17,7 +17,8 @@ const SideNav = () => {
   // };
 
   const [isCollapsed, setIsCollapsed] = useState(false);
-
+  const { data } = useSession();
+  const userData = (data as any)?.user;
 
   const pathname = usePathname();
 
@@ -129,12 +130,14 @@ const SideNav = () => {
                 {!isCollapsed && <span>Users</span>}
               </Link>
             </li>
+            {userData.role ==="admin" && 
             <li className={isActive('/admin/notifications')}>
               <Link href="/admin/notifications">
                 <NotificationsIcon />
                 {!isCollapsed && <span>Notifications</span>}
               </Link>
             </li>
+            }
           </ul>
         </div>
       </div>

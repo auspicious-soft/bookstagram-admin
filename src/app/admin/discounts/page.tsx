@@ -10,6 +10,7 @@ import useSWR from "swr";
 import { getAllDiscountBooks, getAllVouchers } from "@/services/admin-services";
 import TablePagination from "../components/TablePagination";
 import AddBookToDiscount from "../components/AddBookToDiscount";
+import { useSession } from "next-auth/react";
 
 const Page = () => {
   const router = useRouter();
@@ -26,7 +27,8 @@ const Page = () => {
   const {data, error, isLoading, mutate} = useSWR(voucherSearch? `/admin/vouchers?description=${voucherSearch}&${query}` : `/admin/vouchers?${query}`, getAllVouchers)
   const vouchersData = data?.data?.data;
   const total = data?.data?.total
-
+  const { data: session } = useSession();
+  const role:any = (session as any).user.role
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -74,11 +76,13 @@ const Page = () => {
             <SearchBar setQuery={setVoucherSearch} query={voucherSearch} />
           )
         }
+        {role ==="admin" &&
           <div>
             <Button 
               text={activeTab === "Discounted Books" ? "Add to Discounts" : "Generate a Voucher"} 
               onClick={handleButtonAction}/>
           </div>
+        }
         </div>
       </div>
       <div className="tab-content">{renderTabContent()}</div>

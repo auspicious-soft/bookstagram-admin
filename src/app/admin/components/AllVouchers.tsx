@@ -5,6 +5,7 @@ import { ViewIcon, DeleteIcon } from '@/utils/svgicons';
 import CouponCode from './CouponCode';
 import ReactLoading from 'react-loading';
 import TablePagination from './TablePagination';
+import { useSession } from "next-auth/react";
 
 interface Props {
   vouchers: any;
@@ -22,7 +23,8 @@ const AllVouchers = ({ vouchers, isLoading, error, mutate, total, page, itemsPer
   const [coupon, setCoupon] = useState();
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedVoucherId, setSelectedVoucherId] = useState<string | null>(null);
-
+  const { data: session } = useSession();
+  const role:any = (session as any).user.role
   const openCouponModal = (code: any) => {
     setCouponModal(true);
     setCoupon(code);
@@ -84,7 +86,7 @@ const AllVouchers = ({ vouchers, isLoading, error, mutate, total, page, itemsPer
                   <td>
                     <div>
                       <button onClick={() => openCouponModal(row?.voucher?.couponCode)} className='p-2.5'><ViewIcon /></button>
-                      <button onClick={() => openDeleteModal(row?.voucher?._id)} className='p-2.5'><DeleteIcon /></button>
+                      {role === "admin" &&<button onClick={() => openDeleteModal(row?.voucher?._id)} className='p-2.5'><DeleteIcon /></button>}
                     </div>
                   </td>
                 </tr>

@@ -15,6 +15,8 @@ import { DeleteIcon, ViewIcon } from '@/utils/svgicons';
 import { toast } from 'sonner';
 import CouponCode from '../CouponCode';
 import DeleteConfirmationModal from '../DeleteConfirmationModal';
+import { useSession } from "next-auth/react";
+
 
 const BookSchool = () => {
   const router = useRouter();
@@ -26,6 +28,8 @@ const BookSchool = () => {
   const { data, error, isLoading, mutate } = useSWR(searchParams !== "" ? `/admin/book-schools?description=${searchParams}` : `/admin/book-schools?${query}`, getAllSchools, {
     revalidateOnFocus: false,
   })
+   const { data: session } = useSession();
+ const role:any = (session as any).user.role
   const schoolData = data?.data?.data;
   const [isopen, setIsOpen] = useState(false);
   const [couponModal, setCouponModal] = useState(false);
@@ -84,9 +88,11 @@ const BookSchool = () => {
     <div>
       <div className="flex gap-2.5 justify-end mb-5 ">
         <SearchBar setQuery={setsearchParams} query={searchParams} />
+       {role === "admin" && 
         <div>
           <Button text='Generate A Coupon' onClick={() => setIsOpen(true)} />
         </div>
+}
       </div>
 
       <div className='table-common overflo-custom'>
@@ -123,12 +129,14 @@ const BookSchool = () => {
                     <td>
                       <div>
                         <button onClick={() => openCouponModal(row?.couponCode)} className='p-2.5'><ViewIcon /></button>
+                        { role === "admin" &&
                         <button
                           onClick={() => openDeleteModal(row?._id, row?.name?.eng || 'this school')}
                           className='p-2.5'
                         >
                           <DeleteIcon />
                         </button>
+                        }
                       </div>
                     </td>
                   </tr>

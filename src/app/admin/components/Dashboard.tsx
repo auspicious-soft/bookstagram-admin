@@ -25,7 +25,7 @@ const Dashboard = () => {
     {
       id: "1",
       title: "Total revenue",
-      value: `$${overviewData?.totalRevenue}`,
+      value: overviewData?.totalRevenue,
       icon: <DashboardIcon1 />,
     },
     {

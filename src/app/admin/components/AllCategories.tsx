@@ -1,5 +1,5 @@
 'use client'
-import { addNewCategory, getAllCategories } from '@/services/admin-services';
+import { addNewCategory, getAllCategories, deleteBookLife } from '@/services/admin-services';
 import React, { useState, useTransition } from 'react';
 import useSWR from 'swr';
 import CategoryCard from './CategoryCard';
@@ -13,6 +13,7 @@ import categoryImg from '@/assets/images/categoryModal.png'
 import { toast } from 'sonner';
 import { generateSignedUrlForCategory } from '@/actions';
 import { getProfileImageUrl } from '@/utils/getImageUrl';
+import { useSession } from "next-auth/react";
 
 type Language = "eng" | "kaz" | "rus";
 interface FormValues {
@@ -46,6 +47,29 @@ const AllCategories = () => {
     router.push(`/admin/categories/${id}/sub-category`);
   }
 
+const deleteBookLives = (id: string) => {
+  try {
+    startTransition(async () => {
+      const response = await deleteBookLife(`/admin/categories/${id}`);
+      if (response.data.success && (response.status === 200 || response.status === 201) ) {
+        console.log('response: ', response.data.success);
+        toast.success("Category deleted successfully");
+        mutate();
+      }
+      else{
+        toast.error(response.data.message );
+      }
+    });
+  } catch (error) {
+    console.log('error: ', error);
+    if (error.response && error.response.status === 400) {
+      toast.error(error.response.data.message || "Cannot delete category with existing subcategories");
+    } else {
+      toast.error("An unexpected error occurred while deleting the category");
+    }
+    console.log("error", error);
+  }
+};
   const handleSubmit = async (formData: FormValues) => {
     startTransition(async () => {
       try {
@@ -112,6 +136,7 @@ const AllCategories = () => {
             }
             image={getProfileImageUrl(row?.image)}
             onClick={() => handleSubCategory(row?._id)}
+            handleDelete={()=>deleteBookLives(row?._id)}
           />
 
         ))}

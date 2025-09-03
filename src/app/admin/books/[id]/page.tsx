@@ -15,7 +15,6 @@ import { generateSignedUrlBookFiles, generateSignedUrlBooks } from '@/actions';
 import CustomSelect from '@/app/components/CustomSelect';
 import { addNewBook, getSingleBook, updateSingleBook, deleteAudiobookChapters } from '@/services/admin-services';
 import useSWR from 'swr';
-import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import { DashboardIcon1, DashboardIcon2 } from '@/utils/svgicons';
 import DashboardCard from '../../components/DashboardCard';
 import { useRouter } from 'next/navigation';
@@ -78,10 +77,10 @@ const BookForm = () => {
   const bookData = data?.data?.data?.books?.[0];
   const upperData = data?.data?.data;
   const bookType = data?.data?.data?.books?.[0]?.type;
-  console.log('bookType: ', bookType);
   const isAudioEbook = bookType === 'audio&ebook';
   const isEbookOrPodcast = bookType === 'e-book' || bookType === 'podcast';
- const getAcceptedFileTypes = () => {
+
+  const getAcceptedFileTypes = () => {
     switch (bookType) {
       case "podcast":
       case "video-lecture":

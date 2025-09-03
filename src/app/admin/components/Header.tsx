@@ -17,7 +17,7 @@ const Header: React.FC = () => {
   const [summary, setSummary] = useState("");
   const [bookLife, setBookLife] = useState("");
   const { data } = useSession();
-  const name = (data as any)?.user?.fullName;
+  const userData = (data as any)?.user;
   // Add ref to track the dropdown element
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -156,8 +156,8 @@ const Header: React.FC = () => {
               className="rounded-full w-[38px] h-[38px]"
             />
             <div className="pr-1">
-              <p className="text-darkBlack text-sm capitalize ">{name}</p>
-              <p className="text-[#A1A3A5] text-xs ">Administrator</p>
+              <p className="text-darkBlack text-sm capitalize ">{userData.fullName}</p>
+              <p className="text-[#A1A3A5] text-xs capitalize">{userData.role === "admin" ? "Administrator": userData.role}</p>
             </div>
             <DropIcon />
           </div>

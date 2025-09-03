@@ -10,7 +10,7 @@ import CategoryCard from '@/app/admin/components/CategoryCard';
 import TablePagination from '@/app/admin/components/TablePagination';
 import AddCommonModal from '@/app/admin/components/AddCommonModal';
 import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
-import { addBookToCategory, addSubCategory, getSubCategory } from '@/services/admin-services';
+import { addBookToCategory, addSubCategory, getSubCategory, deleteBookLife } from '@/services/admin-services';
 import { generateSignedUrlForSubCategory } from '@/actions';
 import subCatImg from '@/assets/images/subCat.png';
 import cartoon from '@/assets/images/1.png';
@@ -62,6 +62,30 @@ const Page = () => {
     localStorage.setItem("getbookName", name);
     router.push(`/admin/books/${id}`)
   } 
+
+  const deleteBookLives = (id: string) => {
+  try {
+    startTransition(async () => {
+      const response = await deleteBookLife(`/admin/sub-categories/${id}`);
+      if (response.data.success && (response.status === 200 || response.status === 201) ) {
+        console.log('response: ', response.data.success);
+        toast.success("Sub-Category deleted successfully");
+        mutate();
+      }
+      else{
+        toast.error(response.data.message );
+      }
+    });
+  } catch (error) {
+    console.log('error: ', error);
+    if (error.response && error.response.status === 400) {
+      toast.error(error.response.data.message || "Cannot delete category with existing subcategories");
+    } else {
+      toast.error("An unexpected error occurred while deleting the category");
+    }
+    console.log("error", error);
+  }
+};
   const handleAddSubmit = async (formData: FormValues) => {
     startTransition(async () => {
       try {
@@ -153,6 +177,7 @@ return (
               name={row?.name?.eng || row?.name?.kaz || row?.name?.rus}
               image={getProfileImageUrl(row?.image)}
               onClick={() => handleSubCategory(row?._id, row?.name?.eng || row?.name?.kaz || row?.name?.rus)}
+              handleDelete={()=>deleteBookLives(row?._id)}
             />
           ))}
         </div>
