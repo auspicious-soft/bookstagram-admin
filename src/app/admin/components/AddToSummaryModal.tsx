@@ -108,9 +108,9 @@ const AddToSummaryModal: React.FC<ModalProp> = ({ open, onClose, mutate, id }) =
                     unoptimized
                     src={getProfileImageUrl(book?.image)}
                     alt="books"
-                    width={216}
-                    height={112}
-                    className="rounded-lg w-full"
+                    width={264}
+                    height={170}
+                    className="rounded-[10px] aspect-[3/3] object-cover w-full"
                   />
                   <p className="mt-[7px] text-darkBlack text-sm capitalize">
                     {book?.name.eng}

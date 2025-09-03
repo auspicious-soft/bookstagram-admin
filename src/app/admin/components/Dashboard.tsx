@@ -126,7 +126,7 @@ const Dashboard = () => {
               ) : overviewData?.newestUsers?.length > 0 ? (
                 overviewData?.newestUsers?.map((row: any) => (
                   <tr key={row?._id}>
-                    <td>{row?.identifier}</td>
+                    <td>#{row?.identifier}</td>
                     <td><div className='flex items-center gap-[5px]'><TableRowImage image={row?.profilePic !==null ? getProfileImageUrl(row?.profilePic) : defaultprofile} />
                                      {row?.fullName?.eng ?? row?.fullName?.rus ?? row?.fullName?.kaz ?? row.firstName?.eng ?? row.firstName?.kaz ?? row.firstName?.rus ?? "-"}  
 
@@ -176,7 +176,7 @@ const Dashboard = () => {
                   <tr key={row?._id}>
                     <td><TableRowImage image={row?.image ? getProfileImageUrl(row?.image) : profile} /></td>
                     <td>{row?.name}</td>
-                    <td>{row?.createdAt}</td>
+                    <td>{new Date(row?.createdAt).toLocaleDateString('en-GB')}</td>
                     <td><button onClick={() => eventsProfile(row?._id)} className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]  '>View</button></td>
                   </tr>
                 ))
