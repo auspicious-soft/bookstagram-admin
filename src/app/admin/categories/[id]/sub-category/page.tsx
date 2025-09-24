@@ -140,7 +140,7 @@ const Page = () => {
           const response = await addBookToCategory(`/admin/categories/${id}/add`, payload);
   
           if (response.status===200 ) {
-            toast.success("Books added to Book Masters successfully");
+            toast.success("Books added to Sub-Category successfully");
             mutate();
             setBookModal(false); 
             setSelectedBooks([]);
