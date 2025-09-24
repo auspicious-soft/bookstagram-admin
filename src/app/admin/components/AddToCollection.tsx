@@ -115,6 +115,7 @@ const AddToCollection: React.FC<ModalProp> = ({ open, onClose, mutate, id }) => 
                     width={264}
                     height={170}
                     className="rounded-[10px] aspect-[3/3] object-cover w-full"
+                    // className="rounded-[10px] aspect-[1/1]  w-full"
                   />
                   <p className="mt-[7px] text-darkBlack text-sm capitalize">
                     {book?.name.eng}

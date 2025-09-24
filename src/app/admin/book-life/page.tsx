@@ -84,7 +84,7 @@ const Page = () => {
         const response = await addNewBookLife("/admin/book-lives", payload);
 
         if (response?.status === 201) {
-          toast.success("Summary added successfully");
+          toast.success("Book life added successfully");
           setIsAddModalOpen(false);
           // Trigger revalidation instead of page reload
           mutate();

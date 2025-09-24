@@ -104,7 +104,7 @@ const deleteBookLives = (id: string) => {
         const response = await addNewCategory("/admin/categories", payload);
 
         if (response?.status === 201) {
-          toast.success("Summary added successfully");
+          toast.success("Category added successfully");
           setIsAddModalOpen(false);
           // Trigger revalidation instead of page reload
           mutate();

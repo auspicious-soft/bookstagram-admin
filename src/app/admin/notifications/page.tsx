@@ -100,7 +100,7 @@ const Page = () => {
           toast.success(response.data.message);
           methods.reset();
           setSelectedOptions([]);
-          window.location.reload();
+           window.location.reload();
         } else {
           toast.error('Failed to send notification');
         }

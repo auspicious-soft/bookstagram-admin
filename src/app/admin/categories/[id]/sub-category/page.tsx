@@ -117,7 +117,7 @@ const Page = () => {
         const response = await addSubCategory("/admin/sub-categories", payload);
 
         if (response?.status === 201) {
-          toast.success("Summary added successfully");
+          toast.success("Sub-category added successfully");
           setIsAddModalOpen(false);
           mutate();
         } else {
