@@ -85,9 +85,17 @@ const QuotesManager: React.FC = () => {
                 acc[lang] = translation?.content?.trim() || '';
                 return acc;
             }, {} as Record<Language, string>);
-
+            
+            console.log('quoteTransforms: ', quoteTransforms);
+            const missingLanguages = allLanguages.filter(lang => !quoteTransforms[lang]);
+            console.log('missingLanguages: ', missingLanguages);
+            
+            if (missingLanguages.length > 0) {
+                toast.error(`Please add quotes in all languages. Missing: ${missingLanguages.map(l => l.toUpperCase()).join(', ')}`);
+                setLoading(false);
+                return;
+            }
             const payload = { quote: quoteTransforms };
-
             // Mock API call - replace with actual: 
             const response = await addQuotation('/admin/quotes', payload);
             if (response.status === 201) {

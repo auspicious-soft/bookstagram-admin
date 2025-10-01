@@ -172,11 +172,13 @@
 //           }
 //         }
 
-//         // Transform translations array into name object
-//         const nameObject = data.translations.reduce((acc, { language, name }) => {
-//           acc[language] = name.trim();
+//         // Include all languages, set empty or removed values to null
+//         const allLanguages: Language[] = ["eng", "kaz", "rus"];
+//         const nameObject = allLanguages.reduce((acc, lang) => {
+//           const translation = data.translations.find(t => t.language === lang);
+//           acc[lang] = translation?.name?.trim() || null;
 //           return acc;
-//         }, {} as Record<Language, string>);
+//         }, {} as Record<Language, string | null>);
 
 //         const payload = {
 //           name: nameObject,
@@ -184,6 +186,8 @@
 //         };
  
 //         const response = await addNewStory("/admin/stories", payload);
+
+//         console.log('payload: ', payload);
         
 //         if (response?.status === 201) {
 //           toast.success("Banner added successfully");
@@ -202,7 +206,6 @@
 //     });
 //   };
 
-
 //   return ( 
 //     <div className="bg-white p-5 rounded-[20px]">
 //       <div className="main-form bg-white p-[30px] rounded-[20px]">
@@ -211,7 +214,7 @@
 //             <div className="">
 //               {translations.map((_, index) => (
 //                 <div key={index} className="mb-3">
-//                   <p className="mb-1 text-sm text-darkBlack">Name/Title of the banner</p>
+//                   <p className="mb-1 text-sm text-darkBlack">Name/Title of the Story</p>
 //                   <div className="flex items-center gap-[5px] w-full">
 //                     <label className="!flex bg-[#F5F5F5] rounded-[10px] w-full">
 //                       <select
@@ -375,8 +378,9 @@ import { PlusIcon2 } from "@/utils/svgicons";
 type Language = "eng" | "kaz" | "rus";
 
 interface FileSection {
-  imageFile: File | null;
-  imagePreview: string | null;
+  file: File | null;
+  filePreview: string | null;
+  fileType: "image" | "video" | null;
   link: string;
 }
 
@@ -410,7 +414,7 @@ const Page = () => {
     resolver: yupResolver(validationSchema) as any,
     defaultValues: {
       translations: [{ language: "eng", name: "" }],
-      fileSections: [{ imageFile: null, imagePreview: null, link: "" }],
+      fileSections: [{ file: null, filePreview: null, fileType: null, link: "" }],
     },
   });
 
@@ -431,22 +435,37 @@ const Page = () => {
     if (fileInput) fileInput.click();
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      const reader = new FileReader();
-      
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
+      const fileType = file.type.startsWith("video") ? "video" : "image";
+
+      if (fileType === "image") {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          const currentSections = getValues("fileSections");
+          currentSections[index] = {
+            ...currentSections[index],
+            file,
+            filePreview: result,
+            fileType,
+          };
+          setValue("fileSections", [...currentSections]);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // For videos, use object URL instead of base64
+        const videoUrl = URL.createObjectURL(file);
         const currentSections = getValues("fileSections");
         currentSections[index] = {
           ...currentSections[index],
-          imageFile: file,
-          imagePreview: result,
+          file,
+          filePreview: videoUrl,
+          fileType,
         };
         setValue("fileSections", [...currentSections]);
-      };
-      reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -469,10 +488,10 @@ const Page = () => {
   const removeTranslation = (index: number) => {
     const currentTranslations = getValues("translations");
     const languageToRemove = currentTranslations[index].language;
-    
+
     const newTranslations = currentTranslations.filter((_, i) => i !== index);
     setValue("translations", newTranslations);
-    
+
     setUsedLanguages((prev) => {
       const updated = new Set(prev);
       updated.delete(languageToRemove);
@@ -482,7 +501,10 @@ const Page = () => {
 
   const addFileSection = () => {
     const currentSections = getValues("fileSections");
-    setValue("fileSections", [...currentSections, { imageFile: null, imagePreview: null, link: "" }]);
+    setValue("fileSections", [
+      ...currentSections,
+      { file: null, filePreview: null, fileType: null, link: "" },
+    ]);
   };
 
   const removeFileSection = (index: number) => {
@@ -494,25 +516,23 @@ const Page = () => {
   const onSubmit = async (data: FormValues) => {
     startTransition(async () => {
       try {
-        const fileObject: Record<string, string> = {};
-        
+        const fileObject: Record<string, { link: string; type: string }> = {};
+
         // Get the banner name from translations
         const bannerName = data.translations[0].name.trim();
         const sanitizedBannerName = bannerName.replace(/\s+/g, "-").toLowerCase();
 
-        // Upload all images and create the file object
+        // Upload all files and create the file object
         for (const section of data.fileSections) {
-          if (section.imageFile && section.link) {
-            const file = section.imageFile;
-            
+          if (section.file && section.link) {
+            const file = section.file;
             try {
               const { signedUrl, key } = await generateSignedUrlForStories(
                 file.name,
                 file.type,
-                sanitizedBannerName  // This is the 'name' parameter that determines the folder
+                sanitizedBannerName
               );
 
-              // Upload the image
               const uploadResponse = await fetch(signedUrl, {
                 method: "PUT",
                 body: file,
@@ -521,15 +541,16 @@ const Page = () => {
                 },
               });
 
-              if (!uploadResponse.ok) {
-                throw new Error("Failed to upload image to S3");
-              }
+              if (!uploadResponse.ok) throw new Error("Failed to upload file to S3");
 
-              // Use the key returned from generateSignedUrlForStories
-              fileObject[key] = section.link;
+              // include file type too
+              fileObject[key] = {
+                link: section.link,
+                type: section.fileType || "image",
+              };
             } catch (error) {
-              console.error(`Error uploading image ${file.name}:`, error);
-              toast.error(`Failed to upload image ${file.name}`);
+              console.error(`Error uploading ${file.name}:`, error);
+              toast.error(`Failed to upload ${file.name}`);
             }
           }
         }
@@ -537,28 +558,28 @@ const Page = () => {
         // Include all languages, set empty or removed values to null
         const allLanguages: Language[] = ["eng", "kaz", "rus"];
         const nameObject = allLanguages.reduce((acc, lang) => {
-          const translation = data.translations.find(t => t.language === lang);
+          const translation = data.translations.find((t) => t.language === lang);
           acc[lang] = translation?.name?.trim() || null;
           return acc;
         }, {} as Record<Language, string | null>);
 
         const payload = {
           name: nameObject,
-          file: fileObject
+          file: fileObject,
         };
- 
+
         const response = await addNewStory("/admin/stories", payload);
 
-        console.log('payload: ', payload);
-        
+        console.log("payload: ", payload);
+
         if (response?.status === 201) {
-          toast.success("Banner added successfully");
+          toast.success("Story added successfully");
           window.location.href = "/admin/stories";
         } else {
           toast.error("Failed to add banner");
         }
       } catch (error: any) {
-        console.error('Submission error:', error);
+        console.error("Submission error:", error);
         toast.error(
           error?.response?.status === 400
             ? error?.response?.data?.message
@@ -568,7 +589,7 @@ const Page = () => {
     });
   };
 
-  return ( 
+  return (
     <div className="bg-white p-5 rounded-[20px]">
       <div className="main-form bg-white p-[30px] rounded-[20px]">
         <FormProvider {...methods}>
@@ -576,7 +597,7 @@ const Page = () => {
             <div className="">
               {translations.map((_, index) => (
                 <div key={index} className="mb-3">
-                  <p className="mb-1 text-sm text-darkBlack">Name/Title of the banner</p>
+                  <p className="mb-1 text-sm text-darkBlack">Name/Title of the Story</p>
                   <div className="flex items-center gap-[5px] w-full">
                     <label className="!flex bg-[#F5F5F5] rounded-[10px] w-full">
                       <select
@@ -624,17 +645,23 @@ const Page = () => {
                 {fileSections.map((section, index) => (
                   <div key={index} className="repeat-section mb-8">
                     <div className="custom relative mb-5">
-                      {section.imagePreview ? (
-                        <div className="relative">
+                      {section.filePreview ? (
+                        section.fileType === "image" ? (
                           <Image
                             unoptimized
-                            src={section.imagePreview}
+                            src={section.filePreview}
                             alt="Preview"
                             width={340}
                             height={340}
                             className="rounded-[10px] aspect-square w-full h-full object-cover"
                           />
-                        </div>
+                        ) : (
+                          <video
+                            controls
+                            src={section.filePreview}
+                            className="rounded-[10px] aspect-square w-full h-full object-cover"
+                          />
+                        )
                       ) : (
                         <div className="grid place-items-center">
                           <Image
@@ -651,11 +678,11 @@ const Page = () => {
                         <input
                           className="absolute top-0 left-0 h-full w-full opacity-0 p-0 cursor-pointer"
                           type="file"
-                          accept="image/*"
+                          accept="image/*,video/*"
                           data-index={index}
-                          onChange={(e) => handleImageChange(e, index)}
+                          onChange={(e) => handleFileChange(e, index)}
                         />
-                        {section.imagePreview ? (
+                        {section.filePreview ? (
                           <button
                             type="button"
                             onClick={() => triggerFileInputClick(index)}
@@ -668,7 +695,7 @@ const Page = () => {
                             className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] cursor-pointer"
                             onClick={() => triggerFileInputClick(index)}
                           >
-                            Upload Image
+                            Upload File
                           </p>
                         )}
                       </div>
@@ -693,16 +720,16 @@ const Page = () => {
                     )}
                   </div>
                 ))}
-               <div>
-               <button
-                  type="button"
-                  onClick={addFileSection}
-                  className="bg-[#FFDCBD] text-darkBlack border-orange border [&_*]:mx-auto px-5 py-3 rounded-[10px] text-sm"
-                >
-                  <PlusIcon2/>
-                  Add
-                </button>
-               </div>
+                <div>
+                  <button
+                    type="button"
+                    onClick={addFileSection}
+                    className="bg-[#FFDCBD] text-darkBlack border-orange border [&_*]:mx-auto px-5 py-3 rounded-[10px] text-sm"
+                  >
+                    <PlusIcon2 />
+                    Add
+                  </button>
+                </div>
               </div>
               <button
                 type="submit"

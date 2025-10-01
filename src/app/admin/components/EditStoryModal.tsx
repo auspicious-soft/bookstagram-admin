@@ -1,3 +1,480 @@
+// import Modal from '@mui/material/Modal';
+// import Image from 'next/image';
+// import React, { useState, useTransition, useEffect, useRef } from 'react';  
+// import preview from "@/assets/images/preview.png";
+// import { toast } from "sonner";
+// import { generateSignedUrlForStories } from "@/actions";
+// import { FormProvider, useForm } from "react-hook-form";
+// import * as yup from "yup";
+// import { yupResolver } from "@hookform/resolvers/yup";
+// import { updateStory } from "@/services/admin-services";
+// import { PlusIcon2 } from "@/utils/svgicons";
+// import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
+// import { getProfileImageUrl } from '@/utils/getImageUrl';
+
+// type Language = "eng" | "kaz" | "rus";
+
+// interface FileSection {
+//   imageFile: File | null;
+//   imagePreview: string | null;
+//   link: string;
+//   key?: string;
+//   isNewImage?: boolean;
+// }
+
+// interface FormValues {
+//   translations: {
+//     language: Language;
+//     name: string;
+//   }[];
+//   fileSections: FileSection[];
+// }
+
+// const validationSchema = yup.object({
+//   translations: yup.array().of(
+//     yup.object({
+//       language: yup.string().oneOf(["eng", "kaz", "rus"], "Invalid language").required("Language is required"),
+//       name: yup.string().required("Name is required").trim()
+//         .min(2, "Name must be at least 2 characters")
+//         .max(100, "Name must not exceed 100 characters"),
+//     })
+//   ).min(1, "At least one translation is required"),
+//   fileSections: yup.array().of(
+//     yup.object({
+//       link: yup.string()
+//         .required("Link is required")
+//         .url("Please enter a valid URL")
+//         .matches(/^https?:\/\//, "URL must start with http:// or https://"),
+//     })
+//   ).min(1, "At least one file section is required"),
+// });
+
+// interface Props {
+//   open: boolean;
+//   onClose: () => void;
+//   data: any;
+// }
+
+// const EditStoryModal = ({open, onClose, data}: Props) => {
+//   const [isPending, startTransition] = useTransition();
+//   const [usedLanguages, setUsedLanguages] = useState<Set<Language>>(new Set());
+//   const [isSubmitting, setIsSubmitting] = useState(false);
+//   const isInitialized = useRef(false);
+  
+//   const methods = useForm<FormValues>({
+//     resolver: yupResolver(validationSchema) as any,
+//     mode: 'onChange', 
+//   });
+
+//   const {
+//     register,
+//     handleSubmit,
+//     formState: { errors },
+//     setValue,
+//     getValues,
+//     watch,
+//     reset, trigger,
+//   } = methods;
+
+//   const showFormErrors = () => {
+//     const allErrors: string[] = [];
+    
+//     // Translation errors
+//     if (errors.translations) {
+//       errors.translations.forEach((translation: any, index: number) => {
+//         if (translation?.name) {
+//           allErrors.push(`Translation ${index + 1}: ${translation.name.message}`);
+//         }
+//         if (translation?.language) {
+//           allErrors.push(`Translation ${index + 1}: ${translation.language.message}`);
+//         }
+//       });
+//     }
+
+//     if (errors.fileSections) {
+//       errors.fileSections.forEach((section: any, index: number) => {
+//         if (section?.link) {
+//           allErrors.push(`File Section ${index + 1}: ${section.link.message}`);
+//         }
+//       });
+//     }
+
+//     if (allErrors.length > 0) {
+//       toast.error(
+//         <div className="space-y-1">
+//           <p className="font-semibold">Please fix the following errors:</p>
+//           {allErrors.map((error, index) => (
+//             <p key={index} className="text-sm">• {error}</p>
+//           ))}
+//         </div>
+//       );
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (data && open && !isInitialized.current) {
+//       try {
+//         // Initialize translations with only languages that have non-null values, setting missing ones to empty string
+//         const allLanguages: Language[] = ["eng", "kaz", "rus"];
+//         const initialTranslations = allLanguages
+//           .filter(lang => data.name[lang] !== null)
+//           .map(lang => ({
+//             language: lang,
+//             name: data.name[lang] || ""
+//           }));
+
+//         // Initialize file sections
+//         const initialFileSections = Object.entries(data.file).map(([key, value]) => ({
+//           imageFile: null,
+//           imagePreview: getProfileImageUrl(key),
+//           link: value as string,
+//           key: key,
+//           isNewImage: false
+//         }));
+
+//         reset({
+//           translations: initialTranslations,
+//           fileSections: initialFileSections,
+//         });
+
+//         // Update used languages
+//         setUsedLanguages(new Set(initialTranslations.map(t => t.language)));
+//         isInitialized.current = true;
+//       } catch (error) {
+//         console.error('Error initializing form:', error);
+//         toast.error('Error initializing form data');
+//       }
+//     }
+//   }, [data, reset, open]);
+
+//   useEffect(() => {
+//     if (!open) {
+//       isInitialized.current = false;
+//       setIsSubmitting(false);
+//       reset(); // Reset form when modal closes
+//     }
+//   }, [open, reset]);
+
+//   const translations = watch("translations");
+//   const fileSections = watch("fileSections");
+
+//   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+//     try {
+//       if (e.target.files && e.target.files[0]) {
+//         const file = e.target.files[0];
+        
+//         // Validate file size (e.g., 5MB limit)
+//         if (file.size > 5 * 1024 * 1024) {
+//           toast.error('Image size must be less than 5MB');
+//           return;
+//         }
+
+//         // Validate file type
+//         if (!file.type.startsWith('image/')) {
+//           toast.error('Please upload only image files');
+//           return;
+//         }
+
+//         const previewUrl = URL.createObjectURL(file);
+        
+//         const currentSections = getValues("fileSections");
+//         const updatedSection = {
+//           ...currentSections[index],
+//           imageFile: file,
+//           imagePreview: previewUrl,
+//           isNewImage: true
+//         };
+
+//         if (currentSections[index].imagePreview && currentSections[index].isNewImage) {
+//           URL.revokeObjectURL(currentSections[index].imagePreview);
+//         }
+
+//         currentSections[index] = updatedSection;
+//         setValue("fileSections", [...currentSections]);
+//       }
+//     } catch (error) {
+//       console.error('Error handling image:', error);
+//       toast.error('Error uploading image');
+//     }
+//   };
+
+//   useEffect(() => {
+//     return () => {
+//       const sections = getValues("fileSections") || [];
+//       sections.forEach(section => {
+//         if (section.imagePreview && section.isNewImage) {
+//           URL.revokeObjectURL(section.imagePreview);
+//         }
+//       });
+//     };
+//   }, [getValues]);
+
+//   const addTranslation = async () => {
+//     const currentTranslations = getValues("translations");
+//     const availableLanguages: Language[] = ["eng", "kaz", "rus"];
+//     const unusedLanguage = availableLanguages.find(
+//       (lang) => !usedLanguages.has(lang as Language)
+//     ) as Language;
+
+//     if (unusedLanguage) {
+//       setValue("translations", [
+//         ...currentTranslations,
+//         { language: unusedLanguage, name: "" },
+//       ]);
+//       setUsedLanguages((prev) => new Set([...prev, unusedLanguage]));
+//       // Trigger validation after adding new translation
+//       await trigger("translations");
+//     } else {
+//       toast.error('All languages are already in use');
+//     }
+//   };
+
+//   const addFileSection = async () => {
+//     const currentSections = getValues("fileSections");
+//     setValue("fileSections", [
+//       ...currentSections, 
+//       { 
+//         imageFile: null, 
+//         imagePreview: null, 
+//         link: "",
+//         isNewImage: false
+//       }
+//     ]);
+//     // Trigger validation after adding new section
+//     await trigger("fileSections");
+//   };
+
+//   const removeTranslation = (index: number) => {
+//     const currentTranslations = getValues("translations");
+//     const languageToRemove = currentTranslations[index].language;
+    
+//     const newTranslations = currentTranslations.filter((_, i) => i !== index);
+//     setValue("translations", newTranslations);
+    
+//     setUsedLanguages((prev) => {
+//       const updated = new Set(prev);
+//       updated.delete(languageToRemove);
+//       return updated;
+//     });
+//   };
+
+//   const removeFileSection = (index: number) => {
+//     const currentSections = getValues("fileSections");
+//     const newSections = currentSections.filter((_, i) => i !== index);
+//     setValue("fileSections", newSections);
+//   };
+
+//   const onSubmit = async (formData: FormValues) => {
+//     startTransition(async () => {
+//       try {
+//         const fileObject: Record<string, string> = {};
+         
+//         const bannerName = formData.translations[0].name.trim();
+//         const sanitizedBannerName = bannerName.replace(/\s+/g, "-").toLowerCase();
+ 
+//         // Process each file section
+//         for (const section of formData.fileSections) {
+//           if (section.imageFile && section.isNewImage) {
+//             // Handle new or updated images
+//             const { signedUrl, key } = await generateSignedUrlForStories(
+//               section.imageFile.name,
+//               section.imageFile.type,
+//               sanitizedBannerName
+//             );
+
+//             // Upload the image
+//             const uploadResponse = await fetch(signedUrl, {
+//               method: "PUT",
+//               body: section.imageFile,
+//               headers: {
+//                 "Content-Type": section.imageFile.type,
+//               },
+//             });
+
+//             if (!uploadResponse.ok) {
+//               throw new Error("Failed to upload image to S3");
+//             }
+
+//             fileObject[key] = section.link;
+//           } else if (section.key) {
+//             // Keep existing images
+//             fileObject[section.key] = section.link;
+//           }
+//         }
+
+//         // Include all languages, set missing ones to null
+//         const allLanguages: Language[] = ["eng", "kaz", "rus"];
+//         const nameObject = allLanguages.reduce((acc, lang) => {
+//           const translation = formData.translations.find(t => t.language === lang);
+//           acc[lang] = translation?.name?.trim() || null;
+//           return acc;
+//         }, {} as Record<Language, string | null>);
+
+//         const payload = {
+//           name: nameObject,
+//           file: fileObject
+//         };
+
+//         const response = await updateStory(`/admin/stories/${data._id}`, payload);
+        
+//         if (response?.status === 200) {
+//           toast.success("Story updated successfully");
+//           onClose();
+//           window.location.reload(); 
+//         } else {
+//           toast.error("Failed to update story");
+//         }
+//       } catch (error: any) {
+//         console.error('Update error:', error);
+//         toast.error(
+//           error?.response?.status === 400
+//             ? error?.response?.data?.message
+//             : "An error occurred"
+//         );
+//       }
+//     });
+//   };
+
+//   return (
+//     <Modal
+//       open={open}
+//       onClose={onClose}
+//       aria-labelledby="child-modal-title"
+//       className="grid place-items-center"
+//     >
+//       <div className="modal bg-white py-[30px] px-5 max-w-[950px] mx-auto rounded-[20px] w-full h-full">
+//         <div className="max-h-[80vh] main-form overflow-auto overflo-custom">
+//           <FormProvider {...methods}>
+//             <form onSubmit={handleSubmit(onSubmit)} className="form-box">
+//               <div className="">
+//                 {translations?.map((_, index) => (
+//                   <div key={index} className="mb-3">
+//                     <p className="mb-1 text-sm text-darkBlack">Update Story</p>
+//                     <div className="flex items-center gap-[5px] w-full">
+//                       <label className="!flex bg-[#F5F5F5] rounded-[10px] w-full">
+//                         <select
+//                           {...register(`translations.${index}.language`)}
+//                           className="!mt-0 max-w-[80px] !bg-[#D9D9D9]"
+//                         >
+//                           <option value="eng">Eng</option>
+//                           <option value="kaz">Kaz</option>
+//                           <option value="rus">Rus</option>
+//                         </select>
+//                         <input
+//                           type="text"
+//                           {...register(`translations.${index}.name`)}
+//                           placeholder="Enter name"
+//                           className="!mt-0 flex-1"
+//                         />
+//                       </label>
+//                       {index === 0 ? (
+//                         <button
+//                           type="button"
+//                           onClick={addTranslation}
+//                           disabled={usedLanguages.size >= 3}
+//                           className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm"
+//                         >
+//                           Add
+//                         </button>
+//                       ) : (
+//                         <button
+//                           type="button"
+//                           onClick={() => removeTranslation(index)}
+//                           className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm"
+//                         >
+//                           Remove
+//                         </button>
+//                       )}
+//                     </div>
+//                     {errors.translations?.[index]?.name && (
+//                       <p className="text-red-500 text-sm mt-1">
+//                         {errors.translations[index]?.name?.message}
+//                       </p>
+//                     )}
+//                   </div>
+//                 ))}
+//                 <div className="mt-10 grid gap-2 grid-cols-3">
+//                   {fileSections?.map((section, index) => (
+//                     <div key={index} className="repeat-section mb-8">
+//                       <div className="custom relative mb-5">
+//                         <div className="relative">
+//                           <Image
+//                             unoptimized
+//                             src={section.imagePreview || preview}
+//                             alt="Preview"
+//                             width={340}
+//                             height={340}
+//                             className="rounded-[10px] w-full h-full aspect-square object-cover"
+//                           />
+//                         </div>
+//                         <div className="relative mt-5">
+//                           <input
+//                             className="absolute top-0 left-0 h-full w-full opacity-0 p-0 cursor-pointer"
+//                             type="file"
+//                             accept="image/*"
+//                             onChange={(e) => handleImageChange(e, index)}
+//                           />
+//                           <button
+//                             type="button"
+//                             className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] w-full"
+//                           >
+//                           Edit
+//                           </button>
+//                         </div>
+//                       </div>
+//                       <label>
+//                         Link
+//                         <input
+//                           type="text"
+//                           {...register(`fileSections.${index}.link`)}
+//                           placeholder="https://example.com"
+//                           className="w-full"
+//                         />
+//                       </label>
+//                       {index > 0 && (
+//                         <button
+//                           type="button"
+//                           onClick={() => removeFileSection(index)}
+//                           className="bg-[#FF0004] text-white px-5 py-3 mt-3 rounded-[10px] text-sm"
+//                         >
+//                           Remove 
+//                         </button>
+//                       )}
+//                     </div>
+//                   ))}
+//                   <div>
+//                     <button
+//                       type="button"
+//                       onClick={addFileSection}
+//                       className="bg-[#FFDCBD] text-darkBlack border-orange border [&_*]:mx-auto px-5 py-3 rounded-[10px] text-sm"
+//                     >
+//                       <PlusIcon2/>
+//                       Add
+//                     </button>
+//                   </div>
+//                 </div>
+//                 <button
+//                   type="submit"
+//                   disabled={isPending}
+//                   className="bg-orange text-white text-sm px-4 mt-10 py-[14px] text-center rounded-[28px] w-full"
+//                 >
+//                   {isPending ? "Updating Story..." : "Update Story"}
+//                 </button>
+//               </div>
+//             </form>
+//           </FormProvider>
+//         </div>
+//       </div>
+//     </Modal>
+//   );
+// }
+
+// export default EditStoryModal;
+
+
+
+
+
 import Modal from '@mui/material/Modal';
 import Image from 'next/image';
 import React, { useState, useTransition, useEffect, useRef } from 'react';  
@@ -9,17 +486,17 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { updateStory } from "@/services/admin-services";
 import { PlusIcon2 } from "@/utils/svgicons";
-import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import { getProfileImageUrl } from '@/utils/getImageUrl';
 
 type Language = "eng" | "kaz" | "rus";
 
 interface FileSection {
-  imageFile: File | null;
-  imagePreview: string | null;
+  file: File | null;
+  previewUrl: string | null;
   link: string;
+  type?: "image" | "video";
   key?: string;
-  isNewImage?: boolean;
+  isNewFile?: boolean;
 }
 
 interface FormValues {
@@ -33,20 +510,15 @@ interface FormValues {
 const validationSchema = yup.object({
   translations: yup.array().of(
     yup.object({
-      language: yup.string().oneOf(["eng", "kaz", "rus"], "Invalid language").required("Language is required"),
-      name: yup.string().required("Name is required").trim()
-        .min(2, "Name must be at least 2 characters")
-        .max(100, "Name must not exceed 100 characters"),
+      language: yup.string().oneOf(["eng", "kaz", "rus"]).required(),
+      name: yup.string().required().trim().min(2).max(100),
     })
-  ).min(1, "At least one translation is required"),
+  ).min(1),
   fileSections: yup.array().of(
     yup.object({
-      link: yup.string()
-        .required("Link is required")
-        .url("Please enter a valid URL")
-        .matches(/^https?:\/\//, "URL must start with http:// or https://"),
+      link: yup.string().required().url().matches(/^https?:\/\//),
     })
-  ).min(1, "At least one file section is required"),
+  ).min(1),
 });
 
 interface Props {
@@ -58,7 +530,6 @@ interface Props {
 const EditStoryModal = ({open, onClose, data}: Props) => {
   const [isPending, startTransition] = useTransition();
   const [usedLanguages, setUsedLanguages] = useState<Set<Language>>(new Set());
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const isInitialized = useRef(false);
   
   const methods = useForm<FormValues>({
@@ -66,145 +537,80 @@ const EditStoryModal = ({open, onClose, data}: Props) => {
     mode: 'onChange', 
   });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-    getValues,
-    watch,
-    reset, trigger,
-  } = methods;
-
-  const showFormErrors = () => {
-    const allErrors: string[] = [];
-    
-    // Translation errors
-    if (errors.translations) {
-      errors.translations.forEach((translation: any, index: number) => {
-        if (translation?.name) {
-          allErrors.push(`Translation ${index + 1}: ${translation.name.message}`);
-        }
-        if (translation?.language) {
-          allErrors.push(`Translation ${index + 1}: ${translation.language.message}`);
-        }
-      });
-    }
-
-    if (errors.fileSections) {
-      errors.fileSections.forEach((section: any, index: number) => {
-        if (section?.link) {
-          allErrors.push(`File Section ${index + 1}: ${section.link.message}`);
-        }
-      });
-    }
-
-    if (allErrors.length > 0) {
-      toast.error(
-        <div className="space-y-1">
-          <p className="font-semibold">Please fix the following errors:</p>
-          {allErrors.map((error, index) => (
-            <p key={index} className="text-sm">• {error}</p>
-          ))}
-        </div>
-      );
-    }
-  };
+  const { register, handleSubmit, setValue, getValues, watch, reset, trigger } = methods;
 
   useEffect(() => {
     if (data && open && !isInitialized.current) {
       try {
-        // Initialize translations with only languages that have non-null values, setting missing ones to empty string
         const allLanguages: Language[] = ["eng", "kaz", "rus"];
         const initialTranslations = allLanguages
-          .filter(lang => data.name[lang] !== null)
-          .map(lang => ({
-            language: lang,
-            name: data.name[lang] || ""
-          }));
+          .map(lang => ({ language: lang, name: data.name[lang] || "" }))
+          .filter(t => t.name !== "");
 
-        // Initialize file sections
-        const initialFileSections = Object.entries(data.file).map(([key, value]) => ({
-          imageFile: null,
-          imagePreview: getProfileImageUrl(key),
-          link: value as string,
-          key: key,
-          isNewImage: false
+        const initialFileSections = Object.entries(data.file).map(([key, value]: any) => ({
+          file: null,
+          previewUrl: getProfileImageUrl(key),
+          link: value.link,
+          type: value.type,
+          key,
+          isNewFile: false,
         }));
 
-        reset({
-          translations: initialTranslations,
-          fileSections: initialFileSections,
-        });
-
-        // Update used languages
+        reset({ translations: initialTranslations, fileSections: initialFileSections });
         setUsedLanguages(new Set(initialTranslations.map(t => t.language)));
         isInitialized.current = true;
-      } catch (error) {
-        console.error('Error initializing form:', error);
-        toast.error('Error initializing form data');
+      } catch (err) {
+        console.error(err);
+        toast.error("Error initializing form data");
       }
     }
-  }, [data, reset, open]);
+  }, [data, open, reset]);
 
   useEffect(() => {
     if (!open) {
       isInitialized.current = false;
-      setIsSubmitting(false);
-      reset(); // Reset form when modal closes
+      reset();
     }
   }, [open, reset]);
 
-  const translations = watch("translations");
   const fileSections = watch("fileSections");
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    try {
-      if (e.target.files && e.target.files[0]) {
-        const file = e.target.files[0];
-        
-        // Validate file size (e.g., 5MB limit)
-        if (file.size > 5 * 1024 * 1024) {
-          toast.error('Image size must be less than 5MB');
-          return;
-        }
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const currentSections = getValues("fileSections");
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-        // Validate file type
-        if (!file.type.startsWith('image/')) {
-          toast.error('Please upload only image files');
-          return;
-        }
+    const type = file.type.startsWith("video") ? "video" : "image";
 
-        const previewUrl = URL.createObjectURL(file);
-        
-        const currentSections = getValues("fileSections");
-        const updatedSection = {
-          ...currentSections[index],
-          imageFile: file,
-          imagePreview: previewUrl,
-          isNewImage: true
-        };
-
-        if (currentSections[index].imagePreview && currentSections[index].isNewImage) {
-          URL.revokeObjectURL(currentSections[index].imagePreview);
-        }
-
-        currentSections[index] = updatedSection;
-        setValue("fileSections", [...currentSections]);
-      }
-    } catch (error) {
-      console.error('Error handling image:', error);
-      toast.error('Error uploading image');
+    // Optional size limit
+    if ((type === "image" && file.size > 5 * 1024 * 1024) || (type === "video" && file.size > 50 * 1024 * 1024)) {
+      toast.error(type === "image" ? "Image size must be <5MB" : "Video size must be <50MB");
+      return;
     }
+
+    const previewUrl = URL.createObjectURL(file);
+
+    const updatedSection: FileSection = {
+      ...currentSections[index],
+      file,
+      previewUrl,
+      type,
+      isNewFile: true
+    };
+
+    if (currentSections[index].previewUrl && currentSections[index].isNewFile) {
+      URL.revokeObjectURL(currentSections[index].previewUrl);
+    }
+
+    currentSections[index] = updatedSection;
+    setValue("fileSections", [...currentSections]);
   };
 
   useEffect(() => {
     return () => {
       const sections = getValues("fileSections") || [];
-      sections.forEach(section => {
-        if (section.imagePreview && section.isNewImage) {
-          URL.revokeObjectURL(section.imagePreview);
-        }
+      sections.forEach(s => {
+        if (s.previewUrl && s.isNewFile) URL.revokeObjectURL(s.previewUrl);
       });
     };
   }, [getValues]);
@@ -212,252 +618,141 @@ const EditStoryModal = ({open, onClose, data}: Props) => {
   const addTranslation = async () => {
     const currentTranslations = getValues("translations");
     const availableLanguages: Language[] = ["eng", "kaz", "rus"];
-    const unusedLanguage = availableLanguages.find(
-      (lang) => !usedLanguages.has(lang as Language)
-    ) as Language;
+    const unusedLanguage = availableLanguages.find(l => !usedLanguages.has(l)) as Language;
+    if (!unusedLanguage) return toast.error("All languages already in use");
 
-    if (unusedLanguage) {
-      setValue("translations", [
-        ...currentTranslations,
-        { language: unusedLanguage, name: "" },
-      ]);
-      setUsedLanguages((prev) => new Set([...prev, unusedLanguage]));
-      // Trigger validation after adding new translation
-      await trigger("translations");
-    } else {
-      toast.error('All languages are already in use');
-    }
+    setValue("translations", [...currentTranslations, { language: unusedLanguage, name: "" }]);
+    setUsedLanguages(prev => new Set([...prev, unusedLanguage]));
+    await trigger("translations");
   };
 
   const addFileSection = async () => {
     const currentSections = getValues("fileSections");
     setValue("fileSections", [
-      ...currentSections, 
-      { 
-        imageFile: null, 
-        imagePreview: null, 
-        link: "",
-        isNewImage: false
-      }
+      ...currentSections,
+      { file: null, previewUrl: null, link: "", isNewFile: false }
     ]);
-    // Trigger validation after adding new section
     await trigger("fileSections");
   };
 
   const removeTranslation = (index: number) => {
     const currentTranslations = getValues("translations");
     const languageToRemove = currentTranslations[index].language;
-    
-    const newTranslations = currentTranslations.filter((_, i) => i !== index);
-    setValue("translations", newTranslations);
-    
-    setUsedLanguages((prev) => {
-      const updated = new Set(prev);
-      updated.delete(languageToRemove);
-      return updated;
-    });
+    setValue("translations", currentTranslations.filter((_, i) => i !== index));
+    setUsedLanguages(prev => { const s = new Set(prev); s.delete(languageToRemove); return s; });
   };
 
   const removeFileSection = (index: number) => {
     const currentSections = getValues("fileSections");
-    const newSections = currentSections.filter((_, i) => i !== index);
-    setValue("fileSections", newSections);
+    setValue("fileSections", currentSections.filter((_, i) => i !== index));
   };
 
   const onSubmit = async (formData: FormValues) => {
     startTransition(async () => {
       try {
-        const fileObject: Record<string, string> = {};
-         
+        const fileObject: Record<string, { link: string; type: string }> = {};
         const bannerName = formData.translations[0].name.trim();
         const sanitizedBannerName = bannerName.replace(/\s+/g, "-").toLowerCase();
- 
-        // Process each file section
+
         for (const section of formData.fileSections) {
-          if (section.imageFile && section.isNewImage) {
-            // Handle new or updated images
-            const { signedUrl, key } = await generateSignedUrlForStories(
-              section.imageFile.name,
-              section.imageFile.type,
-              sanitizedBannerName
-            );
+          if (section.file && section.isNewFile) {
+            const { signedUrl, key } = await generateSignedUrlForStories(section.file.name, section.file.type, sanitizedBannerName);
 
-            // Upload the image
-            const uploadResponse = await fetch(signedUrl, {
-              method: "PUT",
-              body: section.imageFile,
-              headers: {
-                "Content-Type": section.imageFile.type,
-              },
-            });
+            const uploadResponse = await fetch(signedUrl, { method: "PUT", body: section.file, headers: { "Content-Type": section.file.type }});
+            if (!uploadResponse.ok) throw new Error("Failed to upload file");
 
-            if (!uploadResponse.ok) {
-              throw new Error("Failed to upload image to S3");
-            }
-
-            fileObject[key] = section.link;
+            fileObject[key] = { link: section.link, type: section.type! };
           } else if (section.key) {
-            // Keep existing images
-            fileObject[section.key] = section.link;
+            fileObject[section.key] = { link: section.link, type: section.type! };
           }
         }
 
-        // Include all languages, set missing ones to null
         const allLanguages: Language[] = ["eng", "kaz", "rus"];
         const nameObject = allLanguages.reduce((acc, lang) => {
-          const translation = formData.translations.find(t => t.language === lang);
-          acc[lang] = translation?.name?.trim() || null;
+          const t = formData.translations.find(tr => tr.language === lang);
+          acc[lang] = t?.name.trim() || null;
           return acc;
         }, {} as Record<Language, string | null>);
 
-        const payload = {
-          name: nameObject,
-          file: fileObject
-        };
-
+        const payload = { name: nameObject, file: fileObject };
         const response = await updateStory(`/admin/stories/${data._id}`, payload);
-        
+
         if (response?.status === 200) {
           toast.success("Story updated successfully");
           onClose();
-          window.location.reload(); 
+          window.location.reload();
         } else {
           toast.error("Failed to update story");
         }
       } catch (error: any) {
-        console.error('Update error:', error);
-        toast.error(
-          error?.response?.status === 400
-            ? error?.response?.data?.message
-            : "An error occurred"
-        );
+        console.error(error);
+        toast.error("An error occurred while updating the story");
       }
     });
   };
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      aria-labelledby="child-modal-title"
-      className="grid place-items-center"
-    >
+    <Modal open={open} onClose={onClose} aria-labelledby="child-modal-title" className="grid place-items-center">
       <div className="modal bg-white py-[30px] px-5 max-w-[950px] mx-auto rounded-[20px] w-full h-full">
         <div className="max-h-[80vh] main-form overflow-auto overflo-custom">
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)} className="form-box">
-              <div className="">
-                {translations?.map((_, index) => (
+              <div>
+                {watch("translations")?.map((_, index) => (
                   <div key={index} className="mb-3">
                     <p className="mb-1 text-sm text-darkBlack">Update Story</p>
                     <div className="flex items-center gap-[5px] w-full">
                       <label className="!flex bg-[#F5F5F5] rounded-[10px] w-full">
-                        <select
-                          {...register(`translations.${index}.language`)}
-                          className="!mt-0 max-w-[80px] !bg-[#D9D9D9]"
-                        >
+                        <select {...register(`translations.${index}.language`)} className="!mt-0 max-w-[80px] !bg-[#D9D9D9]">
                           <option value="eng">Eng</option>
                           <option value="kaz">Kaz</option>
                           <option value="rus">Rus</option>
                         </select>
-                        <input
-                          type="text"
-                          {...register(`translations.${index}.name`)}
-                          placeholder="Enter name"
-                          className="!mt-0 flex-1"
-                        />
+                        <input type="text" {...register(`translations.${index}.name`)} placeholder="Enter name" className="!mt-0 flex-1"/>
                       </label>
                       {index === 0 ? (
-                        <button
-                          type="button"
-                          onClick={addTranslation}
-                          disabled={usedLanguages.size >= 3}
-                          className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm"
-                        >
-                          Add
-                        </button>
+                        <button type="button" onClick={addTranslation} disabled={usedLanguages.size >= 3} className="bg-[#70A1E5] text-white px-5 py-3 rounded-[10px] text-sm">Add</button>
                       ) : (
-                        <button
-                          type="button"
-                          onClick={() => removeTranslation(index)}
-                          className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm"
-                        >
-                          Remove
-                        </button>
+                        <button type="button" onClick={() => removeTranslation(index)} className="bg-[#FF0004] text-white px-5 py-3 rounded-[10px] text-sm">Remove</button>
                       )}
                     </div>
-                    {errors.translations?.[index]?.name && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {errors.translations[index]?.name?.message}
-                      </p>
-                    )}
                   </div>
                 ))}
+
                 <div className="mt-10 grid gap-2 grid-cols-3">
                   {fileSections?.map((section, index) => (
                     <div key={index} className="repeat-section mb-8">
                       <div className="custom relative mb-5">
                         <div className="relative">
-                          <Image
-                            unoptimized
-                            src={section.imagePreview || preview}
-                            alt="Preview"
-                            width={340}
-                            height={340}
-                            className="rounded-[10px] w-full h-full aspect-square object-cover"
-                          />
+                          {section.type === "video" ? (
+                            <video src={section.previewUrl || (typeof preview === "string" ? preview : (preview as any).src)} controls className="rounded-[10px] w-full h-full aspect-square object-cover"/>
+                          ) : (
+                            <Image unoptimized src={section.previewUrl || preview} alt="Preview" width={340} height={340} className="rounded-[10px] w-full h-full aspect-square object-cover"/>
+                          )}
                         </div>
                         <div className="relative mt-5">
-                          <input
-                            className="absolute top-0 left-0 h-full w-full opacity-0 p-0 cursor-pointer"
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageChange(e, index)}
-                          />
-                          <button
-                            type="button"
-                            className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] w-full"
-                          >
-                          Edit
-                          </button>
+                          <input className="absolute top-0 left-0 h-full w-full opacity-0 p-0 cursor-pointer" type="file" accept="image/*,video/*" onChange={(e) => handleFileChange(e, index)} />
+                          <button type="button" className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] w-full">Edit</button>
                         </div>
                       </div>
                       <label>
                         Link
-                        <input
-                          type="text"
-                          {...register(`fileSections.${index}.link`)}
-                          placeholder="https://example.com"
-                          className="w-full"
-                        />
+                        <input type="text" {...register(`fileSections.${index}.link`)} placeholder="https://example.com" className="w-full"/>
                       </label>
                       {index > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => removeFileSection(index)}
-                          className="bg-[#FF0004] text-white px-5 py-3 mt-3 rounded-[10px] text-sm"
-                        >
-                          Remove 
-                        </button>
+                        <button type="button" onClick={() => removeFileSection(index)} className="bg-[#FF0004] text-white px-5 py-3 mt-3 rounded-[10px] text-sm">Remove</button>
                       )}
                     </div>
                   ))}
                   <div>
-                    <button
-                      type="button"
-                      onClick={addFileSection}
-                      className="bg-[#FFDCBD] text-darkBlack border-orange border [&_*]:mx-auto px-5 py-3 rounded-[10px] text-sm"
-                    >
+                    <button type="button" onClick={addFileSection} className="bg-[#FFDCBD] text-darkBlack border-orange border [&_*]:mx-auto px-5 py-3 rounded-[10px] text-sm">
                       <PlusIcon2/>
                       Add
                     </button>
                   </div>
                 </div>
-                <button
-                  type="submit"
-                  disabled={isPending}
-                  className="bg-orange text-white text-sm px-4 mt-10 py-[14px] text-center rounded-[28px] w-full"
-                >
+
+                <button type="submit" disabled={isPending} className="bg-orange text-white text-sm px-4 mt-10 py-[14px] text-center rounded-[28px] w-full">
                   {isPending ? "Updating Story..." : "Update Story"}
                 </button>
               </div>
@@ -467,6 +762,6 @@ const EditStoryModal = ({open, onClose, data}: Props) => {
       </div>
     </Modal>
   );
-}
+};
 
 export default EditStoryModal;
