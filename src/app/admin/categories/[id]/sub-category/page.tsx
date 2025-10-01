@@ -174,6 +174,7 @@ return (
           {subCategory?.map((row) => (
             <CategoryCard
               key={row?._id}
+              
               name={row?.name?.eng || row?.name?.kaz || row?.name?.rus}
               image={getProfileImageUrl(row?.image)}
               onClick={() => handleSubCategory(row?._id, row?.name?.eng || row?.name?.kaz || row?.name?.rus)}
