@@ -40,6 +40,7 @@ const QuotesManager: React.FC = () => {
     const [itemToDelete, setItemToDelete] = useState<QuoteItem | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [currentLanguages, setCurrentLanguages] = useState<{ [key: string]: Language }>({});
+    const [isFetchingQuotes, setIsFetchingQuotes] = useState<boolean>(true);
 
     const methods = useForm<FormValues>({
         defaultValues: {
@@ -61,16 +62,28 @@ const QuotesManager: React.FC = () => {
     });
 
     // Fetch all quotes
-    const fetchQuotes = async () => {
-        try {
-            // Mock API call - replace with actual: 
-            const response = await getQuotation('/admin/quotes');
+    // const fetchQuotes = async () => {
+    //     try {
+    //         // Mock API call - replace with actual: 
+    //         const response = await getQuotation('/admin/quotes');
 
-            setQuotes(response.data.data);
-        } catch (error) {
-            console.error('Error fetching quotes:', error);
-        }
-    };
+    //         setQuotes(response.data.data);
+    //     } catch (error) {
+    //         console.error('Error fetching quotes:', error);
+    //     }
+    // };
+const fetchQuotes = async () => {
+    try {
+        setIsFetchingQuotes(true); // Start loading
+        const response = await getQuotation('/admin/quotes');
+        setQuotes(response.data.data);
+    } catch (error) {
+        console.error('Error fetching quotes:', error);
+        toast.error("Failed to load saved quotes");
+    } finally {
+        setIsFetchingQuotes(false); // End loading
+    }
+};
 
     useEffect(() => {
         fetchQuotes();
@@ -253,6 +266,52 @@ const QuotesManager: React.FC = () => {
                     <div>
                         <h2 className="text-xl font-semibold mb-4">Saved Quotes</h2>
                         <div className="grid md:grid-cols-3 gap-4">
+    {isFetchingQuotes ? (
+        <p className="text-gray-600 col-span-full">Loading saved quotes...</p>
+    ) : quotes.length === 0 ? (
+        <p className="text-gray-600 col-span-full">No quotes found.</p>
+    ) : (
+        quotes.map((quoteItem, index) => {
+            const displayLang = currentLanguages[quoteItem._id] || 'eng';
+            return (
+                <div key={quoteItem._id} className="bg-white p-6 rounded-[20px] shadow-sm">
+                    <div className="flex items-center justify-between mb-4">
+                        <span className="text-sm text-gray-500">{index + 1}.</span>
+                        <button
+                            onClick={() => openDeleteModal(quoteItem)}
+                            className="text-[#FF6B35] text-sm flex items-center gap-1 hover:text-[#ff5722]"
+                        >
+                            <Trash2 size={16} />
+                            Delete
+                        </button>
+                    </div>
+
+                    <p className="text-sm mb-6 min-h-[80px]">
+                        &quot;{quoteItem.quote[displayLang] || quoteItem.quote.eng}&quot;
+                    </p>
+
+                    <div className="flex items-center justify-between">
+                        <button
+                            onClick={() => cycleLanguage(quoteItem._id, 'prev')}
+                            className="p-1 hover:bg-gray-100 rounded"
+                        >
+                            <ChevronLeft size={20} />
+                        </button>
+                        <span className="font-semibold uppercase">{displayLang}</span>
+                        <button
+                            onClick={() => cycleLanguage(quoteItem._id, 'next')}
+                            className="p-1 hover:bg-gray-100 rounded"
+                        >
+                            <ChevronRight size={20} />
+                        </button>
+                    </div>
+                </div>
+            );
+        })
+    )}
+</div>
+
+                        {/* <div className="grid md:grid-cols-3 gap-4">
                             {quotes.map((quoteItem, index) => {
                                 const displayLang = currentLanguages[quoteItem._id] || 'eng';
                                 return (
@@ -290,7 +349,7 @@ const QuotesManager: React.FC = () => {
                                     </div>
                                 );
                             })}
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 
