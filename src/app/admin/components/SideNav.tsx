@@ -138,6 +138,12 @@ const SideNav = () => {
               </Link>
             </li>
             }
+            <li className={`${isActive('/admin/quotes')} ${pathname.startsWith('/admin/quotes') ? 'active' : ''}`}>
+              <Link href="/admin/quotes">
+                <BookLifeIcon />
+                {!isCollapsed && <span>Quotes</span>}
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

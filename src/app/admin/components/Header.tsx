@@ -68,7 +68,7 @@ const Header: React.FC = () => {
     "/admin/authors/add-author": "Add New Author",
     "/admin/stories/add-new-story": "Add New Story",
     "/admin/promotions/add-new-banner": "Add New Banner",
-    // "/admin/add-new": "Add New Product",
+    "/admin/quotes": "Quotes",
   };
   const getPageName = (path: string): string => {
     if (path.startsWith("/admin/add-new")) {

@@ -348,6 +348,19 @@ export const DeleteBlog = async (route: any) => {
     const axiosInstance = await getAxiosInstance();
     return axiosInstance.delete(route);
 };
+//Quotation routes
+export const addQuotation = async (route: string, payload: any) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.post(route, payload)
+}
+export const getQuotation = async (route: string) => {
+    const axiosInstance = await getAxiosInstance()
+    return axiosInstance.get(route)
+}
+export const DeleteQuotation = async (route: any) => {
+    const axiosInstance = await getAxiosInstance();
+    return axiosInstance.delete(route);
+};
 
 //--------------Notifications page  ---------------
 export const postNotificationToAll = async (route: string, payload: any) => {
