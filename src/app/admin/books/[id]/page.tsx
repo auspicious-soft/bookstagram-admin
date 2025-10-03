@@ -277,75 +277,158 @@ const handleSelectChange = (name: string, value: any) => {
   }
 };
 
-  const onSubmit = async (data: FormValues) => {
+  // const onSubmit = async (data: FormValues) => {
+  // const userName = data.translations[0].name?.split(" ").join("-").toLowerCase() || "default-book";
+  // startTransition(async () => {
+  //   try {
+  //     let imageUrl = null;
+  //     if (imageFile) {
+  //       const { signedUrl, key } = await generateSignedUrlBooks(imageFile.name, imageFile.type, userName);
+  //       await fetch(signedUrl, {
+  //         method: 'PUT',
+  //         body: imageFile,
+  //         headers: {
+  //           'Content-Type': imageFile.type,
+  //         },
+  //       });
+  //       imageUrl = key;
+  //     }
+
+  //     let uploadedFiles: { language: Language; fileUrl: string }[] = [];
+  //     if (shouldUploadFiles) {
+  //       const filePromises = data.fileTranslations
+  //         .filter(trans => trans.file != null)
+  //         .map(async trans => {
+  //           const file = trans.file as File;
+  //           const { signedUrl, key } = await generateSignedUrlBookFiles(file.name, file.type, userName, trans.language);
+
+  //           await fetch(signedUrl, {
+  //             method: 'PUT',
+  //             body: file,
+  //             headers: {
+  //               'Content-Type': file.type,
+  //             },
+  //           });
+
+  //           return {
+  //             language: trans.language,
+  //             fileUrl: key
+  //           };
+  //         });
+
+  //       uploadedFiles = await Promise.all(filePromises);
+  //     }
+
+  //     // Only include non-null and non-empty name translations
+  //     const nameTransforms = data.translations
+  //       .filter(trans => trans.name != null && trans.name.trim() !== '')
+  //       .reduce((acc, curr) => ({
+  //         ...acc,
+  //         [curr.language]: curr.name
+  //       }), {});
+
+  //     // Only include non-null and non-empty description translations
+  //     const descriptionTransforms = data.descriptionTranslations
+  //       .filter(trans => trans.content != null && trans.content.trim() !== '')
+  //       .reduce((acc, curr) => ({
+  //         ...acc,
+  //         [curr.language]: curr.content
+  //       }), {});
+
+  //     // Only include uploaded files (non-null fileUrls)
+  //     const fileTransforms = uploadedFiles
+  //       .filter(file => file.fileUrl != null)
+  //       .reduce((acc, curr) => ({
+  //         ...acc,
+  //         [curr.language]: curr.fileUrl
+  //       }), {});
+
+  //     const payload = {
+  //       name: Object.keys(nameTransforms).length > 0 ? nameTransforms : { eng: "Untitled Book" },
+  //       description: Object.keys(descriptionTransforms).length > 0 ? descriptionTransforms : { eng: "No description provided" },
+  //       file: fileTransforms,
+  //       price: data.price,
+  //       authorId: data.authorId,
+  //       publisherId: data.publisherId,
+  //       categoryId: data.categoryId,
+  //       subCategoryId: data.subCategoryId,
+  //       genre: data.genre,
+  //       type: data.type,
+  //       ...(isAudioEbook && { format: data.format }),
+  //       ...(imageUrl && { image: imageUrl })
+  //     };
+const onSubmit = async (data: FormValues) => {
   const userName = data.translations[0].name?.split(" ").join("-").toLowerCase() || "default-book";
+
   startTransition(async () => {
     try {
       let imageUrl = null;
+
+      // Upload new image only if changed
       if (imageFile) {
         const { signedUrl, key } = await generateSignedUrlBooks(imageFile.name, imageFile.type, userName);
         await fetch(signedUrl, {
-          method: 'PUT',
+          method: "PUT",
           body: imageFile,
-          headers: {
-            'Content-Type': imageFile.type,
-          },
+          headers: { "Content-Type": imageFile.type },
         });
         imageUrl = key;
       }
 
       let uploadedFiles: { language: Language; fileUrl: string }[] = [];
+
       if (shouldUploadFiles) {
-        const filePromises = data.fileTranslations
-          .filter(trans => trans.file != null)
-          .map(async trans => {
-            const file = trans.file as File;
+        const filePromises = data.fileTranslations.map(async (trans) => {
+          // if file is File (new upload)
+          if (trans.file instanceof File) {
+            const file = trans.file;
             const { signedUrl, key } = await generateSignedUrlBookFiles(file.name, file.type, userName, trans.language);
 
             await fetch(signedUrl, {
-              method: 'PUT',
+              method: "PUT",
               body: file,
-              headers: {
-                'Content-Type': file.type,
-              },
+              headers: { "Content-Type": file.type },
             });
 
-            return {
-              language: trans.language,
-              fileUrl: key
-            };
-          });
+            return { language: trans.language, fileUrl: key };
+          }
 
-        uploadedFiles = await Promise.all(filePromises);
+          // if file is string (already in DB) -> reuse it
+          if (typeof trans.file === "string") {
+            return { language: trans.language, fileUrl: trans.file };
+          }
+
+          return null;
+        });
+
+        uploadedFiles = (await Promise.all(filePromises)).filter(Boolean) as {
+          language: Language;
+          fileUrl: string;
+        }[];
       }
 
-      // Only include non-null and non-empty name translations
+      // Name translations
       const nameTransforms = data.translations
-        .filter(trans => trans.name != null && trans.name.trim() !== '')
-        .reduce((acc, curr) => ({
-          ...acc,
-          [curr.language]: curr.name
-        }), {});
+        .filter((trans) => trans.name != null && trans.name.trim() !== "")
+        .reduce((acc, curr) => ({ ...acc, [curr.language]: curr.name }), {});
 
-      // Only include non-null and non-empty description translations
+      // Description translations
       const descriptionTransforms = data.descriptionTranslations
-        .filter(trans => trans.content != null && trans.content.trim() !== '')
-        .reduce((acc, curr) => ({
-          ...acc,
-          [curr.language]: curr.content
-        }), {});
+        .filter((trans) => trans.content != null && trans.content.trim() !== "")
+        .reduce((acc, curr) => ({ ...acc, [curr.language]: curr.content }), {});
 
-      // Only include uploaded files (non-null fileUrls)
-      const fileTransforms = uploadedFiles
-        .filter(file => file.fileUrl != null)
-        .reduce((acc, curr) => ({
-          ...acc,
-          [curr.language]: curr.fileUrl
-        }), {});
+      // File transformations (reuse old + new uploads)
+      const fileTransforms = uploadedFiles.reduce(
+        (acc, curr) => ({ ...acc, [curr.language]: curr.fileUrl }),
+        {}
+      );
 
       const payload = {
         name: Object.keys(nameTransforms).length > 0 ? nameTransforms : { eng: "Untitled Book" },
-        description: Object.keys(descriptionTransforms).length > 0 ? descriptionTransforms : { eng: "No description provided" },
+        description:
+          Object.keys(descriptionTransforms).length > 0
+            ? descriptionTransforms
+            : { eng: "No description provided" },
         file: fileTransforms,
         price: data.price,
         authorId: data.authorId,
@@ -355,9 +438,9 @@ const handleSelectChange = (name: string, value: any) => {
         genre: data.genre,
         type: data.type,
         ...(isAudioEbook && { format: data.format }),
-        ...(imageUrl && { image: imageUrl })
+        ...(imageUrl && { image: imageUrl }),
       };
-
+      
       if (id && isAudioEbook) {
         const prevFormat = initialFormat.current;
         console.log('prevFormat: ', prevFormat);
