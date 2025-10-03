@@ -24,11 +24,19 @@ interface OptionType {
 type Language = "eng" | "kaz" | "rus";
 
 const professions: OptionType[] = [
+  { value: "speaker", label: "Speaker" },
+  { value: "teacher", label: "Teacher" },
   { value: "poet", label: "Poet" },
   { value: "writer", label: "Writer" },
   { value: "artist", label: "Artist" },
 ];
 
+const categories: OptionType[] = [
+  { value: "bookMarket", label: "Book Market" },
+  { value: "bookStudy", label: "Book Study" },
+  { value: "bookUniversity", label: "Book University" },
+  { value: "bookMaster", label: "Book Masters" },
+];
 const genresOptions: OptionType[] = [
   { value: "fiction", label: "Fiction" },
   { value: "non-fiction", label: "Non-Fiction" },
@@ -49,6 +57,7 @@ const validationSchema = yup.object({
     })
   ),
   profession: yup.array().min(1, 'At least one profession is required'),
+  category: yup.array().min(1, 'At least one profession is required'),
   country: yup.string().required('Country is required'),
   dob: yup.string().required('Date of birth is required'),
   genres: yup.array().min(1, 'At least one genre is required'),
@@ -66,6 +75,7 @@ interface FormValues {
     content: string;
   }[];
   profession: string[];
+  category: string[];
   country: string;
   dob: string;
   genres: string[];
@@ -95,6 +105,7 @@ const Page = () => {
         { id: "1", language: "eng" as Language, content: "" }
       ],
       profession: [],
+      category:[],
       country: "",
       dob: "",
       genres: [],
@@ -147,6 +158,8 @@ const Page = () => {
 
       // Transform professions and genres
       const professionOptions = authorData.profession.map((prof: string) => prof);
+      console.log('professionOptions: ', professionOptions);
+      const categoryOptions = authorData.category.map((prof: string) => prof);
       const genreOptions = authorData.genres.map((genre: string) => genre);
 
       // Format date
@@ -159,6 +172,7 @@ const Page = () => {
         translations: nameTranslations.length > 0 ? nameTranslations : [{ id: "1", language: "eng" as Language, name: "" }],
         descriptionTranslations: descTranslations.length > 0 ? descTranslations : [{ id: "1", language: "eng" as Language, content: "" }],
         profession: professionOptions,
+        category: categoryOptions,
         country: authorData.country,
         dob: formattedDate,
         genres: genreOptions,
@@ -189,6 +203,10 @@ const Page = () => {
   const handleProfessionChange = (selectedOptions: any) => {
     const selectedValues = selectedOptions.map((option: OptionType) => option.value);
     setValue('profession', selectedValues);
+  };
+  const handleCategoryChange = (selectedOptions: any) => {
+    const selectedValues = selectedOptions.map((option: OptionType) => option.value);
+    setValue('category', selectedValues);
   };
 
   const triggerFileInputClick = () => {
@@ -412,6 +430,17 @@ const Page = () => {
             </div>
             <div className="main-form bg-white p-[30px] rounded-[20px]">
               <div className="space-y-5">
+                {/* <CustomSelect
+                  name="profession"
+                  isMulti={true}
+                  options={professions}
+                  value={professions.filter((option) =>
+                    watch('profession').includes(option.value)
+                  )}
+                  onChange={handleProfessionChange}
+                  placeholder="Select Profession"
+                /> */}
+                <div className="grid grid-cols-2 gap-[5px]">
                 <CustomSelect
                   name="profession"
                   isMulti={true}
@@ -422,6 +451,17 @@ const Page = () => {
                   onChange={handleProfessionChange}
                   placeholder="Select Profession"
                 />
+                <CustomSelect
+                  name="category"
+                  isMulti={true}
+                  options={categories}
+                  value={categories.filter((option) =>
+                    watch('category').includes(option.value)
+                  )}
+                  onChange={handleCategoryChange}
+                  placeholder="Select Category"
+                />
+                </div>
                 <div className="grid grid-cols-2 gap-[5px]">
                   <label>
                     Country

@@ -42,7 +42,10 @@ const BookUniversity = () => {
     setQuery(`page=${newPage}&limit=${itemsPerPage}`);
   };
 
-
+  const openBookProfile = (id: string, name: string) => {
+    localStorage.setItem("getbookName", name);
+    router.push(`/admin/books/${id}`);
+  };
 
   const openDeleteModal = (id: string, name: string) => {
     setItemToDelete({ id, name });
@@ -109,7 +112,7 @@ const BookUniversity = () => {
       <div className="flex gap-2.5 justify-end mb-5 ">
         <SearchBar setQuery={setsearchParams} query={searchParams} />
         <div>
-          <Button text="Add To University" onClick={() => setOpenModal(true)} />
+          <Button text="Add To University" onClick={() => router.push("/admin/add-new?type=course&module=bookUniversity")} />
         </div>
       </div>
 
@@ -168,6 +171,15 @@ const BookUniversity = () => {
                       className="p-[10px]"
                     >
                       <DeleteIcon />
+                    </button>
+                    <button
+                      onClick={() => openBookProfile(
+                        row?.productsId?._id,
+                        row?.productsId?.name?.eng ?? row?.productsId?.name?.kaz ?? row?.productsId?.name?.rus ?? 'this course'
+                  )}
+                      className="p-[10px]"
+                    >
+                      <ViewIcon />
                     </button>
                   </td>
                 </tr>

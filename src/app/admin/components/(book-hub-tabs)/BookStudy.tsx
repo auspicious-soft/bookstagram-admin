@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useTransition } from "react";
 import Button from "@/app/components/Button";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import useSWR from "swr";
 import { addToBookStudy, deleteBookStudy, getAllBookStudy } from "@/services/admin-services";
 import ReactLoading from "react-loading";
@@ -76,6 +76,16 @@ const BookStudy = () => {
     }
   }
 
+    const openBookProfile = (id: string, name: string) => {
+    localStorage.setItem("getbookName", name);
+    router.push(`/admin/books/${id}`);
+  };
+  
+//  const handleTabClick = (tab: string) => {
+//     setQuery(`page=${1}&limit=${itemsPerPage}`);
+//     setActiveTab(tab);
+//     setPage(1);
+//   };
   const addBookToBookStudy = async() => {
     if (selectedBooks.length === 0) {
       toast.error("Please select at least one book");
@@ -108,8 +118,15 @@ const BookStudy = () => {
       <div className="flex gap-2.5 justify-end mb-5 ">
         <SearchBar setQuery={setsearchParams} query={searchParams} />
         <div>
-          <Button text="Add To Book Study" onClick={addBook} />
+          <Button text="Add To Book Study" onClick={() => router.push("/admin/add-new?type=course&module=bookStudy")} />
         </div>
+        {/* <button
+              // key={tab}
+              className={`flex items-center gap-2.5 bg-orange text-white text-sm px-5 py-2.5 text-center rounded-[28px] disabled:opacity-50 `}
+              onClick={() => router.push("/admin/add-new?type=course")}
+            >
+              Add To Book Study
+            </button> */}
       </div>
 
       <div className="table-common overflo-custom">
@@ -121,7 +138,7 @@ const BookStudy = () => {
               <th>Author Name</th>
               {/* <th>Language</th> */}
               <th>Categories</th>
-              <th>Action</th>
+              <th >Action</th>
             </tr>
           </thead>
           <tbody className="">
@@ -173,6 +190,15 @@ const BookStudy = () => {
                     >
                       <DeleteIcon/>
                     </button>
+                     <button
+                      onClick={() => openBookProfile(
+                        row?.productsId?._id,
+                        row?.productsId?.name?.eng ?? row?.productsId?.name?.kaz ?? row?.productsId?.name?.rus ?? 'this course'
+                  )}
+                      className="p-[10px]"
+                    >
+                      <ViewIcon />
+                    </button>
                   </td>
                 </tr>
               ))
@@ -196,17 +222,18 @@ const BookStudy = () => {
           itemsPerPage={itemsPerPage}
         />
       </div>
-      <AddToBookCommon
-        open={openModal}
-        onClose={() => setOpenModal(false)}
+      {/* <AddToBookCommon
+        // open={openModal}
+        // onClose={() => setOpenModal(false)}
         title="Add To Book Study"
         selectedBooks={selectedBooks}
         onSelectBooks={setSelectedBooks}
         handleSubmit={addBookToBookStudy}
         isPending={isPending}
         type="course"
-        route = "/admin/book-studies/books"
-      />
+        route = "/admin/add-new?type=course"
+      /> */}
+      {/* <button onclick>Add To Book Study</button> */}
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal

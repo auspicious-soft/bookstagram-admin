@@ -18,7 +18,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             profilePic: credentials.profilePic,
           };
         } else {
-          throw new CredentialsSignin({ cause: "Invalid credentials" });
+          // throw new CredentialsSignin({ cause: "Invalid credentials" });
+          throw new CredentialsSignin("Invalid credentials");
         }
       },
     }),

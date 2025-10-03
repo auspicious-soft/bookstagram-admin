@@ -1,8 +1,9 @@
 import { getAllAuthors } from '@/services/admin-services';
 import useSWR from 'swr'; 
 
-const UseAuthors = () => {
-    const { data, error, isLoading } = useSWR(`/admin/authors`, getAllAuthors, {
+const UseAuthors = (type?:string) => {
+    console.log('type: ', type);
+    const { data, error, isLoading } = useSWR(`/admin/authors?category=${type}`, getAllAuthors, {
         revalidateOnFocus: false,
       });
 

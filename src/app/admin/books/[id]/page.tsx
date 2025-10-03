@@ -77,6 +77,7 @@ const BookForm = () => {
   const bookData = data?.data?.data?.books?.[0];
   const upperData = data?.data?.data;
   const bookType = data?.data?.data?.books?.[0]?.type;
+  const moduleType = data?.data?.data?.books?.[0]?.module;
   const isAudioEbook = bookType === 'audio&ebook';
   const isEbookOrPodcast = bookType === 'e-book' || bookType === 'podcast';
 
@@ -138,7 +139,7 @@ const BookForm = () => {
     { id: "2", title: "Revenue By This Book", value: `$${upperData?.totalRevenue}`, icon: <DashboardIcon1 /> },
   ];
 
-  const { authors } = UseAuthors();
+  const { authors } = UseAuthors(moduleType);
   const { subCategory } = UseSubCategory();
   const { publishers } = UsePublisher();
   const { category } = UseCategory();

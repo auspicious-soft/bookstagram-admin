@@ -75,7 +75,11 @@ const BookMasters = () => {
       closeDeleteModal();
     }
   }
-
+  const openBookProfile = (id: string, name: string) => {
+    localStorage.setItem("getbookName", name);
+    router.push(`/admin/books/${id}`);
+  };
+  
   const addBookToBookMaster = async() => {
     if (selectedBooks.length === 0) {
       toast.error("Please select at least one book.");
@@ -109,7 +113,7 @@ const BookMasters = () => {
       <div className="flex gap-2.5 justify-end mb-5 ">
         <SearchBar setQuery={setsearchParams} query={searchParams} />
         <div>
-          <Button text="Add To Masters" onClick={()=>setOpenModal(true)} />
+          <Button text="Add To Masters" onClick={() => router.push("/admin/add-new?type=video-lecture&module=bookMaster")} />
         </div>
       </div>
 
@@ -172,6 +176,15 @@ const BookMasters = () => {
                       className="p-[10px]"
                     >
                       <DeleteIcon/>
+                    </button>
+                     <button
+                      onClick={() => openBookProfile(
+                        row?.productsId?._id,
+                        row?.productsId?.name?.eng ?? row?.productsId?.name?.kaz ?? row?.productsId?.name?.rus ?? 'this course'
+                  )}
+                      className="p-[10px]"
+                    >
+                      <ViewIcon />
                     </button>
                   </td>
                 </tr>

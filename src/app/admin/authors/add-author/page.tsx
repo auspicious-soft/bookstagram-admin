@@ -19,9 +19,17 @@ interface OptionType {
 type MultiValue<T> = T[];
 
 const professions: OptionType[] = [
+  { value: "speaker", label: "Speaker" },
+  { value: "teacher", label: "Teacher" },
   { value: "poet", label: "Poet" },
   { value: "writer", label: "Writer" },
   { value: "artist", label: "Artist" },
+];
+const categories: OptionType[] = [
+  { value: "bookMarket", label: "Book Market" },
+  { value: "bookStudy", label: "Book Study" },
+  { value: "bookUniversity", label: "Book University" },
+  { value: "bookMaster", label: "Book Masters" },
 ];
 
 const genresOptions: OptionType[] = [
@@ -46,6 +54,7 @@ const validationSchema = yup.object({
     })
   ),
   profession: yup.array().min(1, 'At least one profession is required'),
+  category: yup.array().min(1, 'At least one profession is required'),
   country: yup.string().required('Country is required'),
   dob: yup.string().required('Date of birth is required'),
   genres: yup.array().min(1, 'At least one genre is required'),
@@ -63,6 +72,7 @@ interface FormValues {
     content: string;
   }[];
   profession: string[];
+  category: string[];
   country: string;
   dob: string;
   genres: string[];
@@ -85,6 +95,7 @@ const Page = () => {
         { id: "1", language: "eng" as Language, content: "" }
       ],
       profession: [],
+      category: [],
       country: "",
       dob: "",
       genres: [],
@@ -119,6 +130,10 @@ const Page = () => {
   const handleProfessionChange = (selectedOptions: MultiValue<OptionType>) => {
     const selectedValues = selectedOptions.map((option) => option.value);
     setValue('profession', selectedValues);
+  };
+  const handleCategoryChange = (selectedOptions: MultiValue<OptionType>) => {
+    const selectedValues = selectedOptions.map((option) => option.value);
+    setValue('category', selectedValues);
   };
 
   const triggerFileInputClick = () => {
@@ -329,6 +344,7 @@ const Page = () => {
             </div>
             <div className="main-form bg-white p-[30px] rounded-[30px]">
               <div className="space-y-5">
+                <div className="grid grid-cols-2 gap-[5px]">
                 <CustomSelect
                   name="profession"
                   isMulti={true}
@@ -339,6 +355,17 @@ const Page = () => {
                   onChange={handleProfessionChange}
                   placeholder="Select Profession"
                 />
+                <CustomSelect
+                  name="category"
+                  isMulti={true}
+                  options={categories}
+                  value={categories.filter((option) =>
+                    watch('category').includes(option.value)
+                  )}
+                  onChange={handleCategoryChange}
+                  placeholder="Select Category"
+                />
+                </div>
                 <div className="grid grid-cols-2 gap-[5px]">
                   <label>
                     Country

@@ -69,7 +69,8 @@ const BookForm = () => {
 
   const searchParams = useSearchParams();
   const bookType = searchParams.get('type') || 'audioebook';
-  const { authors } = UseAuthors();
+  const moduleParam  = searchParams.get('module') || 'bookMarket';
+  const { authors } = UseAuthors(moduleParam);
   const { subCategory } = UseSubCategory();
   const { publishers } = UsePublisher();
   const { category } = UseCategory();
@@ -258,7 +259,8 @@ const BookForm = () => {
           genre: data.genre,
           type: finalType,
           format: data.format, // Include format in payload
-          image: imageUrl
+          image: imageUrl,
+          module:moduleParam 
         };
 
         // Handle file uploads first if needed (for e-book or both formats)

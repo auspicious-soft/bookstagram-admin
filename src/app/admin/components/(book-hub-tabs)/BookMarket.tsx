@@ -33,7 +33,7 @@ const BookMarket = () => {
   };
 
   // Construct the API URL with proper query parameters
-  const apiUrl = `/admin/books?${query}${searchTerm ? `&description=${searchTerm}` : ''}&type=${getTypeParam(activeTab)}`;
+  const apiUrl = `/admin/books?${query}${searchTerm ? `&description=${searchTerm}` : ''}&module=bookMarket&type=${getTypeParam(activeTab)}`;
   const { data, isLoading, error, mutate } = useSWR(apiUrl, getAllBooks);
   const booksdata = data?.data?.data;
 
@@ -80,8 +80,7 @@ const BookMarket = () => {
 
   const onTypeSelect = (type: string) => {
     const encodedType = encodeURIComponent(type);
-    console.log('encodedType: ', encodedType);
-    router.push(`/admin/add-new?type=${encodedType}`);
+    router.push(`/admin/add-new?type=${encodedType}&module=bookMarket`);
   };
 
   return (
