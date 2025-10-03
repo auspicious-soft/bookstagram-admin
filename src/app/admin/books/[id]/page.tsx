@@ -265,10 +265,17 @@ const BookForm = () => {
     }
   };
 
-  const handleSelectChange = (name: string, value: any) => {
-    setValue(name as any, Array.isArray(value) ? value.map(v => v.value) : value.value);
-  };
+  // const handleSelectChange = (name: string, value: any) => {
+  //   setValue(name as any, Array.isArray(value) ? value.map(v => v.value) : value.value);
+  // };
 
+const handleSelectChange = (name: string, value: any) => {
+  if (Array.isArray(value)) {
+    setValue(name as any, value.map(v => v.value)); // multi-select
+  } else {
+    setValue(name as any, value?.value || ""); // single-select
+  }
+};
 
   const onSubmit = async (data: FormValues) => {
   const userName = data.translations[0].name?.split(" ").join("-").toLowerCase() || "default-book";
@@ -366,6 +373,7 @@ const BookForm = () => {
           }
         }
       }
+      console.log('payload: ', payload);
       console.log('payload: ', payload);
 
       let bookId = id as string;
@@ -700,14 +708,22 @@ const BookForm = () => {
                     isMulti={true}
                   />
 
-                  <CustomSelect
+                  {/* <CustomSelect
                     name="Select Publisher"
                     value={publishers.find(option =>
                       watch('publisherId')?.includes(option.value))}
                     options={publishers}
                     onChange={(value) => handleSelectChange('publisherId', value)}
                     placeholder="Select Publisher"
-                  />
+                  /> */}
+                  <CustomSelect
+  name="Select Publisher"
+  value={publishers.find(option =>
+    option.value === watch('publisherId')) || null}
+  options={publishers}
+  onChange={(value) => handleSelectChange('publisherId', value)}
+  placeholder="Select Publisher"
+/>
 
                   <CustomSelect
                     name="Select Genre"
