@@ -9,7 +9,7 @@ const UsePublisher = () => {
 
   const publishers = data?.data?.data?.map((row: any) => ({
     label: `${row?.name?.eng || row?.name?.kaz || row?.name?.rus}`,
-    value: row?.id,
+    value: row?._id,
   })) || []; 
   
   return {

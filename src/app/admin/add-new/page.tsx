@@ -127,8 +127,8 @@ const BookForm = () => {
     categoryId: yup.array().min(1, 'Category is required'),
     genre: yup.array().required('Genre is required')
   });
-
-
+  
+  
   const methods = useForm<FormValues>({
     resolver: yupResolver(validationSchema) as any,
     defaultValues: {
@@ -147,7 +147,7 @@ const BookForm = () => {
     },
     mode: 'onChange'
   });
-
+  
   const { control, handleSubmit, register, watch, setValue, formState: { errors } } = methods;
   console.log('errors: ', errors);
   
@@ -158,22 +158,22 @@ const BookForm = () => {
     control,
     name: "translations"
   });
-
+  
   const { fields: descriptionFields, append: appendDescription, remove: removeDescription } = useFieldArray({
     control,
     name: "descriptionTranslations"
   });
-
+  
   const { fields: fileFields, append: appendFile, remove: removeFile } = useFieldArray({
     control,
     name: "fileTranslations"
   });
-
+  
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setImageFile(file);
-
+      
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
@@ -182,30 +182,31 @@ const BookForm = () => {
       reader.readAsDataURL(file);
     }
   };
-
+  
   const handleSelectChange = (name: string, value: any) => {
     setValue(name as any, Array.isArray(value) ? value.map(v => v.value) : value.value);
   };
-
+  
   const handleFormatChange = (format: Format) => {
     setSelectedFormat(format);
     setValue('format', format);
   };
- const getAcceptedFileTypes = () => {
+  const getAcceptedFileTypes = () => {
     switch (bookType) {
       case "audiobook":
         return ".epub"; // Only EPUB for audiobook
-      case "podcast":
-      case "video-lecture":
-        return ".mp4,.mov,.avi"; // Video files for podcast and video-lecture
-      case "audioebook":
-        return selectedFormat === "e-book" || selectedFormat === "both" ? ".epub" : "";
-      default:
-        return ""; // No restrictions for other types
-    }
-  };
-  const onSubmit = async (data: FormValues) => {
-    const userName = data.translations[0].name?.split(" ").join("-").toLowerCase();
+        case "podcast":
+          case "video-lecture":
+            return ".mp4,.mov,.avi"; // Video files for podcast and video-lecture
+            case "audioebook":
+              return selectedFormat === "e-book" || selectedFormat === "both" ? ".epub" : "";
+              default:
+                return ""; // No restrictions for other types
+              }
+            };
+            const onSubmit = async (data: FormValues) => {
+              const userName = data.translations[0].name?.split(" ").join("-").toLowerCase();
+              console.log('data: ', data);
 
     startTransition(async () => {
       try {

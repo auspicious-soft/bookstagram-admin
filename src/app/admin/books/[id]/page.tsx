@@ -87,7 +87,7 @@ const BookForm = () => {
       case "video-lecture":
         return ".mp4,.mov,.avi"; // Video files for podcast and video-lecture
       case "audio&ebook":
-        return ".epub" ;
+        return ".epub";
       default:
         return ""; // No restrictions for other types
     }
@@ -269,13 +269,13 @@ const BookForm = () => {
   //   setValue(name as any, Array.isArray(value) ? value.map(v => v.value) : value.value);
   // };
 
-const handleSelectChange = (name: string, value: any) => {
-  if (Array.isArray(value)) {
-    setValue(name as any, value.map(v => v.value)); // multi-select
-  } else {
-    setValue(name as any, value?.value || ""); // single-select
-  }
-};
+  const handleSelectChange = (name: string, value: any) => {
+    if (Array.isArray(value)) {
+      setValue(name as any, value.map(v => v.value)); // multi-select
+    } else {
+      setValue(name as any, value?.value || ""); // single-select
+    }
+  };
 
   // const onSubmit = async (data: FormValues) => {
   // const userName = data.translations[0].name?.split(" ").join("-").toLowerCase() || "default-book";
@@ -357,143 +357,143 @@ const handleSelectChange = (name: string, value: any) => {
   //       ...(isAudioEbook && { format: data.format }),
   //       ...(imageUrl && { image: imageUrl })
   //     };
-const onSubmit = async (data: FormValues) => {
-  const userName = data.translations[0].name?.split(" ").join("-").toLowerCase() || "default-book";
+  const onSubmit = async (data: FormValues) => {
+    const userName = data.translations[0].name?.split(" ").join("-").toLowerCase() || "default-book";
 
-  startTransition(async () => {
-    try {
-      let imageUrl = null;
+    startTransition(async () => {
+      try {
+        let imageUrl = null;
 
-      // Upload new image only if changed
-      if (imageFile) {
-        const { signedUrl, key } = await generateSignedUrlBooks(imageFile.name, imageFile.type, userName);
-        await fetch(signedUrl, {
-          method: "PUT",
-          body: imageFile,
-          headers: { "Content-Type": imageFile.type },
-        });
-        imageUrl = key;
-      }
+        // Upload new image only if changed
+        if (imageFile) {
+          const { signedUrl, key } = await generateSignedUrlBooks(imageFile.name, imageFile.type, userName);
+          await fetch(signedUrl, {
+            method: "PUT",
+            body: imageFile,
+            headers: { "Content-Type": imageFile.type },
+          });
+          imageUrl = key;
+        }
 
-      let uploadedFiles: { language: Language; fileUrl: string }[] = [];
+        let uploadedFiles: { language: Language; fileUrl: string }[] = [];
 
-      if (shouldUploadFiles) {
-        const filePromises = data.fileTranslations.map(async (trans) => {
-          // if file is File (new upload)
-          if (trans.file instanceof File) {
-            const file = trans.file;
-            const { signedUrl, key } = await generateSignedUrlBookFiles(file.name, file.type, userName, trans.language);
+        if (shouldUploadFiles) {
+          const filePromises = data.fileTranslations.map(async (trans) => {
+            // if file is File (new upload)
+            if (trans.file instanceof File) {
+              const file = trans.file;
+              const { signedUrl, key } = await generateSignedUrlBookFiles(file.name, file.type, userName, trans.language);
 
-            await fetch(signedUrl, {
-              method: "PUT",
-              body: file,
-              headers: { "Content-Type": file.type },
-            });
+              await fetch(signedUrl, {
+                method: "PUT",
+                body: file,
+                headers: { "Content-Type": file.type },
+              });
 
-            return { language: trans.language, fileUrl: key };
-          }
+              return { language: trans.language, fileUrl: key };
+            }
 
-          // if file is string (already in DB) -> reuse it
-          if (typeof trans.file === "string") {
-            return { language: trans.language, fileUrl: trans.file };
-          }
+            // if file is string (already in DB) -> reuse it
+            if (typeof trans.file === "string") {
+              return { language: trans.language, fileUrl: trans.file };
+            }
 
-          return null;
-        });
+            return null;
+          });
 
-        uploadedFiles = (await Promise.all(filePromises)).filter(Boolean) as {
-          language: Language;
-          fileUrl: string;
-        }[];
-      }
+          uploadedFiles = (await Promise.all(filePromises)).filter(Boolean) as {
+            language: Language;
+            fileUrl: string;
+          }[];
+        }
 
-      // Name translations
-      const nameTransforms = data.translations
-        .filter((trans) => trans.name != null && trans.name.trim() !== "")
-        .reduce((acc, curr) => ({ ...acc, [curr.language]: curr.name }), {});
+        // Name translations
+        const nameTransforms = data.translations
+          .filter((trans) => trans.name != null && trans.name.trim() !== "")
+          .reduce((acc, curr) => ({ ...acc, [curr.language]: curr.name }), {});
 
-      // Description translations
-      const descriptionTransforms = data.descriptionTranslations
-        .filter((trans) => trans.content != null && trans.content.trim() !== "")
-        .reduce((acc, curr) => ({ ...acc, [curr.language]: curr.content }), {});
+        // Description translations
+        const descriptionTransforms = data.descriptionTranslations
+          .filter((trans) => trans.content != null && trans.content.trim() !== "")
+          .reduce((acc, curr) => ({ ...acc, [curr.language]: curr.content }), {});
 
-      // File transformations (reuse old + new uploads)
-      const fileTransforms = uploadedFiles.reduce(
-        (acc, curr) => ({ ...acc, [curr.language]: curr.fileUrl }),
-        {}
-      );
+        // File transformations (reuse old + new uploads)
+        const fileTransforms = uploadedFiles.reduce(
+          (acc, curr) => ({ ...acc, [curr.language]: curr.fileUrl }),
+          {}
+        );
 
-      const payload = {
-        name: Object.keys(nameTransforms).length > 0 ? nameTransforms : { eng: "Untitled Book" },
-        description:
-          Object.keys(descriptionTransforms).length > 0
-            ? descriptionTransforms
-            : { eng: "No description provided" },
-        file: fileTransforms,
-        price: data.price,
-        authorId: data.authorId,
-        publisherId: data.publisherId,
-        categoryId: data.categoryId,
-        subCategoryId: data.subCategoryId,
-        genre: data.genre,
-        type: data.type,
-        ...(isAudioEbook && { format: data.format }),
-        ...(imageUrl && { image: imageUrl }),
-      };
-      
-      if (id && isAudioEbook) {
-        const prevFormat = initialFormat.current;
-        console.log('prevFormat: ', prevFormat);
-        const currFormat = data.format || '';
-        console.log('currFormat: ', currFormat);
-        if (currFormat !== prevFormat) {
-          if (currFormat === 'audiobook' && (prevFormat === 'e-book' || prevFormat === 'both')) {
-            payload.file = {};
-          }
-          if (currFormat === 'e-book' && (prevFormat === 'audiobook' || prevFormat === 'both')) {
-            const deleteAudioBook = await deleteAudiobookChapters(`/admin/audiobook-chapters/product/${id}`);
-            console.log('deleteAudioBook: ', deleteAudioBook);
+        const payload = {
+          name: Object.keys(nameTransforms).length > 0 ? nameTransforms : { eng: "Untitled Book" },
+          description:
+            Object.keys(descriptionTransforms).length > 0
+              ? descriptionTransforms
+              : { eng: "No description provided" },
+          file: fileTransforms,
+          price: data.price,
+          authorId: data.authorId,
+          publisherId: data.publisherId,
+          categoryId: data.categoryId,
+          subCategoryId: data.subCategoryId,
+          genre: data.genre,
+          type: data.type,
+          ...(isAudioEbook && { format: data.format }),
+          ...(imageUrl && { image: imageUrl }),
+        };
+
+        if (id && isAudioEbook) {
+          const prevFormat = initialFormat.current;
+          console.log('prevFormat: ', prevFormat);
+          const currFormat = data.format || '';
+          console.log('currFormat: ', currFormat);
+          if (currFormat !== prevFormat) {
+            if (currFormat === 'audiobook' && (prevFormat === 'e-book' || prevFormat === 'both')) {
+              payload.file = {};
+            }
+            if (currFormat === 'e-book' && (prevFormat === 'audiobook' || prevFormat === 'both')) {
+              const deleteAudioBook = await deleteAudiobookChapters(`/admin/audiobook-chapters/product/${id}`);
+              console.log('deleteAudioBook: ', deleteAudioBook);
+            }
           }
         }
-      }
-      console.log('payload: ', payload);
-      console.log('payload: ', payload);
+        console.log('payload: ', payload);
+        console.log('payload: ', payload);
 
-      let bookId = id as string;
-      const isNew = !id;
-      if (isNew || !isNext) {
-        const action = isNew ? addNewBook : updateSingleBook;
-        const url = isNew ? "/admin/books" : `/admin/books/${id}`;
-        const response = await action(url, payload);
-        if ((isNew && response?.status !== 201) || (!isNew && response?.status !== 200)) {
-          toast.error(`Failed to ${isNew ? 'add' : 'update'} Book`);
-          return; // Ensure no value is returned
+        let bookId = id as string;
+        const isNew = !id;
+        if (isNew || !isNext) {
+          const action = isNew ? addNewBook : updateSingleBook;
+          const url = isNew ? "/admin/books" : `/admin/books/${id}`;
+          const response = await action(url, payload);
+          if ((isNew && response?.status !== 201) || (!isNew && response?.status !== 200)) {
+            toast.error(`Failed to ${isNew ? 'add' : 'update'} Book`);
+            return; // Ensure no value is returned
+          }
+          toast.success(`Book ${isNew ? 'added' : 'updated'} successfully`);
+          if (isNew) {
+            bookId = response.data.data.books[0]._id; // Update bookId
+          }
         }
-        toast.success(`Book ${isNew ? 'added' : 'updated'} successfully`);
-        if (isNew) {
-          bookId = response.data.data.books[0]._id; // Update bookId
-        }
-      }
 
-      if (isNext) {
-        let storageKey: string;
-        let path: string;
-        if (data.type === "course") {
-          storageKey = "courseData";
-          path = "lessons";
-        } else {
-          storageKey = "audioBookData";
-          path = "timestamps";
+        if (isNext) {
+          let storageKey: string;
+          let path: string;
+          if (data.type === "course") {
+            storageKey = "courseData";
+            path = "lessons";
+          } else {
+            storageKey = "audioBookData";
+            path = "timestamps";
+          }
+          sessionStorage.setItem(storageKey, JSON.stringify(payload));
+          router.push(`/admin/books/${bookId}/${path}`);
         }
-        sessionStorage.setItem(storageKey, JSON.stringify(payload));
-        router.push(`/admin/books/${bookId}/${path}`);
+      } catch (error) {
+        console.error("Error", error);
+        toast.error(`An error occurred while ${id ? 'updating' : 'adding'} the Book`);
       }
-    } catch (error) {
-      console.error("Error", error);
-      toast.error(`An error occurred while ${id ? 'updating' : 'adding'} the Book`);
-    }
-  });
-};
+    });
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -800,13 +800,13 @@ const onSubmit = async (data: FormValues) => {
                     placeholder="Select Publisher"
                   /> */}
                   <CustomSelect
-  name="Select Publisher"
-  value={publishers.find(option =>
-    option.value === watch('publisherId')) || null}
-  options={publishers}
-  onChange={(value) => handleSelectChange('publisherId', value)}
-  placeholder="Select Publisher"
-/>
+                    name="Select Publisher"
+                    value={publishers.find(option =>
+                      option.value === watch('publisherId')) || null}
+                    options={publishers}
+                    onChange={(value) => handleSelectChange('publisherId', value)}
+                    placeholder="Select Publisher"
+                  />
 
                   <CustomSelect
                     name="Select Genre"
@@ -853,3 +853,5 @@ const onSubmit = async (data: FormValues) => {
 };
 
 export default BookForm;
+
+
