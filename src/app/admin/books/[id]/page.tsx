@@ -142,7 +142,7 @@ const BookForm = () => {
   const { authors } = UseAuthors(moduleType);
   const { subCategory } = UseSubCategory();
   const { publishers } = UsePublisher();
-  const { category } = UseCategory();
+  const { category } = UseCategory(moduleType);
 
   const methods = useForm<FormValues>({
     resolver: yupResolver(validationSchema) as any,

@@ -198,6 +198,7 @@ const UserProfile = ({ id }: Props) => {
         let profilePicKey = data.profilePic;
 
         if (imageFile) {
+          
           const { signedUrl, key } = await generateUserProfilePicture(
             imageFile.name,
             imageFile.type,

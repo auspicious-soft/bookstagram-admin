@@ -17,6 +17,7 @@ import { useSession } from "next-auth/react";
 
 type Language = "eng" | "kaz" | "rus";
 interface FormValues {
+  module: any;
   image: File | null;
   descriptionTranslations: {
     id: string;
@@ -52,7 +53,6 @@ const deleteBookLives = (id: string) => {
     startTransition(async () => {
       const response = await deleteBookLife(`/admin/categories/${id}`);
       if (response.data.success && (response.status === 200 || response.status === 201) ) {
-        console.log('response: ', response.data.success);
         toast.success("Category deleted successfully");
         mutate();
       }
@@ -61,7 +61,6 @@ const deleteBookLives = (id: string) => {
       }
     });
   } catch (error) {
-    console.log('error: ', error);
     if (error.response && error.response.status === 400) {
       toast.error(error.response.data.message || "Cannot delete category with existing subcategories");
     } else {
@@ -99,6 +98,7 @@ const deleteBookLives = (id: string) => {
         const payload = {
           name: nameTransforms,
           image: imageUrl,
+          module: formData?.module
         };
 
         const response = await addNewCategory("/admin/categories", payload);

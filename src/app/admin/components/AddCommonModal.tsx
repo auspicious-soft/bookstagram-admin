@@ -6,12 +6,13 @@
 // import Image, { StaticImageData } from "next/image";
 // import { PlusIcon } from "@/utils/svgicons";
 // import sumImg from '@/assets/images/Summary.png';
+// import CustomSelect from "@/app/components/CustomSelect";
 
 // type Language = "eng" | "kaz" | "rus";
 
 // type FormValues = {
 //   image: File | null;
-//   descriptionTranslations: { id: string; language: Language; content: string }[];
+//   descriptionTranslations: { id: string; language: Language; content: string | null }[];
 // };
 
 // const validationSchema = yup.object({
@@ -19,7 +20,7 @@
 //   descriptionTranslations: yup.array().of(
 //     yup.object({
 //       language: yup.string().required("Language is required"),
-//       content: yup.string().required("Content is required"),
+//       content: yup.string().nullable().transform((value) => value || null),
 //     })
 //   ).min(1, "At least one translation is required"),
 // });
@@ -48,6 +49,16 @@
 //   const [previewImage, setPreviewImage] = useState<string>();
 //   const [usedDescLanguages, setUsedDescLanguages] = useState<Set<Language>>(new Set());
 
+//   interface OptionType {
+//     value: string;
+//     label: string;
+//   }
+//   const categories: OptionType[] = [
+//     { value: "bookMarket", label: "Book Market" },
+//     { value: "bookStudy", label: "Book Study" },
+//     { value: "bookUniversity", label: "Book University" },
+//     { value: "bookMaster", label: "Book Masters" },
+//   ];
 //   const methods = useForm<FormValues>({
 //     resolver: yupResolver(validationSchema) as any,
 //     defaultValues: {
@@ -78,10 +89,29 @@
 //       reader.readAsDataURL(file);
 //     }
 //   };
-
+//  const handleCategoryChange = (selectedOptions: MultiValue<OptionType>) => {
+//     const selectedValues = selectedOptions.map((option) => option.value);
+//     setValue('category', selectedValues);
+//   };
 //   const handleFormSubmit = (data: FormValues) => {
 //     if (onSubmit) {
-//       onSubmit(data);
+//       // Transform descriptionTranslations to include all languages with null for empty content
+//       const allLanguages: Language[] = ["eng", "kaz", "rus"];
+//       const transformedTranslations = allLanguages.map((lang) => {
+//         const existingTranslation = data.descriptionTranslations.find(t => t.language === lang);
+
+//         return {
+//           id: existingTranslation?.id || String(allLanguages.indexOf(lang) + 1),
+//           language: lang,
+//           content: existingTranslation?.content?.trim() || null,
+//         };
+//       });
+
+//       onSubmit({
+//         ...data,
+//         descriptionTranslations: transformedTranslations,
+//       });
+//       handleClose();
 //     }
 //   };
 
@@ -206,6 +236,16 @@
 //                     </div>
 //                   ))}
 //                 </div>
+//                 <CustomSelect
+//                   name="category"
+//                   isMulti={true}
+//                   options={categories}
+//                   value={categories.filter((option) =>
+//                     watch('category').includes(option.value)
+//                   )}
+//                   onChange={handleCategoryChange}
+//                   placeholder="Select Category"
+//                 />
 //               </div>
 
 //               <div className="mt-[30px] flex gap-2.5 justify-end">
@@ -225,6 +265,7 @@
 //                   Cancel
 //                 </button>
 //               </div>
+
 //             </form>
 //           </FormProvider>
 //         </div>
@@ -237,6 +278,7 @@
 
 
 
+
 import React, { useState } from "react";
 import Modal from "@mui/material/Modal";
 import { useForm, FormProvider, useFieldArray } from "react-hook-form";
@@ -244,23 +286,28 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Image, { StaticImageData } from "next/image";
 import { PlusIcon } from "@/utils/svgicons";
-import sumImg from '@/assets/images/Summary.png';
+import CustomSelect from "@/app/components/CustomSelect";
+import { MultiValue } from "react-select";
 
 type Language = "eng" | "kaz" | "rus";
 
 type FormValues = {
   image: File | null;
   descriptionTranslations: { id: string; language: Language; content: string | null }[];
+  module?: string[]; // ✅ Added for "Add a Category"
 };
 
 const validationSchema = yup.object({
   image: yup.mixed().required("Image is required"),
-  descriptionTranslations: yup.array().of(
-    yup.object({
-      language: yup.string().required("Language is required"),
-      content: yup.string().nullable().transform((value) => value || null),
-    })
-  ).min(1, "At least one translation is required"),
+  descriptionTranslations: yup
+    .array()
+    .of(
+      yup.object({
+        language: yup.string().required("Language is required"),
+        content: yup.string().nullable().transform((value) => value || null),
+      })
+    )
+    .min(1, "At least one translation is required"),
 });
 
 interface ModalProps {
@@ -282,28 +329,48 @@ const AddCommonModal: React.FC<ModalProps> = ({
   title,
   image,
   labelname,
-  disabled
+  disabled,
 }) => {
   const [previewImage, setPreviewImage] = useState<string>();
   const [usedDescLanguages, setUsedDescLanguages] = useState<Set<Language>>(new Set());
+  const [selectedModules, setSelectedModules] = useState<string[]>([]); // ✅ state for module selection
+
+  interface OptionType {
+    value: string;
+    label: string;
+  }
+
+  const categories: OptionType[] = [
+    { value: "bookMarket", label: "Book Market" },
+    { value: "bookStudy", label: "Book Study" },
+    { value: "bookUniversity", label: "Book University" },
+    { value: "bookMaster", label: "Book Masters" },
+  ];
 
   const methods = useForm<FormValues>({
     resolver: yupResolver(validationSchema) as any,
     defaultValues: {
       image: null,
       descriptionTranslations: [{ id: "1", language: "eng", content: "" }],
+      module: [], // ✅ default empty array
     },
     mode: "onChange",
   });
 
-  const { control, handleSubmit, formState: { isValid, errors }, watch, reset } = methods;
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid, errors },
+    watch,
+    reset,
+    setValue,
+  } = methods;
 
   const { fields: descriptionFields, append, remove } = useFieldArray({
     control,
     name: "descriptionTranslations",
   });
 
-  // Watch the image field to check if it has a value
   const imageValue = watch("image");
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -318,13 +385,18 @@ const AddCommonModal: React.FC<ModalProps> = ({
     }
   };
 
+  // ✅ Handle category (module) change
+  const handleCategoryChange = (selectedOptions: MultiValue<OptionType>) => {
+    const selectedValues = selectedOptions.map((option) => option.value);
+    setSelectedModules(selectedValues);
+    setValue("module", selectedValues, { shouldValidate: true });
+  };
+
   const handleFormSubmit = (data: FormValues) => {
     if (onSubmit) {
-      // Transform descriptionTranslations to include all languages with null for empty content
       const allLanguages: Language[] = ["eng", "kaz", "rus"];
       const transformedTranslations = allLanguages.map((lang) => {
-        const existingTranslation = data.descriptionTranslations.find(t => t.language === lang);
-      
+        const existingTranslation = data.descriptionTranslations.find((t) => t.language === lang);
         return {
           id: existingTranslation?.id || String(allLanguages.indexOf(lang) + 1),
           language: lang,
@@ -332,26 +404,33 @@ const AddCommonModal: React.FC<ModalProps> = ({
         };
       });
 
-      onSubmit({
+      const finalPayload = {
         ...data,
         descriptionTranslations: transformedTranslations,
-      });
+        module: selectedModules 
+        // ...(title === "Add a Category" && {
+          //  module: selectedModules 
+          // }), // ✅ add module only for Add a Category
+      };
+
+      console.log('finalPayload: ', finalPayload);
+      onSubmit(finalPayload);
       handleClose();
     }
   };
 
-  // Handle modal close and reset all state
   const handleClose = () => {
     reset({
       image: null,
       descriptionTranslations: [{ id: "1", language: "eng", content: "" }],
-    }); // Reset form to default values
-    setPreviewImage(undefined); // Clear image preview
-    setUsedDescLanguages(new Set()); // Clear used languages
-    onClose(); // Call the original onClose
+      module: [],
+    });
+    setPreviewImage(undefined);
+    setUsedDescLanguages(new Set());
+    setSelectedModules([]);
+    onClose();
   };
 
-  // Determine if the submit button should be disabled
   const isSubmitDisabled = !isValid || !imageValue || disabled;
 
   return (
@@ -360,9 +439,11 @@ const AddCommonModal: React.FC<ModalProps> = ({
         <div className="max-h-[80vh] overflow-auto overflo-custom">
           <Image src={image} alt="imgg" width={244} height={194} className="mx-auto" />
           <h2 className="text-[32px] text-darkBlack mb-5 mt-[27px]">{title}</h2>
+
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(handleFormSubmit)}>
               <div className="grid grid-cols-[1fr_2fr] gap-5 main-form mt-4">
+                {/* Upload Image */}
                 <div>
                   <p className="mb-1 text-sm text-darkBlack">Upload Image</p>
                   <div className="flex items-center gap-2.5">
@@ -389,10 +470,10 @@ const AddCommonModal: React.FC<ModalProps> = ({
                       />
                     </div>
                   </div>
-                  {errors.image && (
-                    <p className="text-red-500 text-xs mt-1">{errors.image.message}</p>
-                  )}
+                  {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image.message}</p>}
                 </div>
+
+                {/* Description Translations */}
                 <div>
                   {descriptionFields.map((field, index) => (
                     <div key={field.id}>
@@ -439,7 +520,9 @@ const AddCommonModal: React.FC<ModalProps> = ({
                           <button
                             type="button"
                             onClick={() => {
-                              const languageToRemove = methods.getValues(`descriptionTranslations.${index}.language`);
+                              const languageToRemove = methods.getValues(
+                                `descriptionTranslations.${index}.language`
+                              );
                               remove(index);
                               setUsedDescLanguages((prev) => {
                                 const updated = new Set(prev);
@@ -461,6 +544,21 @@ const AddCommonModal: React.FC<ModalProps> = ({
                     </div>
                   ))}
                 </div>
+
+                {/* ✅ Show category multi-select only for "Add a Category" */}
+                {title === "Add a Category" && (
+                  <div className="col-span-2">
+                    {/* <p className="mb-1 text-sm text-darkBlack">Select Modules</p> */}
+                    <CustomSelect
+                      name="Select Module"
+                      isMulti={true}
+                      options={categories}
+                      value={categories.filter((option) => selectedModules.includes(option.value))}
+                      onChange={handleCategoryChange}
+                      placeholder="Select Module"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="mt-[30px] flex gap-2.5 justify-end">

@@ -73,7 +73,7 @@ const BookForm = () => {
   const { authors } = UseAuthors(moduleParam);
   const { subCategory } = UseSubCategory();
   const { publishers } = UsePublisher();
-  const { category } = UseCategory();
+  const { category } = UseCategory(moduleParam);
 
   // Helper function to determine if file upload should be shown
   const shouldShowFileUpload = () => {
