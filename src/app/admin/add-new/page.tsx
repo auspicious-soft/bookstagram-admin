@@ -69,9 +69,9 @@ const BookForm = () => {
 
   const searchParams = useSearchParams();
   const bookType = searchParams.get('type') || 'audioebook';
-  const moduleParam  = searchParams.get('module') || 'bookMarket';
+  const moduleParam = searchParams.get('module') || 'bookMarket';
   const { authors } = UseAuthors(moduleParam);
-  const { subCategory } = UseSubCategory();
+
   const { publishers } = UsePublisher();
   const { category } = UseCategory(moduleParam);
 
@@ -127,8 +127,8 @@ const BookForm = () => {
     categoryId: yup.array().min(1, 'Category is required'),
     genre: yup.array().required('Genre is required')
   });
-  
-  
+
+
   const methods = useForm<FormValues>({
     resolver: yupResolver(validationSchema) as any,
     defaultValues: {
@@ -147,33 +147,33 @@ const BookForm = () => {
     },
     mode: 'onChange'
   });
-  
+
   const { control, handleSubmit, register, watch, setValue, formState: { errors } } = methods;
   console.log('errors: ', errors);
-  
-  if(bookType ==="podcast"){
+
+  if (bookType === "podcast") {
     setValue('format', "video"); //TODO--
   }
   const { fields: nameFields, append: appendName, remove: removeName } = useFieldArray({
     control,
     name: "translations"
   });
-  
+
   const { fields: descriptionFields, append: appendDescription, remove: removeDescription } = useFieldArray({
     control,
     name: "descriptionTranslations"
   });
-  
+
   const { fields: fileFields, append: appendFile, remove: removeFile } = useFieldArray({
     control,
     name: "fileTranslations"
   });
-  
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setImageFile(file);
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
@@ -182,31 +182,34 @@ const BookForm = () => {
       reader.readAsDataURL(file);
     }
   };
-  
+
   const handleSelectChange = (name: string, value: any) => {
     setValue(name as any, Array.isArray(value) ? value.map(v => v.value) : value.value);
   };
-  
+
   const handleFormatChange = (format: Format) => {
     setSelectedFormat(format);
     setValue('format', format);
   };
+  const currentSelectedCategory = watch('categoryId')
+  console.log('currentSelectedCategory: ', currentSelectedCategory);
+  const { subCategory } = UseSubCategory(currentSelectedCategory);
+  console.log('currentSelectedCategory?.[0]: ', currentSelectedCategory?.[0]);
   const getAcceptedFileTypes = () => {
     switch (bookType) {
       case "audiobook":
         return ".epub"; // Only EPUB for audiobook
-        case "podcast":
-          case "video-lecture":
-            return ".mp4,.mov,.avi"; // Video files for podcast and video-lecture
-            case "audioebook":
-              return selectedFormat === "e-book" || selectedFormat === "both" ? ".epub" : "";
-              default:
-                return ""; // No restrictions for other types
-              }
-            };
-            const onSubmit = async (data: FormValues) => {
-              const userName = data.translations[0].name?.split(" ").join("-").toLowerCase();
-              console.log('data: ', data);
+      case "podcast":
+      case "video-lecture":
+        return ".mp4,.mov,.avi"; // Video files for podcast and video-lecture
+      case "audioebook":
+        return selectedFormat === "e-book" || selectedFormat === "both" ? ".epub" : "";
+      default:
+        return ""; // No restrictions for other types
+    }
+  };
+  const onSubmit = async (data: FormValues) => {
+    const userName = data.translations[0].name?.split(" ").join("-").toLowerCase();
 
     startTransition(async () => {
       try {
@@ -261,7 +264,7 @@ const BookForm = () => {
           type: finalType,
           format: data.format, // Include format in payload
           image: imageUrl,
-          module:moduleParam 
+          module: moduleParam
         };
 
         // Handle file uploads first if needed (for e-book or both formats)

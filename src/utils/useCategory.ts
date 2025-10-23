@@ -2,7 +2,7 @@ import { getAllCategories } from "@/services/admin-services";
 import useSWR from "swr";
 
 const UseCategory = (type?: string) => {
-	const { data, error, isLoading } = useSWR(type !== undefined ? `/admin/categories?module=${type}` : `/admin/categories`, getAllCategories, {
+	const { data, error, isLoading } = useSWR(type == "bookMarket" ? `/admin/categories-with-sub-categories?type=${type}` : type !== "undefined" ?`/admin/categories?module=${type}` :`/admin/categories`, getAllCategories, {
 		revalidateOnFocus: false,
 	});
 	console.log("data: ", data);
