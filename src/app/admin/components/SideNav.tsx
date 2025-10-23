@@ -112,13 +112,13 @@ const SideNav = () => {
                 {!isCollapsed && <span>Publishers</span>}
               </Link>
             </li>
-            <li className={`${isActive('/admin/stories')} ${pathname.startsWith('/admin/stories/single-story') ? 'active' : ''}`}>
+            <li className={`${isActive('/admin/stories')} ${pathname.startsWith('/admin/stories') ? 'active' : ''}`}>
               <Link href="/admin/stories">
                 <StoriesIcon />
                 {!isCollapsed && <span>Stories</span>}
               </Link>
             </li>
-            <li className={isActive('/admin/promotions')}>
+            <li className={`${isActive('/admin/promotions')} ${pathname.startsWith('/admin/promotions') ? 'active' : ''}`}>
               <Link href="/admin/promotions">
                 <PromotionsIcon />
                 {!isCollapsed && <span>Promotions</span>}
