@@ -129,12 +129,13 @@ const Page = () => {
     if (publishersData && category && !isFormInitialized) {
       try {
         const selectedCategories = Array.isArray(publishersData.categoryId)
-          ? publishersData.categoryId.map((catId) => {
-              const id = typeof catId === "object" ? catId._id : catId;
-              const foundCategory = category.find((cat) => cat.value === id);
-              return foundCategory || { value: id, label: id };
-            })
-          : [];
+        ? publishersData.categoryId.map((catId) => {
+          const id = typeof catId === "object" ? catId._id : catId;
+          const foundCategory = category.find((cat) => cat.value === id);
+          console.log('foundCategory: ', foundCategory);
+          return foundCategory || { value: id, label: catId.name.eng ?? catId.name.rus ?? catId.name.kaz };
+        })
+        : [];
 
         const allLanguages: Language[] = ["eng", "kaz", "rus"];
         const nameTranslations = allLanguages.map((lang, index) => {

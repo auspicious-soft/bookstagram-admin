@@ -192,9 +192,7 @@ const BookForm = () => {
     setValue('format', format);
   };
   const currentSelectedCategory = watch('categoryId')
-  console.log('currentSelectedCategory: ', currentSelectedCategory);
   const { subCategory } = UseSubCategory(currentSelectedCategory);
-  console.log('currentSelectedCategory?.[0]: ', currentSelectedCategory?.[0]);
   const getAcceptedFileTypes = () => {
     switch (bookType) {
       case "audiobook":
@@ -694,18 +692,19 @@ const BookForm = () => {
                   placeholder="Select Category"
                   isMulti={true}
                 />
-
-                <CustomSelect
-                  name="Select Sub-Category (If Any)"
-                  value={subCategory.filter(option =>
-                    watch('subCategoryId').includes(option.value)
-                  )}
-                  options={subCategory}
-                  onChange={(value) => handleSelectChange('subCategoryId', value)}
-                  placeholder="Select Sub-Category"
-                  isMulti={true}
-                  required={false}
-                />
+                {moduleParam === "bookMarket" &&
+                  <CustomSelect
+                    name="Select Sub-Category (If Any)"
+                    value={subCategory.filter(option =>
+                      watch('subCategoryId').includes(option.value)
+                    )}
+                    options={subCategory}
+                    onChange={(value) => handleSelectChange('subCategoryId', value)}
+                    placeholder="Select Sub-Category"
+                    isMulti={true}
+                    required={false}
+                  />
+                }
               </div>
               <button
                 type="submit"

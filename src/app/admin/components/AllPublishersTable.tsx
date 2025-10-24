@@ -25,6 +25,7 @@ const AllPublishersTable = () => {
   const [searchParams, setsearchParams] = useState("");
   const {data, error, isLoading} = useSWR(`/admin/publishers?description=${searchParams}&${query}`, getAllPublishers)
   const publishersData = data?.data?.data;  
+  console.log('publishersData: ', publishersData);
   
   const { category } = UseCategory(); 
   
@@ -42,10 +43,12 @@ const AllPublishersTable = () => {
     router.push(`/admin/publishers/profile/${id}`);
   };
   const getCategoryNames = (categoryIds: string[]) => {
+    console.log('categoryIds: ', categoryIds);
     if (!categoryIds || !category) return [];
 
     return categoryIds.map(catId => {
       const foundCategory = category.find(cat => cat.value === catId);
+      console.log('foundCategory: ', foundCategory);
       return foundCategory ? foundCategory.label : null;
     }).filter(Boolean);
   };
@@ -65,7 +68,7 @@ const AllPublishersTable = () => {
           <thead className="">
             <tr>
               <th>Name of Publisher</th>
-              <th>Categories</th>
+              {/* <th>Categories</th> */}
               <th>Country</th>
               <th>Number of books released</th> 
               <th>Action</th>
@@ -82,25 +85,25 @@ const AllPublishersTable = () => {
               </tr>
             ) : publishersData?.length > 0 ? (
                 publishersData?.map((row: any, index: number) => (
-                <tr key={row?.id || `publisher-${index}`}>
+                <tr key={row?._id || `publisher-${index}`}>
                   <td><div className="flex items-center gap-2.5 capitalize">
                   <TableRowImage image={row?.image ? getProfileImageUrl(row?.image) : profile}/>  {row?.name.eng || row?.name.kaz || row?.name.rus} </div></td>
                   <td>
-                  <div className="flex flex-wrap gap-2">
-                  {getCategoryNames(row?.categoryId).slice(0, 3).map((categoryName, index) => (
+                  {/* <div className="flex flex-wrap gap-2"> */}
+                  {/* {getCategoryNames(row?.categoryId).slice(0, 3).map((categoryName, index) => (
                       <span key={index} className="bg-[#EDEDED] px-2.5 py-1 rounded-full capitalize" >
                         {categoryName}
                       </span>
-                    ))}
-                  {getCategoryNames(row?.categoryId).length > 3 && (
+                    ))} */}
+                  {/* {getCategoryNames(row?.categoryId).length > 3 && (
                     <span className="bg-[#EDEDED] px-2.5 py-1 rounded-full">...</span>
-                  )}
-                </div>  
+                  )} */}
+                {/* </div>   */}
                   </td>
                   <td>{row?.country}</td> 
                   <td>{row?.bookCount}</td>
                   <td className="space-x-1">
-                    <button onClick={() => authorProfile(row?.id)} className="p-[10px]"><ViewIcon/></button>
+                    <button onClick={() => authorProfile(row?._id)} className="p-[10px]"><ViewIcon/></button>
                   </td>
                 </tr>
               ))
@@ -129,7 +132,6 @@ const AllPublishersTable = () => {
           itemsPerPage={itemsPerPage}
         />
       </div>
-
     </div>
   );
 };
