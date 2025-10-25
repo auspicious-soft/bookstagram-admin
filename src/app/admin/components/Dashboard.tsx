@@ -6,7 +6,6 @@ import { DashboardIcon1, DashboardIcon2, DashboardIcon3, DashboardIcon4 } from '
 import useSWR from "swr";
 import { getDashboardStats } from '@/services/admin-services';
 import { useRouter } from 'next/navigation';
-import { getImageClientS3URL } from '@/utils/get-image-ClientS3URL';
 import TableRowImage from '@/app/components/TableRowImage';
 import profile from '@/assets/images/preview.png';
 import { getProfileImageUrl } from '@/utils/getImageUrl';
@@ -67,11 +66,11 @@ const Dashboard = () => {
       <div className='flex justify-between items-center'>
         <h2 className='text-[22px] text-darkBlack '>Overview</h2>
         <div>
-          <select name="overview"
+          <select name=" overview"
             value={overview}
             onChange={handleOverviewChange}
-            className="custom-arrow py-[9px] px-[14px] rounded-[17px] ">
-            <option value="7">Last 7 days</option>
+            className="cursor-pointer py-[9px] px-[14px] rounded-[17px] ">
+            <option value="7" >Last 7 days</option>
             <option value="30">Last 30 days</option>
           </select>
         </div>
@@ -93,7 +92,7 @@ const Dashboard = () => {
             <select name="user"
               value={user}
               onChange={handleUsersChange}
-              className="custom-arrow py-[9px] px-[14px] rounded-[17px] ">
+              className="custom-arrow cursor-pointer py-[9px] px-[14px] rounded-[17px] ">
               <option value="7">Last 7 days</option>
               <option value="30">Last 30 days</option>
             </select>

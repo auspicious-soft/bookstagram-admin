@@ -75,6 +75,7 @@ const BookForm = () => {
   const isImageChanged = useRef(false);
   const initialFormat = useRef<string>('');
   const bookData = data?.data?.data?.books?.[0];
+  console.log('bookData: ', bookData);
   const upperData = data?.data?.data;
   const bookType = data?.data?.data?.books?.[0]?.type;
   const moduleType = data?.data?.data?.books?.[0]?.module;
@@ -140,9 +141,11 @@ const BookForm = () => {
   ];
 
   const { authors } = UseAuthors(moduleType);
-  const { subCategory } = UseSubCategory();
   const { publishers } = UsePublisher();
   const { category } = UseCategory(moduleType);
+  console.log('category: ', category);
+  // const { subCategory } = UseSubCategory();
+  // const current = bookData?.categoryId,
 
   const methods = useForm<FormValues>({
     resolver: yupResolver(validationSchema) as any,
@@ -180,7 +183,8 @@ const BookForm = () => {
   });
 
   const format = watch('format');
-
+  const currentSelectedCategory = watch('categoryId')
+  const { subCategory } = UseSubCategory(currentSelectedCategory);
   const showFiles = isAudioEbook ? (format === 'e-book' || format === 'both') : (bookType !== 'audiobook' && bookType !== 'course');
 
   const isNext = isAudioEbook ? (format === 'audiobook' || format === 'both') : (bookType === 'audiobook' || bookType === 'course');
