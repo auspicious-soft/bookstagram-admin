@@ -3,8 +3,6 @@ import { getDashboardStats } from '@/services/admin-services';
 import React from 'react';
 import Dashboard from '../components/Dashboard';
 
-
-
 const Page = async() => {
     return (
         <div>
@@ -12,5 +10,4 @@ const Page = async() => {
         </div>
     );
 }
-
 export default Page;
