@@ -88,7 +88,7 @@ const AllPublishersTable = () => {
                 <tr key={row?._id || `publisher-${index}`}>
                   <td><div className="flex items-center gap-2.5 capitalize">
                   <TableRowImage image={row?.image ? getProfileImageUrl(row?.image) : profile}/>  {row?.name.eng || row?.name.kaz || row?.name.rus} </div></td>
-                  <td>
+                  {/* <td> */}
                   {/* <div className="flex flex-wrap gap-2"> */}
                   {/* {getCategoryNames(row?.categoryId).slice(0, 3).map((categoryName, index) => (
                       <span key={index} className="bg-[#EDEDED] px-2.5 py-1 rounded-full capitalize" >
@@ -99,7 +99,7 @@ const AllPublishersTable = () => {
                     <span className="bg-[#EDEDED] px-2.5 py-1 rounded-full">...</span>
                   )} */}
                 {/* </div>   */}
-                  </td>
+                  {/* </td> */}
                   <td>{row?.country}</td> 
                   <td>{row?.bookCount}</td>
                   <td className="space-x-1">

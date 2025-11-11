@@ -280,87 +280,6 @@ const BookForm = () => {
       setValue(name as any, value?.value || ""); // single-select
     }
   };
-
-  // const onSubmit = async (data: FormValues) => {
-  // const userName = data.translations[0].name?.split(" ").join("-").toLowerCase() || "default-book";
-  // startTransition(async () => {
-  //   try {
-  //     let imageUrl = null;
-  //     if (imageFile) {
-  //       const { signedUrl, key } = await generateSignedUrlBooks(imageFile.name, imageFile.type, userName);
-  //       await fetch(signedUrl, {
-  //         method: 'PUT',
-  //         body: imageFile,
-  //         headers: {
-  //           'Content-Type': imageFile.type,
-  //         },
-  //       });
-  //       imageUrl = key;
-  //     }
-
-  //     let uploadedFiles: { language: Language; fileUrl: string }[] = [];
-  //     if (shouldUploadFiles) {
-  //       const filePromises = data.fileTranslations
-  //         .filter(trans => trans.file != null)
-  //         .map(async trans => {
-  //           const file = trans.file as File;
-  //           const { signedUrl, key } = await generateSignedUrlBookFiles(file.name, file.type, userName, trans.language);
-
-  //           await fetch(signedUrl, {
-  //             method: 'PUT',
-  //             body: file,
-  //             headers: {
-  //               'Content-Type': file.type,
-  //             },
-  //           });
-
-  //           return {
-  //             language: trans.language,
-  //             fileUrl: key
-  //           };
-  //         });
-
-  //       uploadedFiles = await Promise.all(filePromises);
-  //     }
-
-  //     // Only include non-null and non-empty name translations
-  //     const nameTransforms = data.translations
-  //       .filter(trans => trans.name != null && trans.name.trim() !== '')
-  //       .reduce((acc, curr) => ({
-  //         ...acc,
-  //         [curr.language]: curr.name
-  //       }), {});
-
-  //     // Only include non-null and non-empty description translations
-  //     const descriptionTransforms = data.descriptionTranslations
-  //       .filter(trans => trans.content != null && trans.content.trim() !== '')
-  //       .reduce((acc, curr) => ({
-  //         ...acc,
-  //         [curr.language]: curr.content
-  //       }), {});
-
-  //     // Only include uploaded files (non-null fileUrls)
-  //     const fileTransforms = uploadedFiles
-  //       .filter(file => file.fileUrl != null)
-  //       .reduce((acc, curr) => ({
-  //         ...acc,
-  //         [curr.language]: curr.fileUrl
-  //       }), {});
-
-  //     const payload = {
-  //       name: Object.keys(nameTransforms).length > 0 ? nameTransforms : { eng: "Untitled Book" },
-  //       description: Object.keys(descriptionTransforms).length > 0 ? descriptionTransforms : { eng: "No description provided" },
-  //       file: fileTransforms,
-  //       price: data.price,
-  //       authorId: data.authorId,
-  //       publisherId: data.publisherId,
-  //       categoryId: data.categoryId,
-  //       subCategoryId: data.subCategoryId,
-  //       genre: data.genre,
-  //       type: data.type,
-  //       ...(isAudioEbook && { format: data.format }),
-  //       ...(imageUrl && { image: imageUrl })
-  //     };
   const onSubmit = async (data: FormValues) => {
     const userName = data.translations[0].name?.split(" ").join("-").toLowerCase() || "default-book";
 
@@ -857,5 +776,3 @@ const BookForm = () => {
 };
 
 export default BookForm;
-
-
