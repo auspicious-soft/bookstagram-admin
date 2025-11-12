@@ -29,6 +29,7 @@ const professions: OptionType[] = [
   { value: "poet", label: "Poet" },
   { value: "writer", label: "Writer" },
   { value: "artist", label: "Artist" },
+  { value: "publicist", label: "Publicist" },
 ];
 
 const categories: OptionType[] = [

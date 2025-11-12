@@ -158,6 +158,7 @@ const deleteBookLives = (id: string) => {
         title="Add a Category"
         labelname="Name of Category"
         disabled={isPending}
+         
       />
     </div>
   );
