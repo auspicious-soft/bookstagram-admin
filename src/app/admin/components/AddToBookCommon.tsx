@@ -17,9 +17,10 @@ interface Props {
   onSelectBooks: (books: string[]) => void;
   type?: string;
   route?: string;
+  module?:any
 }
 
-const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSelectBooks, selectedBooks, type, route }: Props) => {
+const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSelectBooks, selectedBooks, type, route, module }: Props) => {
   const [searchParams, setSearchParams] = useState("");
   // Dynamically set the SWR key based on whether route is provided
   // const swrKey = route 
@@ -28,6 +29,9 @@ const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSele
   
   const queryParams = new URLSearchParams();
   if (type) queryParams.append('type', type);
+  if (module && module.length > 0) {
+  module.forEach((m) => queryParams.append('module', m));
+}
   if (searchParams) queryParams.append('description', searchParams);
   const queryString = queryParams.toString();
   

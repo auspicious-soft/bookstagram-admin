@@ -26,7 +26,7 @@ const validationSchema = yup.object({
       content: yup.string().nullable().transform((value) => value || null),
     })
   ),
-  categoryId: yup.array().min(1, 'At least one category is required'),
+  // categoryId: yup.array().min(1, 'At least one category is required'),
   country: yup.string().required('Country is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
   password: yup.string().required('Password is required'),
@@ -43,7 +43,7 @@ interface FormValues {
     language: Language;
     content: string | null;
   }[];
-  categoryId: string[];
+  // categoryId: string[];
   country: string;
   email: string;
   password: string;
@@ -66,7 +66,7 @@ const Page = () => {
       descriptionTranslations: [
         { id: "1", language: "eng" as Language, content: "" }
       ],
-      categoryId: [],
+      // categoryId: [],
       country: "",
       email: "",
       password: "",
@@ -95,7 +95,7 @@ const Page = () => {
 
   const handleCategoryChange = (selectedOptions: any) => {
     const selectedValues = selectedOptions.map((option: any) => option.value);
-    setValue('categoryId', selectedValues);
+    // setValue('categoryId', selectedValues);
   };
 
   const triggerFileInputClick = () => {
@@ -334,7 +334,7 @@ const Page = () => {
                     )}
                   </label>
                 </div>
-                <CustomSelect
+                {/* <CustomSelect
                   name="Categories"
                   isMulti={true}
                   options={category}
@@ -346,7 +346,7 @@ const Page = () => {
                 />
                 {errors.categoryId && (
                   <span className="text-red-500 text-sm">{errors.categoryId.message}</span>
-                )}
+                )} */}
                 <label>
                   Country
                   <input

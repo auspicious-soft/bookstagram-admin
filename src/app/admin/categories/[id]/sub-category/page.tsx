@@ -44,7 +44,12 @@ const Page = () => {
     `/admin/categories/${id}/sub-categories?description=${searchParams}&${query}`,
     getSubCategory
   );
-
+  const { data:categoryData, mutate: categoryMutate } = useSWR(
+    `/admin/categories/${id}`,
+    getSubCategory
+  );
+  console.log('categoryData: ', categoryData?.data?.data?.module);
+  const categoryModule= categoryData?.data?.data?.module;
   const subCategory = data?.data?.data?.subcategory ;
   const booksData = data?.data?.data?.books;
 
@@ -222,11 +227,24 @@ return (
       <div className="h-full grid place-items-center">
         <div className="text-center">
           <Image src={cartoon} alt="cartoon" width={154} height={181} className="mx-auto" />
-          <h2 className="text-[32px] text-darkBlack mt-5 mb-2.5">No Books Found Here!</h2>
-          <p className="text-sm text-darkBlack mb-5">Add a book or a sub category.</p>
+          {categoryModule?.includes("bookMarket") ?
+           <h2 className="text-[32px] text-darkBlack mt-5 mb-2.5">No Sub-Category Found Here!</h2>
+            :
+            <h2 className="text-[32px] text-darkBlack mt-5 mb-2.5">No Books Found Here!</h2>
+
+            }
+          {/* {categoryModule?.includes("bookMarket") ?
+            <p className="text-sm text-darkBlack mb-5">Add a sub category.</p>
+            :
+            // <p className="text-sm text-darkBlack mb-5">Add a book.</p>
+            <></>
+            } */}
           <div className="flex justify-center gap-[9px]">
+          {categoryModule?.includes("bookMarket") ?
             <Button text="Add a Sub-Category" onClick={() => setIsAddModalOpen(true)} />
+            :
             <Button text="Add A Book" onClick={() => setBookModal(true)} />
+          }
           </div>
         </div>
       </div>
@@ -251,6 +269,7 @@ return (
       onSelectBooks={setSelectedBooks}
       handleSubmit={handleAddBookToCategory}
       isPending={isPending}
+      module={categoryModule}
     />
   </div>
 );

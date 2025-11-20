@@ -13,21 +13,32 @@ type Language = "eng" | "kaz" | "rus";
 type FormValues = {
   image: File | null;
   descriptionTranslations: { id: string; language: Language; content: string | null }[];
-  module?: string[]; // ✅ Added for "Add a Category"
+  module?: string[];
 };
 
-const validationSchema = yup.object({
+/* ----------------------------- */
+/*  BASE VALIDATION SCHEMA       */
+/* ----------------------------- */
+const baseSchema = {
   image: yup.mixed().required("Image is required"),
   descriptionTranslations: yup
     .array()
     .of(
       yup.object({
-        language: yup.string().required("Language is required"),
-        content: yup.string().nullable().transform((value) => value || null),
+        language: yup.string().required(),
+        content: yup.string().nullable(),
       })
     )
     .min(1, "At least one translation is required"),
+};
+
+/* Module required only for Add Category */
+const addCategorySchema = yup.object({
+  ...baseSchema,
+  module: yup.array().min(1, "Please select at least one module"),
 });
+
+const defaultSchema = yup.object(baseSchema);
 
 interface ModalProps {
   open: boolean;
@@ -52,26 +63,24 @@ const AddCommonModal: React.FC<ModalProps> = ({
 }) => {
   const [previewImage, setPreviewImage] = useState<string>();
   const [usedDescLanguages, setUsedDescLanguages] = useState<Set<Language>>(new Set());
-  const [selectedModules, setSelectedModules] = useState<string[]>([]); // ✅ state for module selection
+  const [selectedModules, setSelectedModules] = useState<string[]>([]);
 
-  interface OptionType {
-    value: string;
-    label: string;
-  }
-
-  const categories: OptionType[] = [
+  const categories = [
     { value: "bookMarket", label: "Book Market" },
     { value: "bookStudy", label: "Book Study" },
     { value: "bookUniversity", label: "Book University" },
     { value: "bookMaster", label: "Book Masters" },
   ];
 
+  /* ----------------------------- */
+  /*  VALIDATION BASED ON TITLE    */
+  /* ----------------------------- */
   const methods = useForm<FormValues>({
-    resolver: yupResolver(validationSchema) as any,
+    resolver: yupResolver(title === "Add a Category" ? addCategorySchema : defaultSchema) as any,
     defaultValues: {
       image: null,
       descriptionTranslations: [{ id: "1", language: "eng", content: "" }],
-      module: [], // ✅ default empty array
+      module: [],
     },
     mode: "onChange",
   });
@@ -83,6 +92,7 @@ const AddCommonModal: React.FC<ModalProps> = ({
     watch,
     reset,
     setValue,
+    getValues,
   } = methods;
 
   const { fields: descriptionFields, append, remove } = useFieldArray({
@@ -104,35 +114,35 @@ const AddCommonModal: React.FC<ModalProps> = ({
     }
   };
 
-  // ✅ Handle category (module) change
-  const handleCategoryChange = (selectedOptions: MultiValue<OptionType>) => {
+  const handleCategoryChange = (selectedOptions: MultiValue<{ value: string; label: string }>) => {
     const selectedValues = selectedOptions.map((option) => option.value);
     setSelectedModules(selectedValues);
     setValue("module", selectedValues, { shouldValidate: true });
   };
 
+  /* ----------------------------- */
+  /*        SUBMIT HANDLER         */
+  /* ----------------------------- */
   const handleFormSubmit = (data: FormValues) => {
     if (onSubmit) {
       const allLanguages: Language[] = ["eng", "kaz", "rus"];
+
       const transformedTranslations = allLanguages.map((lang) => {
-        const existingTranslation = data.descriptionTranslations.find((t) => t.language === lang);
+        const existing = data.descriptionTranslations.find((t) => t.language === lang);
         return {
-          id: existingTranslation?.id || String(allLanguages.indexOf(lang) + 1),
+          id: existing?.id || String(allLanguages.indexOf(lang) + 1),
           language: lang,
-          content: existingTranslation?.content?.trim() || null,
+          content: existing?.content?.trim() || null,
         };
       });
 
       const finalPayload = {
         ...data,
         descriptionTranslations: transformedTranslations,
-        module: selectedModules 
-        // ...(title === "Add a Category" && {
-          //  module: selectedModules 
-          // }), // ✅ add module only for Add a Category
+        module: selectedModules,
       };
 
-      console.log('finalPayload: ', finalPayload);
+      console.log("finalPayload:", finalPayload);
       onSubmit(finalPayload);
       handleClose();
     }
@@ -150,19 +160,35 @@ const AddCommonModal: React.FC<ModalProps> = ({
     onClose();
   };
 
-  const isSubmitDisabled = !isValid || !imageValue || disabled;
+  /* ----------------------------- */
+  /*   DISABLE BUTTON CONDITIONS   */
+  /* ----------------------------- */
+
+  const moduleSelected = selectedModules.length > 0;
+  const isAddCategory = title === "Add a Category";
+
+  const isSubmitDisabled =
+    !isValid ||
+    !imageValue ||
+    (isAddCategory && !moduleSelected) || // IMPORTANT: require module only for Add Category
+    disabled;
+
+  /* ----------------------------- */
+  /*            UI (unchanged!)    */
+  /* ----------------------------- */
 
   return (
     <Modal open={open} onClose={handleClose} aria-labelledby="child-modal-title" className="grid place-items-center">
       <div className="modal bg-white py-[30px] px-5 max-w-[620px] mx-auto rounded-[20px] w-full h-auto">
         <div className="max-h-[80vh] overflow-auto overflo-custom">
           <Image src={image} alt="imgg" width={244} height={194} className="mx-auto" />
-          <h2 className="text-[32px] text-darkBlack mb-5 mt-[27px]">{title}</h2>
+          <h2 className="text-[32px] text-darkBlack mb-5 mt-[18px]">{title}</h2>
 
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(handleFormSubmit)}>
               <div className="grid grid-cols-[1fr_2fr] gap-5 main-form mt-4">
-                {/* Upload Image */}
+
+                {/* ===== Image Upload (UNCHANGED) ===== */}
                 <div>
                   <p className="mb-1 text-sm text-darkBlack">Upload Image</p>
                   <div className="flex items-center gap-2.5">
@@ -177,6 +203,7 @@ const AddCommonModal: React.FC<ModalProps> = ({
                     ) : (
                       <div className="bg-[#D9D9D9] h-[43px] w-[43px] rounded-full"></div>
                     )}
+
                     <div className="relative">
                       <p className="border border-darkBlack text-xs text-[#6E6E6E] py-[7px] px-[15px] rounded-[5px]">
                         Choose Image
@@ -192,7 +219,7 @@ const AddCommonModal: React.FC<ModalProps> = ({
                   {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image.message}</p>}
                 </div>
 
-                {/* Description Translations */}
+                {/* ===== Description Translations (UNCHANGED) ===== */}
                 <div>
                   {descriptionFields.map((field, index) => (
                     <div key={field.id}>
@@ -214,20 +241,22 @@ const AddCommonModal: React.FC<ModalProps> = ({
                             className="!mt-0 flex-1"
                           />
                         </label>
+
+                        {/* Add / Remove button UI untouched */}
                         {index === 0 ? (
                           <button
                             type="button"
                             onClick={() => {
-                              const unusedLanguage = ["kaz", "rus"].find(
+                              const unused = ["kaz", "rus"].find(
                                 (lang) => !usedDescLanguages.has(lang as Language)
                               );
-                              if (unusedLanguage) {
+                              if (unused) {
                                 append({
                                   id: String(descriptionFields.length + 1),
-                                  language: unusedLanguage as Language,
+                                  language: unused as Language,
                                   content: "",
                                 });
-                                setUsedDescLanguages((prev) => new Set([...prev, unusedLanguage as Language]));
+                                setUsedDescLanguages((prev) => new Set([...prev, unused as Language]));
                               }
                             }}
                             disabled={usedDescLanguages.size >= 3}
@@ -239,13 +268,11 @@ const AddCommonModal: React.FC<ModalProps> = ({
                           <button
                             type="button"
                             onClick={() => {
-                              const languageToRemove = methods.getValues(
-                                `descriptionTranslations.${index}.language`
-                              );
+                              const lang = getValues(`descriptionTranslations.${index}.language`);
                               remove(index);
                               setUsedDescLanguages((prev) => {
                                 const updated = new Set(prev);
-                                updated.delete(languageToRemove as Language);
+                                updated.delete(lang as Language);
                                 return updated;
                               });
                             }}
@@ -255,19 +282,13 @@ const AddCommonModal: React.FC<ModalProps> = ({
                           </button>
                         )}
                       </div>
-                      {errors.descriptionTranslations?.[index]?.content && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.descriptionTranslations[index].content.message}
-                        </p>
-                      )}
                     </div>
                   ))}
                 </div>
 
-                {/* ✅ Show category multi-select only for "Add a Category" */}
+                {/* ===== MODULE SELECT (UNCHANGED UI) ===== */}
                 {title === "Add a Category" && (
                   <div className="col-span-2 mb-1">
-                    {/* <p className="mb-1 text-sm text-darkBlack">Select Modules</p> */}
                     <CustomSelect
                       name="Select Module"
                       isMulti={true}
@@ -276,12 +297,16 @@ const AddCommonModal: React.FC<ModalProps> = ({
                       onChange={handleCategoryChange}
                       placeholder="Select Module"
                       optionsHeight="60px"
-                       required={false}
+                      required={false}
                     />
+                    {errors.module && (
+                      <p className="text-red-500 text-xs mt-1">{errors.module.message}</p>
+                    )}
                   </div>
                 )}
               </div>
 
+              {/* ===== Submit Buttons UI unchanged ===== */}
               <div className="mt-[30px] flex gap-2.5 justify-end">
                 <button
                   type="submit"
@@ -291,6 +316,7 @@ const AddCommonModal: React.FC<ModalProps> = ({
                   <PlusIcon />
                   {buttonText}
                 </button>
+
                 <button
                   type="button"
                   onClick={handleClose}

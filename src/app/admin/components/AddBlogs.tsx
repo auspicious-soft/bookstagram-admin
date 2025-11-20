@@ -1,6 +1,6 @@
 "use client";
 import TextEditor from '@/app/components/Editor';
-import React, { useState, useCallback,useMemo, useTransition } from 'react';
+import React, { useState, useCallback, useMemo, useTransition } from 'react';
 import Image from 'next/image';
 import preview from "@/assets/images/preview.png";
 import { useParams, useRouter } from "next/navigation";
@@ -8,18 +8,20 @@ import { submitBlogForm } from '@/utils/forms-submit';
 
 const AddBlogs = () => {
   const router = useRouter();
-  const Id = useParams()
-  const categoryId= Id.id
+  const Id = useParams();
+  const categoryId = Id.id;
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [image, setImage] = useState<any>();
-   const [isPending, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
+
   const disable = useMemo(() => !name || !image || !description, [name, image, description]);
 
   const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    setImage(file)
+    setImage(file);
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -29,22 +31,33 @@ const AddBlogs = () => {
     }
   }, []);
 
-const handleSave = async () => { 
-  const formData ={
-    name,
-    description,
-    image,
-    categoryId
-  }
-  await submitBlogForm(formData, router);
-};
+  const handleSave = () => {
+    startTransition(async () => {
+      const formData = {
+        name,
+        description,
+        image,
+        categoryId
+      };
+
+      await submitBlogForm(formData, router);
+    });
+  };
+
   return (
-    <div className="flex gap-[20px] w-[100%] bg-red">
+    <div className="flex gap-[20px] w-[100%]">
+      {/* Left Image Section */}
       <div className="w-[30%]">
-        <div className="bg-white rounded-[20px] p-4 shadow-sm ">
-          <div className="aspect-square bg-gray-100 rounded-[10px] mb-4 flex items-center justify-center ">
+        <div className="bg-white rounded-[20px] p-4 shadow-sm">
+          <div className="aspect-square bg-gray-100 rounded-[10px] mb-4 flex items-center justify-center">
             {imagePreview ? (
-              <Image unoptimized src={ imagePreview !=null ? imagePreview : preview } alt="Preview" width={500} height={500} />
+              <Image
+                unoptimized
+                src={imagePreview ? imagePreview : preview}
+                alt="Preview"
+                width={500}
+                height={500}
+              />
             ) : (
               <div className="text-gray-400">
                 <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,6 +71,7 @@ const handleSave = async () => {
               </div>
             )}
           </div>
+
           <label className="w-full">
             <input
               type="file"
@@ -74,12 +88,12 @@ const handleSave = async () => {
 
       {/* Editor Section */}
       <div className="flex-1">
-        <div className="bg-white rounded-[20px] p-4 shadow-sm w-[100%] p-[29px 30px]">
+        <div className="bg-white rounded-[20px] p-4 shadow-sm w-[100%]">
           <div className="mb-4">
-            <h2 className="text-[14px] mb-2 text-color-[#060606] font-semi-bold">Name of blog</h2>
+            <h2 className="text-[14px] mb-2 text-[#060606] font-semibold">Name of blog</h2>
             <input
               type="text"
-              className="w-full  border border-gray-200 rounded-lg bg-gray-50 p-[15px] text-[#606060] "
+              className="w-full border border-gray-200 rounded-lg bg-gray-50 p-[15px] text-[#606060]"
               placeholder="Enter Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -90,12 +104,26 @@ const handleSave = async () => {
           <div>
             <h2 className="text-sm mb-2">Text Editor</h2>
             <div className="border border-gray-200 rounded-lg">
-              <TextEditor setDescription={setDescription}/>
+              <TextEditor setDescription={setDescription} />
             </div>
           </div>
-         
-          <button disabled={disable ? true : false} className={`w-full mt-4 text-[14px]  text-white py-3 rounded-[28px] transition-colors ${disable ? "bg-[#C0C0C0] ":"bg-[#ff4f0f] hover:bg-[#ff4f0f]"}  `} onClick={()=>handleSave()}>
-          {!isPending ? "Save" : "Saving..." }
+
+          {/* Save Button */}
+          <button
+            disabled={disable || isPending}
+            className={`w-full mt-4 text-[14px] text-white py-3 rounded-[28px] transition-colors 
+              ${disable || isPending ? "bg-[#C0C0C0]" : "bg-[#ff4f0f] hover:bg-[#ff4f0f]"}
+            `}
+            onClick={handleSave}
+          >
+            {isPending ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Saving...
+              </div>
+            ) : (
+              "Save"
+            )}
           </button>
         </div>
       </div>

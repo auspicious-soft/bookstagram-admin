@@ -35,7 +35,7 @@ const validationSchema = yup.object({
       content: yup.string().nullable().transform((value) => value || null),
     })
   ),
-  categoryId: yup.array().min(1, "At least one category is required"),
+  // categoryId: yup.array().min(1, "At least one category is required"),
   country: yup.string().required("Country is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup.string().required("Password is required"),
@@ -52,7 +52,7 @@ interface FormValues {
     language: Language;
     content: string | null;
   }[];
-  categoryId: any[];
+  // categoryId: any[];
   country: string;
   email: string;
   password: string;
@@ -88,7 +88,7 @@ const Page = () => {
     defaultValues: {
       translations: [{ id: "1", language: "eng", name: "" }],
       descriptionTranslations: [{ id: "1", language: "eng", content: "" }],
-      categoryId: [],
+      // categoryId: [],
       country: "",
       email: "",
       password: "",
@@ -162,7 +162,7 @@ const Page = () => {
           descriptionTranslations: descriptionTranslations.length > 0 ? descriptionTranslations : [{ id: "1", language: "eng", content: "" }],
           email: publishersData.email || "",
           password: publishersData.password || "",
-          categoryId: selectedCategories,
+          // categoryId: selectedCategories,
           country: publishersData.country || "",
         });
 
@@ -183,9 +183,9 @@ const Page = () => {
     }
   }, [publishersData, category, reset, isFormInitialized]);
 
-  const handleCategoryChange = (selectedOptions: any) => {
-    setValue("categoryId", selectedOptions || [], { shouldValidate: true });
-  };
+  // const handleCategoryChange = (selectedOptions: any) => {
+  //   setValue("categoryId", selectedOptions || [], { shouldValidate: true });
+  // };
 
   const openBookProfile = (id: string, name: string) => {
     localStorage.setItem("getbookName", name);
@@ -254,7 +254,7 @@ const Page = () => {
           name: nameTransforms,
           description: descriptionTransforms,
           image: profilePicKey,
-          categoryId: data.categoryId.map((category) => category.value),
+          // categoryId: data.categoryId.map((category) => category.value),
         };
 
         const response = await updateSinglePublisher(
@@ -444,7 +444,7 @@ const Page = () => {
                     className="!text-orange border border-orange !bg-white"
                   />
                 </label>
-                <CustomSelect
+                {/* <CustomSelect
                   name="Categories"
                   isMulti={true}
                   value={watch("categoryId")}
@@ -456,7 +456,7 @@ const Page = () => {
                   <span className="text-red-500 text-sm">
                     {errors.categoryId.message}
                   </span>
-                )}
+                )} */}
                 <label>
                   Country
                   <input

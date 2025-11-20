@@ -25,7 +25,6 @@ const AllPublishersTable = () => {
   const [searchParams, setsearchParams] = useState("");
   const {data, error, isLoading} = useSWR(`/admin/publishers?description=${searchParams}&${query}`, getAllPublishers)
   const publishersData = data?.data?.data;  
-  console.log('publishersData: ', publishersData);
   
   const { category } = UseCategory(); 
   

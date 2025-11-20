@@ -100,34 +100,41 @@ const BookForm = () => {
     return { text: isPending ? 'Submitting...' : 'Submit', isNext: false };
   };
 
-  const validationSchema = yup.object({
-    translations: yup.array().of(
-      yup.object({
-        language: yup.string(),
-        name: yup.string()
-      })
-    ),
-    descriptionTranslations: yup.array().of(
-      yup.object({
-        language: yup.string().required('Language is required'),
-        content: yup.string().required('Description is required')
-      })
-    ),
-    fileTranslations: shouldShowFileUpload()
-      ? yup.array().of(
+
+const validationSchema = yup.object({
+  translations: yup.array().of(
+    yup.object({
+      language: yup.string(),
+      name: yup.string()
+    })
+  ),
+  descriptionTranslations: yup.array().of(
+    yup.object({
+      language: yup.string().required('Language is required'),
+      content: yup.string().required('Description is required')
+    })
+  ),
+  fileTranslations: shouldShowFileUpload()
+    ? yup.array().of(
         yup.object().shape({
           file: yup.mixed().required("File is required"),
           language: yup.string().required("Language is required"),
         })
       )
-      : yup.array().notRequired(),
-    price: yup.number().required('Price is required'),
-    authorId: yup.array().min(1, 'At least one author is required'),
-    publisherId: yup.string().min(1, 'Publisher is required'),
-    categoryId: yup.array().min(1, 'Category is required'),
-    genre: yup.array().required('Genre is required')
-  });
+    : yup.array().notRequired(),
 
+  price: yup.number().required('Price is required'),
+  authorId: yup.array().min(1, 'At least one author is required'),
+  publisherId: yup.string().min(1, 'Publisher is required'),
+  categoryId: yup.array().min(1, 'Category is required'),
+
+  // ⭐ MAKE SUB-CATEGORY REQUIRED ONLY FOR BOOK MARKET
+  subCategoryId: moduleParam === "bookMarket"
+    ? yup.array().min(1, "Sub-category is required")
+    : yup.array().notRequired(),
+
+  genre: yup.array().required('Genre is required'),
+});
 
   const methods = useForm<FormValues>({
     resolver: yupResolver(validationSchema) as any,
@@ -694,7 +701,7 @@ const BookForm = () => {
                 />
                 {moduleParam === "bookMarket" &&
                   <CustomSelect
-                    name="Select Sub-Category (If Any)"
+                    name="Select Sub-Category"
                     value={subCategory.filter(option =>
                       watch('subCategoryId').includes(option.value)
                     )}
@@ -702,7 +709,7 @@ const BookForm = () => {
                     onChange={(value) => handleSelectChange('subCategoryId', value)}
                     placeholder="Select Sub-Category"
                     isMulti={true}
-                    required={false}
+                    required={moduleParam === "bookMarket"}
                   />
                 }
               </div>
