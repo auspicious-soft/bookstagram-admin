@@ -99,9 +99,7 @@ const QuotesManager: React.FC = () => {
                 return acc;
             }, {} as Record<Language, string>);
 
-            console.log('quoteTransforms: ', quoteTransforms);
             const missingLanguages = allLanguages.filter(lang => !quoteTransforms[lang]);
-            console.log('missingLanguages: ', missingLanguages);
 
             if (missingLanguages.length > 0) {
                 toast.error(`Please add quotes in all languages. Missing: ${missingLanguages.map(l => l.toUpperCase()).join(', ')}`);

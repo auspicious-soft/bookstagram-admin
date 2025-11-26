@@ -36,10 +36,13 @@ const Page = () => {
     { id: "3", title: "Overall Rating", value: (Math.round((stats?.averageRating || 0) * 10) / 10).toFixed(1), icon: <DashboardIcon3 /> },
   ];
 
-  const bookProfile = (id: string) => {
+  // const bookProfile = (id: string) => {
+  //   router.push(`/publisher/all-books/${id}`);
+  // }
+  const bookProfile = (id: string, name: string) => {
+    localStorage.setItem("getbookName", name);
     router.push(`/publisher/all-books/${id}`);
-  }
-
+  };
   const handleYearChange = (year: number) => {
     setSelectedYear(year);
     setPage(1); // Reset to first page on year change
@@ -138,7 +141,8 @@ const Page = () => {
                       </div>
                     </td>
                     <td>
-                      <button onClick={() => bookProfile(row?._id)} className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]'>
+                      {/* handleClick={() => openBookProfile(book?._id, book?.name.eng || book?.name.kaz || book?.name.rus)} */}
+                      <button onClick={() => bookProfile(row?._id, row?.name.eng || row?.name.kaz || row?.name.rus)} className='text-[#F96915] bg-[#eac8b8] text-xs inline-block rounded-[20px] py-1 px-[6px]'>
                         View
                       </button>
                     </td>

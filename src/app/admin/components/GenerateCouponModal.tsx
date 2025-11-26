@@ -70,7 +70,6 @@ const GenerateCouponModal: React.FC<ModalProp> = ({ open, onClose, mutateCoupons
   });
 
   const allPublishers = data?.data?.data;
-  console.log('allPublishers: ', allPublishers);
   const methods = useForm<FormData>({
     resolver: yupResolver(schema) as any,
     defaultValues: {

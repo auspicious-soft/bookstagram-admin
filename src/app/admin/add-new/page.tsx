@@ -342,7 +342,6 @@ const validationSchema = yup.object({
   const capitalizedProduct = product.charAt(0).toUpperCase() + product.slice(1);
   const priceValue = watch("price");
 
-  console.log('product: ', product);
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit, onError)} noValidate className="form-box">

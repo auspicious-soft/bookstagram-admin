@@ -278,7 +278,6 @@ const CourseForm = () => {
       });
 
       transformedLessons = [...transformedLessons, ...languageLessons];
-      console.log('transformedLessons: ', transformedLessons);
     }
 
     for (const lesson of transformedLessons) {
@@ -288,7 +287,6 @@ const CourseForm = () => {
       for (const subLesson of lesson.subLessons) {
         const originalLesson = languageData.lessons.find((l) => l.name === lesson.name);
         const originalSubLesson = originalLesson?.subLessons.find((sl) => sl.name === subLesson.name);
-        console.log('originalSubLesson: ', originalSubLesson);
 
         if (!originalSubLesson) continue;
 
@@ -340,7 +338,6 @@ const CourseForm = () => {
     startTransition(async () => {
       try {
         const transformedLessons = await transformFormDataToLessons(data);
-        console.log('transformedLessons upload: ', transformedLessons);
         
         const response = await updateCourse("/admin/course-lessons", transformedLessons);
 

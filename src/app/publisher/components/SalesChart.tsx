@@ -14,7 +14,6 @@ const yAxisTickFormatter = (value: number) => {
 };
 
 const SalesChart = ({selectedYear, data, onYearChange}: Props) => { 
-  console.log('data: ', data);
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 6 }, (_, i) => currentYear - i);
 

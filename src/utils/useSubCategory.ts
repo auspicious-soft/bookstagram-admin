@@ -2,12 +2,10 @@ import { getSubCategory } from "@/services/admin-services";
 import useSWR from "swr";
 
 const UseSubCategory = (ids?: any) => {
-	console.log('ids: ', ids);
 	const { data, error, isLoading } = useSWR(Array.isArray(ids) && ids.length!==0? `/admin/sub-categories/${ids}/category` : null, getSubCategory, {
     revalidateOnFocus: false,
 	});
 	// `/admin/sub-categories`
-  console.log('data-----: ', data?.data?.data);
   
 	const subCategory =
 		 data?.data?.data?.map((row: any) => ({

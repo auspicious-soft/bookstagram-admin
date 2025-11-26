@@ -78,7 +78,6 @@ const AudiobookChaptersForm = () => {
           chapters: chaptersData,
         };
 
-        console.log('payload: ', payload);
         const response = await addNewBook("/admin/audiobook-chapters", payload);
         if (response?.status === 201 || response?.status === 200) {
           toast.success("Audiobook added successfully");

@@ -159,7 +159,6 @@ const Page = () => {
 
       // Transform professions and genres
       const professionOptions = authorData.profession.map((prof: string) => prof);
-      console.log('professionOptions: ', professionOptions);
       const categoryOptions = authorData.category.map((prof: string) => prof);
       const genreOptions = authorData.genres.map((genre: string) => genre);
 

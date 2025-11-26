@@ -44,8 +44,9 @@ const AllCategories = () => {
   const addCategory = () => {
     setIsAddModalOpen(true);
   }
-  const handleSubCategory = (id: string) => {
+  const handleSubCategory = (id: string,name:string) => {
     router.push(`/admin/categories/${id}/sub-category`);
+    localStorage.setItem("categoryName", name);
   }
 
 const deleteBookLives = (id: string) => {
@@ -135,10 +136,14 @@ const deleteBookLives = (id: string) => {
               row?.name.eng ?? (row?.name.eng === null ? row?.name.kaz : row?.name.rus)
             }
             image={getProfileImageUrl(row?.image)}
-            onClick={() => handleSubCategory(row?._id)}
+            onClick={() => 
+              handleSubCategory(row?._id, row.name.eng ??  row?.name.kaz ?? row?.name.rus)
+            }
             handleDelete={()=>deleteBookLives(row?._id)}
+            title={row?.name?.eng || row?.name?.kaz || row?.name?.rus}
+            type={"Category"}
+            module={row?.module}
           />
-
         ))}
       </div>
       <div className="mt-10 flex justify-end">

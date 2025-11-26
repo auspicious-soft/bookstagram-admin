@@ -21,7 +21,6 @@ const AddBookToDiscount: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
   const [selectedCourses, setSelectedCourses] = useState<number[]>([]);
   const [isPending, startTransition] = useTransition();
   const {data, error, isLoading}= useSWR(`/admin/books`, getAllBooks)
-  console.log('data: ', data);
   const allBooks = data?.data?.data;
 
   useEffect(() => {

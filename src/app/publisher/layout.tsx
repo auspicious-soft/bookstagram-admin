@@ -5,7 +5,6 @@ import Link from "next/link";
 import SideBarPublisher from "./components/SideBarPublisher";
 import HeaderPublisher from "./components/HeaderPublisher";
 import MobileHeaderPublisher from "./components/MobileHeaderPublisher";
-// import { auth } from "@/auth";
 
 const AeonikBold = localFont({
   src: "../../assets/fonts/AeonikProBold.otf",
@@ -29,11 +28,30 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  // const session = await auth()
-  // if (!session) {
-  //   redirect('/')
-  // }
-  // else if ((session as any)?.user?.role === 'publisher') {
+const session = await auth(); 
+
+  if (!session) {
+    redirect("/");
+  }
+
+  const userRole = (session as any)?.user?.role;
+  const restrictedRoles = ['admin','user']; 
+  
+  //Check if user has restricted role
+  if (restrictedRoles.includes(userRole)) {
+    return (
+      <html lang="en">
+        <body>
+          <div className="p-3 bg-black min-h-screen text-white">
+            <span>You are not authorized to view this page click</span>
+            <Link href="/" className="p-3 text-black bg-white">
+              Login
+            </Link>
+          </div>
+        </body>
+      </html>
+    );
+  }
     return (
       <html lang="en">
          <body className={`${AeonikBold.variable} ${AeonikRegular.variable} ${AeonikLight.variable} `}>

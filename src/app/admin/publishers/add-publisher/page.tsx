@@ -171,7 +171,6 @@ const Page = () => {
           image: profilePicKey,
         };
 
-        console.log('payload: ', payload);
         const response = await addNewPublisher("/admin/publishers", payload);
         
         if (response?.status === 201) {

@@ -40,9 +40,7 @@ const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSele
     ? `${route}${queryString ? `?${queryString}` : ''}` 
     : `/admin/books${queryString ? `?${queryString}` : ''}`;
     
-    console.log('swrKey: ', swrKey);
   const { data, error, isLoading } = useSWR(swrKey, getAllBooks);
-  console.log('data: ', data);
   // Determine the books array based on the route
   const allBooks = route ? data?.data?.data?.map((item: any) => ({
     _id: item._id,
@@ -50,7 +48,6 @@ const AddToBookCommon = ({ open, onClose, title, handleSubmit, isPending, onSele
     name: item.name,
     ...item, 
   })) : data?.data?.data;
-  console.log('allBooks: ', allBooks);
 
   const handleSelect = (id: string) => {
     onSelectBooks(

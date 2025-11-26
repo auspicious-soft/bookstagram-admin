@@ -5,7 +5,6 @@ const UseCategory = (type?: string) => {
 	const { data, error, isLoading } = useSWR(type == "bookMarket" ? `/admin/categories-with-sub-categories?type=${type}` : type !== "undefined" ?`/admin/categories?module=${type}` :`/admin/categories`, getAllCategories, {
 		revalidateOnFocus: false,
 	});
-	console.log("data: ", data);
 
 	const category =
 		data?.data?.data?.map((row: any) => ({

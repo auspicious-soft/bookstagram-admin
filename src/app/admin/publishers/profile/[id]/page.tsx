@@ -123,7 +123,6 @@ const Page = () => {
     name: "descriptionTranslations",
   });
   // const bookName= data?.name?.eng || data?.name?.kaz || data?.name?.rus;
-  // console.log('bookName: ', bookName);
   // Initialize form data once when publishersData is available
   useEffect(() => {
     if (publishersData && category && !isFormInitialized) {
@@ -132,7 +131,6 @@ const Page = () => {
         ? publishersData.categoryId.map((catId) => {
           const id = typeof catId === "object" ? catId._id : catId;
           const foundCategory = category.find((cat) => cat.value === id);
-          console.log('foundCategory: ', foundCategory);
           return foundCategory || { value: id, label: catId.name.eng ?? catId.name.rus ?? catId.name.kaz };
         })
         : [];

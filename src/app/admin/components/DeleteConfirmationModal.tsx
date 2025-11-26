@@ -4,10 +4,11 @@ import Image from 'next/image';
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: any;
   title?: string;
   message?: string;
   isDeleting?: boolean;
+  buttonTitle?:string
 }
 
 const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
@@ -17,6 +18,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
   title = 'Delete?',
   message = 'Are you sure you really want to delete this?',
   isDeleting = false,
+  buttonTitle ="Delete"
 }) => {
   if (!isOpen) return null;
 
@@ -55,7 +57,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
                 Deleting...
               </>
             ) : (
-              <>Delete</>
+              <>{buttonTitle}</>
             )}
           </button>
         </div>

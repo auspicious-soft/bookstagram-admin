@@ -17,6 +17,7 @@ interface DeletableBookCardProps {
   format?: string | null;
   handleClick?: React.MouseEventHandler;
   onDeleteSuccess?: () => void;
+  route?:string
 }
 
 const DeletableBookCard: React.FC<DeletableBookCardProps> = ({
@@ -28,12 +29,13 @@ const DeletableBookCard: React.FC<DeletableBookCardProps> = ({
   discount,
   format,
   handleClick,
-  onDeleteSuccess
+  onDeleteSuccess,
+  route
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPending, startTransition] = useTransition();
-
+  const routes = route? route : `/admin/books/${id}`
   const handleOpenModal = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent the card click event from firing
     setIsModalOpen(true);
@@ -47,10 +49,9 @@ const DeletableBookCard: React.FC<DeletableBookCardProps> = ({
     setIsDeleting(true);
     startTransition(async () => {
       try {
-        const response = await deleteBook(`/admin/books/${id}`);
-        console.log('response: ', response);
+        const response = await deleteBook(routes);
         if (response.status === 200) {
-          toast.success('Book deleted successfully');
+          toast.success(route === `/admin/discounted-books/${id}` ? 'Discount Removed successfully' : 'Book deleted successfully');
           if (onDeleteSuccess) {
             onDeleteSuccess();
           }
@@ -85,8 +86,9 @@ const DeletableBookCard: React.FC<DeletableBookCardProps> = ({
         onClose={handleCloseModal}
         onConfirm={handleDelete}
         isDeleting={isDeleting}
-        title="Delete Book?"
-        message={`Are you sure you really want to delete "${title}"?`}
+        title={route === `/admin/discounted-books/${id}`? "Remove Discount?":"Delete Book?"}
+        message={route === `/admin/discounted-books/${id}`?`Are you sure you really want to remove discount for "${title}"?`:`Are you sure you really want to delete "${title}"?`}
+        buttonTitle={route === `/admin/discounted-books/${id}`? "Remove":"Delete"}
       />
     </>
   );

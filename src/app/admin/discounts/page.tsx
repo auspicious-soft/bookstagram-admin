@@ -33,7 +33,7 @@ const Page = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case "Discounted Books":
-        return <DiscountBooks data={bookData} />;
+        return <DiscountBooks data={bookData} mutate={discMutate}/>;
       case "Vouchers":
         return <AllVouchers handlePageChange={handlePageChange} vouchers ={vouchersData} error={error} isLoading={isLoading} mutate={mutate} total={total} page={page} itemsPerPage={itemsPerPage} />;
       default:

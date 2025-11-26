@@ -42,12 +42,10 @@ const AllPublishersTable = () => {
     router.push(`/admin/publishers/profile/${id}`);
   };
   const getCategoryNames = (categoryIds: string[]) => {
-    console.log('categoryIds: ', categoryIds);
     if (!categoryIds || !category) return [];
 
     return categoryIds.map(catId => {
       const foundCategory = category.find(cat => cat.value === catId);
-      console.log('foundCategory: ', foundCategory);
       return foundCategory ? foundCategory.label : null;
     }).filter(Boolean);
   };

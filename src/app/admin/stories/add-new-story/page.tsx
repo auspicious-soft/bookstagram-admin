@@ -187,7 +187,6 @@
  
 //         const response = await addNewStory("/admin/stories", payload);
 
-//         console.log('payload: ', payload);
         
 //         if (response?.status === 201) {
 //           toast.success("Banner added successfully");
@@ -570,7 +569,6 @@ const Page = () => {
 
         const response = await addNewStory("/admin/stories", payload);
 
-        console.log("payload: ", payload);
 
         if (response?.status === 201) {
           toast.success("Story added successfully");

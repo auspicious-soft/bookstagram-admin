@@ -122,7 +122,6 @@ const UserProfile = ({ id }: Props) => {
 
       if (profileData?.profilePic) {
         const imageUrl = getProfileImageUrl(profileData?.profilePic) ?? '';
-        console.log('imageUrl: ', imageUrl);
         setImagePreview(imageUrl);
       }
     }

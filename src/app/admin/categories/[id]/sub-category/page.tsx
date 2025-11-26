@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useTransition } from 'react';
+import React, { useState, useTransition, useEffect } from 'react';
 import useSWR from 'swr';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
@@ -48,8 +48,9 @@ const Page = () => {
     `/admin/categories/${id}`,
     getSubCategory
   );
-  console.log('categoryData: ', categoryData?.data?.data?.module);
+
   const categoryModule= categoryData?.data?.data?.module;
+  const categoryName= categoryData?.data?.data?.name?.eng ?? categoryData?.data?.data?.name?.kaz ?? categoryData?.data?.data?.name?.rus;
   const subCategory = data?.data?.data?.subcategory ;
   const booksData = data?.data?.data?.books;
 
@@ -68,12 +69,24 @@ const Page = () => {
     router.push(`/admin/books/${id}`)
   } 
 
+  useEffect(() => {
+  if (!categoryName) return;         // wait for category
+  if (!data) return;                 // wait for subcategory API
+
+  if (Array.isArray(subCategory) && subCategory.length > 0) {
+    localStorage.setItem("categoryName", "Sub-Category");
+  } else {
+    localStorage.setItem("categoryName", categoryName);
+  }
+
+  window.dispatchEvent(new Event("categoryNameUpdated"));
+}, [subCategory, categoryName]);
+
   const deleteBookLives = (id: string) => {
   try {
     startTransition(async () => {
       const response = await deleteBookLife(`/admin/sub-categories/${id}`);
       if (response.data.success && (response.status === 200 || response.status === 201) ) {
-        console.log('response: ', response.data.success);
         toast.success("Sub-Category deleted successfully");
         mutate();
       }
@@ -183,6 +196,8 @@ return (
               image={getProfileImageUrl(row?.image)}
               onClick={() => handleSubCategory(row?._id, row?.name?.eng || row?.name?.kaz || row?.name?.rus)}
               handleDelete={()=>deleteBookLives(row?._id)}
+              title={row?.name?.eng || row?.name?.kaz || row?.name?.rus}
+              type={"Sub-Category"}
             />
           ))}
         </div>

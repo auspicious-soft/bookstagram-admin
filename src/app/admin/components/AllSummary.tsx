@@ -1,5 +1,5 @@
 'use client'
-import { getAllSummary, postNewSummary } from '@/services/admin-services';
+import { getAllSummary, postNewSummary, deleteBookLife } from '@/services/admin-services';
 import React, { useState, useTransition } from 'react';
 import useSWR from 'swr';
 import CategoryCard from './CategoryCard';
@@ -34,6 +34,9 @@ const AllSummary = () => {
   const { data, error, isLoading, mutate } = useSWR(`/admin/summaries?description=${searchParams}&${query}`, getAllSummary);
   const summary = data?.data?.data;
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedSummaryId, setSelectedSummaryId] = useState<string | null>(null);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -48,6 +51,22 @@ const AllSummary = () => {
     localStorage.setItem("summaryName", name);
     router.push(`/admin/summary/${id}`) 
   };
+
+   const deleteSummary = async (id: string) => {
+    try {
+      startTransition(async()=>{
+      const response = await deleteBookLife(`/admin/summaries/${id}`);
+      if (response.status==200) {
+        toast.success("Deleted successfully");
+        mutate()
+      } else {
+      toast.error("Failed To Delete Story");
+      }
+    });
+    } catch (error) {
+    toast.error("an Error Occurred While Deleting The Story");
+    }
+  }
 
   const handleSubmit = async (formData: FormValues) => {
     startTransition(async () => {
@@ -111,6 +130,9 @@ const AllSummary = () => {
               name={row?.name?.eng || row?.name?.kaz || row?.name?.rus }
               image={getProfileImageUrl(row?.image)}
               onClick={() => handleSummary(row?._id, row?.name?.eng || row?.name?.kaz || row?.name?.rus )}
+              handleDelete={()=>deleteSummary(row?._id)}
+              title={row?.name?.eng || row?.name?.kaz || row?.name?.rus}
+              type={"Summary"}
             />
           ))
         ) : (

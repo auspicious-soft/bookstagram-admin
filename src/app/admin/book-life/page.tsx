@@ -129,6 +129,8 @@ const Page = () => {
               image={getProfileImageUrl(row?.image)}
               onClick={() => openBookLife(row?._id,row.name.eng || row.name.kaz || row.name.rus )}
               handleDelete={()=>deleteBookLives(row?._id)}
+              title={row?.name?.eng || row?.name?.kaz || row?.name?.rus}
+              type={"Book Life"}
             />
           ))
         ) : (

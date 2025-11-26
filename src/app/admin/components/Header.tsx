@@ -11,19 +11,22 @@ const Header: React.FC = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const nameParam = searchParams.get("name");
+  const [subCategoryName, setSubCategoryName] = useState("");
   const [categoryName, setCategoryName] = useState("");
   const [collections, setCollections] = useState("")
   const [bookName, setBookName] = useState("");
   const [summary, setSummary] = useState("");
   const [bookLife, setBookLife] = useState("");
   const { data } = useSession();
+
   const userData = (data as any)?.user;
   // Add ref to track the dropdown element
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setCategoryName(localStorage.getItem("subCategoryName") || "");
+      setCategoryName(localStorage.getItem("categoryName") || "");
+      setSubCategoryName(localStorage.getItem("subCategoryName") || "");
       setCollections(localStorage.getItem("collectionName") || "");
       setBookName(localStorage.getItem("getbookName") || "");
       setSummary(localStorage.getItem("summaryName") || "");
@@ -43,13 +46,27 @@ const Header: React.FC = () => {
     if (showData) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-
+    
     // Cleanup event listener
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showData]);
+  useEffect(() => {
+    const updateCategoryName = () => {
+      setCategoryName(localStorage.getItem("categoryName") || "");
+    };
+    
+  // initial load
+  updateCategoryName();
 
+  // listen for updates
+  window.addEventListener("categoryNameUpdated", updateCategoryName);
+
+  return () => {
+    window.removeEventListener("categoryNameUpdated", updateCategoryName);
+  };
+}, [pathname]);
   const pageNames: { [key: string]: string } = {
     "/admin/dashboard": "dashboard",
     "/admin/book-hub": "Book Hub",
@@ -71,6 +88,7 @@ const Header: React.FC = () => {
     "/admin/quotes": "Quotes",
   };
   const getPageName = (path: string): string => {
+
     if (path.startsWith("/admin/add-new")) {
       const typeParam = searchParams.get("type");
       const product = typeParam === "audioebook" ? "audio & E-book" : typeParam;
@@ -80,8 +98,11 @@ const Header: React.FC = () => {
       return typeParam ? `Add New ${capitalizedProduct}` : "Add New Product";
     }
     if (path.startsWith("/admin/categories/") && path.endsWith("/sub-category")) {
-      return "Sub-Categories";
+      return categoryName;
     }
+//     if (isCategoryDetailPage) {
+//   return categoryName;
+// }
     if (path.startsWith("/admin/book-hub/profile/")) {
       return "Single Book";
     }
@@ -107,7 +128,10 @@ const Header: React.FC = () => {
       return "Single Publisher";
     }
     if (path.startsWith("/admin/categories/sub-category/")) {
-      return categoryName;
+      return subCategoryName;
+    }
+    if (path.startsWith("/admin/categories/")) {
+      return subCategoryName;
     }
     if (path.startsWith("/admin/add-new/timestamps")) {
       return "Add Audiobook Chapters";

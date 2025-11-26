@@ -39,7 +39,7 @@ export default async function RootLayout({
   }
 
   const userRole = (session as any)?.user?.role;
-  const restrictedRoles = ['publisher']; 
+  const restrictedRoles = ['publisher','user']; 
   
   //Check if user has restricted role
   if (restrictedRoles.includes(userRole)) {

@@ -1,5 +1,5 @@
 'use client'
-import { addNewCollection, getAllCollection, updateCollectionStatus } from '@/services/admin-services';
+import { addNewCollection, deleteBook, getAllCollection, updateCollectionStatus } from '@/services/admin-services';
 import React, { useState, useTransition } from 'react';
 import useSWR from 'swr';
 import CategoryCard from './CategoryCard';
@@ -15,6 +15,8 @@ import { generateSignedUrlForCollection } from '@/actions';
 import { SelectSvg } from '@/utils/svgicons';
 import Image from 'next/image';
 import { getProfileImageUrl } from '@/utils/getImageUrl';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
+import { DeleteIcon } from '@/utils/svgicons';
 
 type Language = "eng" | "kaz" | "rus";
 interface FormValues {
@@ -37,8 +39,12 @@ const AllCollections = () => {
   const { data, error, isLoading, mutate } = useSWR(`/admin/collections?description=${searchParams}&${query}`, getAllCollection);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedBooks, setSelectedBooks] = useState<string[]>([]);
+  const [title, setTitle] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
   const collections = data?.data?.data
-
+  
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     setQuery(`page=${newPage}&limit=${itemsPerPage}`);
@@ -52,6 +58,11 @@ const AllCollections = () => {
     localStorage.setItem("collectionName", name);
     router.push(`/admin/collection/${id}`);
   }
+  const handleOpenModal = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the card click event from firing
+    setIsModalOpen(true);
+  };
+
 
   const handleSubmit = async (formData: FormValues) => {
     startTransition(async () => {
@@ -100,8 +111,31 @@ const AllCollections = () => {
       }
     });
   };
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+  const handleDelete = () => {
+    setIsDeleting(true);
+    startTransition(async () => {
+      try {
+        const response = await deleteBook(`/admin/collections/${selectedCollectionId}`);
+        if (response.status === 200) {
+          toast.success('Collection deleted successfully');
+          mutate();
+        } else {
+          toast.error('Failed to delete book');
+        }
+      } catch (error) {
+        console.error('Error deleting book:', error);
+        toast.error('An error occurred while deleting the book');
+      } finally {
+        setIsDeleting(false);
+        setIsModalOpen(false);
+      }
+    });
+  };
 
-  const updateCollection = async (id: string) => {
+  const updateCollection = async (id:string) => {
     try {
       // Find the current collection to get its displayOnMobile status
       const currentCollection = collections.find((collection: any) => collection._id === id);
@@ -111,7 +145,7 @@ const AllCollections = () => {
       };
 
       startTransition(async () => {
-        const response = await updateCollectionStatus(`/admin/collections/${id}`, payload);
+        const response = await updateCollectionStatus(`/admin/collections/`, payload);
         if (response.status === 200) {
           toast.success("Status updated successfully");
           mutate(); // Refresh the data
@@ -150,6 +184,15 @@ const AllCollections = () => {
               <SelectSvg color={row?.displayOnMobile === true ? 'var(--tw-bg-orange)' : '#C1C1C1'} />
               Display on the mobile app
             </p>
+            <div className="absolute top-[5px] right-[6px] z-10 ">
+              <button onClick={(e) => {
+                e.stopPropagation();
+                setSelectedCollectionId(row._id);
+                setIsModalOpen(true);
+                setTitle(row?.name?.eng ?? row?.name?.kaz ?? row?.name?.rus )
+              }} className="bg-white border  border-orange rounded-[34px] flex items-center gap-[5px] py-1 text-sm px-3 text-orange ">
+                <DeleteIcon stroke="var(--tw-bg-orange)" />Remove</button>
+            </div>
           </div>
         ))}
       </div>
@@ -170,6 +213,16 @@ const AllCollections = () => {
         title="Add a Collection"
         labelname="Name of Collection"
         disabled={isPending}
+      />
+
+      <DeleteConfirmationModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+        title={"Delete Collection?"}
+        message={`Are you sure you really want to delete "${title}"?`}
+        buttonTitle={"Delete"}
       />
     </div>
   );

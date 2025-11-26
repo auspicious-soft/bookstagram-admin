@@ -75,7 +75,6 @@ const BookForm = () => {
   const isImageChanged = useRef(false);
   const initialFormat = useRef<string>('');
   const bookData = data?.data?.data?.books?.[0];
-  console.log('bookData: ', bookData);
   const upperData = data?.data?.data;
   const bookType = data?.data?.data?.books?.[0]?.type;
   const moduleType = data?.data?.data?.books?.[0]?.module;
@@ -143,7 +142,6 @@ const BookForm = () => {
   const { authors } = UseAuthors(moduleType);
   const { publishers } = UsePublisher();
   const { category } = UseCategory(moduleType);
-  console.log('category: ', category);
   // const { subCategory } = UseSubCategory();
   // const current = bookData?.categoryId,
 
@@ -366,21 +364,16 @@ const BookForm = () => {
 
         if (id && isAudioEbook) {
           const prevFormat = initialFormat.current;
-          console.log('prevFormat: ', prevFormat);
           const currFormat = data.format || '';
-          console.log('currFormat: ', currFormat);
           if (currFormat !== prevFormat) {
             if (currFormat === 'audiobook' && (prevFormat === 'e-book' || prevFormat === 'both')) {
               payload.file = {};
             }
             if (currFormat === 'e-book' && (prevFormat === 'audiobook' || prevFormat === 'both')) {
               const deleteAudioBook = await deleteAudiobookChapters(`/admin/audiobook-chapters/product/${id}`);
-              console.log('deleteAudioBook: ', deleteAudioBook);
             }
           }
         }
-        console.log('payload: ', payload);
-        console.log('payload: ', payload);
 
         let bookId = id as string;
         const isNew = !id;
