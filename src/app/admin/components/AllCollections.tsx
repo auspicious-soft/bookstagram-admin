@@ -143,7 +143,6 @@ const AllCollections = () => {
       const payload = {
         displayOnMobile: !currentCollection?.displayOnMobile
       };
-      console.log('payload: ', payload);
 
       startTransition(async () => {
         const response = await updateCollectionStatus(`/admin/collections/${id}`, payload);
