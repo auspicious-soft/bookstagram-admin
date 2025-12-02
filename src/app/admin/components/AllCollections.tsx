@@ -143,9 +143,10 @@ const AllCollections = () => {
       const payload = {
         displayOnMobile: !currentCollection?.displayOnMobile
       };
+      console.log('payload: ', payload);
 
       startTransition(async () => {
-        const response = await updateCollectionStatus(`/admin/collections/`, payload);
+        const response = await updateCollectionStatus(`/admin/collections/${id}`, payload);
         if (response.status === 200) {
           toast.success("Status updated successfully");
           mutate(); // Refresh the data
@@ -180,7 +181,7 @@ const AllCollections = () => {
 
               {/* <p className='text-darkBlack text-[15px] leading-5 tracking-[-0.24px] mt-[23px] '>{row?.name?.eng || row?.name?.kaz || row?.name?.rus }</p> */}
             </div>
-            <p onClick={() => updateCollection(row?._id)} className="flex gap-2.5 justify-center pt-1 pb-[30px] px-5 items-center text-sm">
+            <p onClick={() => updateCollection(row?._id)} className="flex gap-2.5 justify-center pt-1 pb-[30px] px-5 items-center text-sm cursor-pointer">
               <SelectSvg color={row?.displayOnMobile === true ? 'var(--tw-bg-orange)' : '#C1C1C1'} />
               Display on the mobile app
             </p>
