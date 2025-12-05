@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import avatar from '@/assets/images/avatar.png';
 import { usePathname, useSearchParams } from "next/navigation";
@@ -18,12 +18,31 @@ const HeaderPublisher: React.FC = () => {
   const [bookName, setBookName] = useState("");
   const {data} = useSession();  
   const publisher = (data as any)?.user; 
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       setBookName(localStorage.getItem("getbookName") || "");
     }
   }, [pathname]);
   
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowData(false);
+      }
+    };
+
+    // Add event listener when dropdown is open
+    if (showData) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    
+    // Cleanup event listener
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showData]); 
 
   const pageNames: { [key: string]: string } = {
     "/publisher/dashboard": "Dashboard",
@@ -61,7 +80,7 @@ const HeaderPublisher: React.FC = () => {
             <DropIcon/>
           </div>
           {showData && (
-           <div className=" absolute z-[2] top-[55px] right-0 w-full h-auto bg-white p-5 rounded-lg shadow-[0_4px_4px_0_rgba(0,0,0,0.08)]">
+           <div ref={dropdownRef} className=" absolute z-[2] top-[55px] right-0 w-full h-auto bg-white p-5 rounded-lg shadow-[0_4px_4px_0_rgba(0,0,0,0.08)]">
             <button  onClick={() => signOut({ redirectTo: '/' })} className="text-darkBlack w-full hover:underline text-left ">Log Out</button>
           </div>
           )}

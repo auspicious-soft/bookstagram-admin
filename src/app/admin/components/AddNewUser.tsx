@@ -65,6 +65,7 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
 
   const methods = useForm<FormValues>({
     resolver: yupResolver(validationSchema) as any,
+    mode: "onChange",
     defaultValues: {
       translations: [{ id: "1", language: "eng", name: "" }],
       fullName: { eng: "" },
@@ -82,7 +83,7 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
     register,
     setValue,
     getValues,
-    formState: { errors },
+    formState: { errors, isValid },
     reset,
   } = methods;
 
@@ -157,6 +158,7 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
           ...otherFields,
           fullName: fullNameObject,
           profilePic: profilePicKey,
+          emailVerified:true
         };
 
         const response = await addNewUser("/admin/users", payload);
@@ -273,7 +275,7 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
                             <p className="mb-1 text-sm text-darkBlack">Name</p>
                             <div className="flex items-center gap-[5px] w-full">
                               <label className="!flex bg-[#F5F5F5] rounded-[10px] w-full">
-                                <select {...register(`translations.${index}.language`, {} )}
+                                <select {...register(`translations.${index}.language`, {})}
                                   className="!mt-0 max-w-[80px] !bg-[#D9D9D9] "
                                 >
                                   <option value="eng">Eng</option>
@@ -301,7 +303,8 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
                               </label>
                               {index === 0 ? (
                                 <button type="button"
-                                  onClick={() => {const unusedLanguage = ["eng","kaz","rus",].find((lang) =>!usedLanguages.has(lang as Language));
+                                  onClick={() => {
+                                    const unusedLanguage = ["eng", "kaz", "rus",].find((lang) => !usedLanguages.has(lang as Language));
                                     if (unusedLanguage) {
                                       append({
                                         id: String(fields.length + 1),
@@ -437,13 +440,20 @@ const AddNewUser: React.FC<ModalProp> = ({ open, onClose, mutate }) => {
                           </label>
                         </div>
                         <div>
+                          
                           <button
                             type="submit"
                             disabled={isPending}
-                            className="bg-orange text-white text-sm px-4 mt-5 py-[14px] text-center rounded-[28px] w-full"
+                            className={`text-sm px-4 mt-5 py-[14px] text-center rounded-[28px] w-full
+                        ${isPending
+                                ? "bg-gray-300 cursor-not-allowed text-gray-600"
+                                : "bg-orange text-white"
+                              }
+                         `}
                           >
-                            Add Details
+                            {isPending ? "Adding..." : "Add Details"}
                           </button>
+
                         </div>
                       </div>
                     </form>

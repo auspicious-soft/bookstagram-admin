@@ -182,7 +182,7 @@ const CustomSelect: React.FC<CustomSelectProps<OptionType>> = ({
     control: (styles) => ({
       ...styles,
       backgroundColor: "#F5F5F5",
-      height: "50px",
+      height: "auto",
       border: "none",
       boxShadow: "none",
       padding: "0 10px",

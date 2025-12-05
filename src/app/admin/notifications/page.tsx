@@ -40,7 +40,7 @@ const Page = () => {
     }
   });
 
-  const { control, handleSubmit, register } = methods;
+  const { control, handleSubmit, register, watch } = methods;
 
   const {
     fields: titleFields,
@@ -63,7 +63,21 @@ const Page = () => {
   const handleSelectChange = (selected: any) => {
     setSelectedOptions(selected);
   };
+const watchedTitles = watch("titleTranslations");
+const watchedDescriptions = watch("descriptionTranslations");
 
+const hasTitleContent = watchedTitles?.some(
+  (t) => t.content?.trim()
+);
+
+const hasDescriptionContent = watchedDescriptions?.some(
+  (d) => d.content?.trim()
+);
+
+// ✅ Disable unless BOTH are filled
+const isSendDisabled = !(hasTitleContent && hasDescriptionContent);
+
+  // Disable when BOTH are empty
   const onSubmit = async (data: FormValues) => {
     if (sendToSpecific && selectedOptions.length === 0) {
       return toast.warning('Please select at least one user');
@@ -84,7 +98,7 @@ const Page = () => {
     }, {} as Record<Language, string | null>);
 
     const payload = {
-      type:"admin",
+      type: "admin",
       title: titleTransforms,
       description: descriptionTransforms,
       ...(sendToSpecific && { userIds: selectedOptions.map((selected: any) => selected?.value) })
@@ -100,7 +114,7 @@ const Page = () => {
           toast.success(response.data.message);
           methods.reset();
           setSelectedOptions([]);
-           window.location.reload();
+          window.location.reload();
         } else {
           toast.error('Failed to send notification');
         }
@@ -270,8 +284,13 @@ const Page = () => {
           <div className='flex justify-end mt-10'>
             <button
               type='submit'
-              disabled={isPending}
-              className="bg-orange text-white text-sm px-4 py-[14px] text-center rounded-[28px] w-full"
+              disabled={isPending || isSendDisabled}
+              className={`text-sm px-4 py-[14px] text-center rounded-[28px] w-full
+    ${isPending || isSendDisabled
+                  ? "bg-gray-300 cursor-not-allowed text-gray-600"
+                  : "bg-orange text-white"
+                }
+  `}
             >
               {!isPending ? 'Send' : 'Sending...'}
             </button>
