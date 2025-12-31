@@ -117,7 +117,7 @@ const MobileHeader = () => {
                 <UsersIcon />
                 <span>Users</span>
               </Link>
-              
+
             </li>
             {userData.role === "admin" &&
 
@@ -148,6 +148,7 @@ const MobileHeader = () => {
                 Log Out
                 {/* </span> */}
               </button>
+
             </li>
           </ul>
         </div>
@@ -155,5 +156,4 @@ const MobileHeader = () => {
     </>
   );
 };
-
 export default MobileHeader;
