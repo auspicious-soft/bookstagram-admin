@@ -132,7 +132,7 @@ const MobileHeader = () => {
             <li className={`${isActive('/admin/quotes')} ${pathname.startsWith('/admin/quotes') ? 'active' : ''}`}>
               <Link href="/admin/quotes">
                 <BookLifeIcon />
-                {!isCollapsed && <span>Quotes</span>}
+                <span>Quotes</span>
               </Link>
             </li>
 
