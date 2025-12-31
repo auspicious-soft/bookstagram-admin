@@ -9,12 +9,7 @@ import Image from "next/image";
 // import { signOut } from "next-auth/react";
 import {  useSession } from "next-auth/react";
 const SideNav = () => {
-  // const router = useRouter();
-
-  // const handleLogout = () => {
-  //   localStorage.removeItem('authToken');
-  //   router.push('https://blacktherapy.vercel.app/');
-  // };
+ 
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { data } = useSession();

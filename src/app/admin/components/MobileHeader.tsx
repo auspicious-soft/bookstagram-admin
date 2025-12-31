@@ -1,15 +1,15 @@
 "use client";
 import { useState } from "react";
-import { usePathname } from 'next/navigation'; 
+import { usePathname } from 'next/navigation';
 import Link from "next/link";
 import { AuthorsIcon, BookEventsIcon, BookHubIcon, BookLifeIcon, CategoryIcon, CollectionIcon, DashboardIcon, DiscountIcon, HamburgerIcon, NotificationsIcon, PromotionsIcon, PublishersIcon, StoriesIcon, SummaryIcon, UsersIcon } from "@/utils/svgicons";
 import Image from "next/image";
 import logo from '@/assets/images/logo.png';
-import { signOut, useSession} from "next-auth/react";
-  
+import { signOut, useSession } from "next-auth/react";
+
 
 const MobileHeader = () => {
-  const pathname = usePathname(); 
+  const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { data } = useSession();
   const userData = (data as any)?.user;
@@ -24,16 +24,16 @@ const MobileHeader = () => {
     setIsCollapsed(false);
   };
 
-  return ( 
+  return (
     <>
       <div className="header flex justify-between gap-[10px] py-3 p-5 bg-darkBlack">
         <div className="logoContainer">
           <Link href="/admin/dashboard" onClick={() => handleLinkClick("/")}>
-           <Image src={logo} alt="logo" width={150} height={30} />
+            <Image src={logo} alt="logo" width={150} height={30} />
           </Link>
         </div>
         <button onClick={toggleSidebar} className="hamburgerButton">
-       <HamburgerIcon/>
+          <HamburgerIcon />
         </button>
       </div>
 
@@ -118,15 +118,22 @@ const MobileHeader = () => {
                 <span>Users</span>
               </Link>
             </li>
-            {userData.role ==="admin" && 
+            {userData.role === "admin" &&
 
-            <li className={isActive('/admin/notifications')}>
-              <Link href="/admin/notifications" onClick={() => handleLinkClick("/admin/notifications")}>
-                <NotificationsIcon />
-                <span>Notifications</span>
+              <li className={isActive('/admin/notifications')}>
+                <Link href="/admin/notifications" onClick={() => handleLinkClick("/admin/notifications")}>
+                  <NotificationsIcon />
+                  <span>Notifications</span>
+                </Link>
+              </li>
+
+            }
+            <li className={`${isActive('/admin/quotes')} ${pathname.startsWith('/admin/quotes') ? 'active' : ''}`}>
+              <Link href="/admin/quotes">
+                <BookLifeIcon />
+                {!isCollapsed && <span>Quotes</span>}
               </Link>
             </li>
-            }
 
           </ul>
         </div>
@@ -134,12 +141,12 @@ const MobileHeader = () => {
         <div className="">
           <ul className="navList">
             <li className="!m-0">
-            <button onClick={() => signOut({ redirectTo: '/' })}
-              className="w-full bg-orange text-white py-2 px-4 rounded-[28px] text-sm">
-               {/* <span className="text-[#283C63] text-[600]"> */}
+              <button onClick={() => signOut({ redirectTo: '/' })}
+                className="w-full bg-orange text-white py-2 px-4 rounded-[28px] text-sm">
+                {/* <span className="text-[#283C63] text-[600]"> */}
                 Log Out
                 {/* </span> */}
-            </button>
+              </button>
             </li>
           </ul>
         </div>
